@@ -22,30 +22,35 @@ class DataParser(object):
                 print subfile + " is a folder, diving in..."
                 DataParser.process_folder(folder_path + "/" + subfile)
 
-    def process_csvs(self, folder_path, year = None):
-        files = os.listdir(folder_path)
+    # def process_csvs(self, folder_path, year, fetchNum = 0):
+    #     files = os.listdir(folder_path)
+    #
+    #     for file_name in files:
+    #         if file_name.endswith(str(year) + ".csv"):
+    #             self.parse_worker_factory_ano(folder_path + "/" + file_name, fetchNum)
 
-        valid_files_ending = ".csv"
-        if year is not None:
-            valid_files_ending = str(year) + ".csv"
+    def parse_worker_factory_ano(self, file_path, fetchNum = 0):
 
-        for file_name in files:
-            if file_name.endswith(valid_files_ending):
-                self.parse_worker_factory_ano(folder_path + "/" + file_name)
-
-    def parse_worker_factory_ano(self, file_path):
-        reader = csv.reader(open(file_path))
-
+        f = open(file_path)
+        reader = csv.reader(f)
         header = reader.next()
         pis_column = header.index("PIS")
-        ano_column = header.index("ANO")
+        year_column = header.index("ANO")
         plant_column = header.index("IDENTIFICAD")  #TODO: make sure this is the plan id.
 
+        linesRead = 0
         for line in reader:
             pis = line[pis_column]
-            ano = line[ano_column]
+            year = line[year_column]
             plant = line[plant_column]
-            self.plant_from_id[pis + "_" + ano] = plant
+            yield [pis, year, plant]
+
+            linesRead += 1
+            if 0 < fetchNum <= linesRead:
+                break
+
+        # remember to clsoe the file :)
+        f.close()
 
     @staticmethod
     def read_txt(file_path, fetch_num = 0):
@@ -65,7 +70,3 @@ class DataParser(object):
             if 0 < fetch_num <= lines_read:
                 break
 
-parser = DataParser()
-parser.process_csvs("../data/rais/base-ano", 2005)
-d = parser.get_dictionary()
-print d
