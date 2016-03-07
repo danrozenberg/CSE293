@@ -10,7 +10,7 @@ def association_graph():
 
     # read data from the following:
     parser = DataParser()
-    for line in parser.parse_worker_factory_ano("../data/rais/base-ano/ano2005.csv", 10):
+    for line in parser.parse_worker_factory_ano("../data/rais/base-ano/ano2005.csv", 100):
         pis = line[0]
         plant = line[2]
         g.add_node(pis)

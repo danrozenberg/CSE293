@@ -22,13 +22,6 @@ class DataParser(object):
                 print subfile + " is a folder, diving in..."
                 DataParser.process_folder(folder_path + "/" + subfile)
 
-    # def process_csvs(self, folder_path, year, fetchNum = 0):
-    #     files = os.listdir(folder_path)
-    #
-    #     for file_name in files:
-    #         if file_name.endswith(str(year) + ".csv"):
-    #             self.parse_worker_factory_ano(folder_path + "/" + file_name, fetchNum)
-
     def parse_worker_factory_ano(self, file_path, fetchNum = 0):
 
         f = open(file_path)
