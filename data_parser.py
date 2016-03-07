@@ -22,6 +22,8 @@ class DataParser(object):
                 print subfile + " is a folder, diving in..."
                 DataParser.process_folder(folder_path + "/" + subfile)
 
+
+
     def parse_worker_factory_ano(self, file_path, fetchNum = 0):
 
         f = open(file_path)
