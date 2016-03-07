@@ -44,22 +44,3 @@ class DataParser(object):
 
         # remember to clsoe the file :)
         f.close()
-
-    @staticmethod
-    def read_txt(file_path, fetch_num = 0):
-        """
-        This is a simple generator. If it receives fetchNum = 0 then it reads the whole file.
-        It reads the fetchNum lines otherwise.
-
-        :param file_path: the path of the file to open
-        :param fetch_num: how many lines to fetch
-        :return: the read line.
-        """
-        lines_read = 0
-        for line in open(file_path):
-            yield line
-            lines_read += 1
-
-            if 0 < fetch_num <= lines_read:
-                break
-
