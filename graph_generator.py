@@ -2,6 +2,22 @@ import networkx as nx
 import itertools
 from data_parser import DataParser
 
+class GraphGenerator(object):
+    """ Abstract class | This is here to implement the strategy pattern that
+    returns a usable graph.
+    """
+
+    def get_graph(self):
+        raise NotImplementedError("Method cannot be called from abstract base class.")
+
+
+class RandomGraphGenerator(GraphGenerator):
+    """ Generates a random graph."""
+
+    def get_graph(self):
+        return nx.fast_gnp_random_graph(100, 0.05)
+
+
 def association_graph():
     details = ["PIS",
                "Plant"]
@@ -50,7 +66,6 @@ def connect_workers_in_same_plant(graph_list, delta_years = 0):
                 graph.add_edges_from(new_edge_list)
 
     #TODO: make sure it connects people from the past data too.
-
 
 def main():
     graph_list = association_graph()
