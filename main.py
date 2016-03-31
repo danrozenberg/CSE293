@@ -1,18 +1,29 @@
+import logging
 from graph_generator import *
 from graph_analyser import *
 
 def main():
-    print "Will start now"
 
-    print "Generating graph..."
-    generator = RandomGraphGenerator()
+    # TODO: config log somewhere else...
+    logging.basicConfig(format='%(asctime)s %(message)s',
+                        datefmt='%d %b - %H:%M:%S -',
+                        level=logging.DEBUG)
+
+    logging.info("Will start now")
+
+    logging.info("Generating graph...")
+    generator = SnapRandomGraphGenerator()
     graph = generator.get_graph()
-    print "Graph generated..."
+    logging.info("Graph generated...")
 
 
-    print "Starting analysis..."
-    analyser = GraphAnalyser(graph)
-    analyser.draw()
+    # logging.info("Starting analysis...")
+    # analyser = GraphAnalyser(graph)
+    # analyser.draw()
+
+
+
+    logging.info("Done!")
 
 if __name__ == "__main__":
     main()
