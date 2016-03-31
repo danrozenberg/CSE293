@@ -1,4 +1,4 @@
-import networkx as nx
+import snap
 import itertools
 from data_parser import DataParser
 
@@ -11,11 +11,23 @@ class GraphGenerator(object):
         raise NotImplementedError("Method cannot be called from abstract base class.")
 
 
-class RandomGraphGenerator(GraphGenerator):
-    """ Generates a random graph."""
+class NxRandomGraphGenerator(GraphGenerator):
+    def __init__(self):
+        import networkx as nx
+        self.nx = nx
+
 
     def get_graph(self):
-        return nx.fast_gnp_random_graph(100, 0.05)
+        return self.nx.gaussian_random_partition_graph(100000, 50, 10, .25, .1)
+
+class SnapRandomGraphGenerator(GraphGenerator):
+
+    def get_graph(self):
+        FOut = snap.TFOut("test.graph")
+        asd = snap.GenRndDegK(100, 12)
+        asd.Save(FOut)
+        FOut.Flush()
+        return asd
 
 
 def association_graph():
