@@ -1,6 +1,7 @@
 import os
 import csv
 import config_manager
+from  itertools import islice
 
 #TODO: call this data manager?
 class DataParser(object):
@@ -26,6 +27,7 @@ class DataParser(object):
                 DataParser.process_folder(folder_path + "/" + subfile)
 
 
+    #TODO: replace with itertools
     def file_name_generator(self, folder_path, fetch_num = 0):
         """
         A generator...
@@ -40,13 +42,42 @@ class DataParser(object):
         """
         found_files = os.listdir(folder_path)
 
-        lines_read = 0
+        names_read = 0
+
+        #TODO: rename subfile variable
         for subfile in found_files:
             if os.path.isfile(folder_path + "/" +  subfile):
                 yield subfile
-                lines_read += 1
-                if 0 < fetch_num <= lines_read:
+                names_read += 1
+                if 0 < fetch_num <= names_read:
                     break
+
+    #TODO: replace with itertools
+    def file_line_reader(self, file_path, fetch_num = None):
+
+        #TODO: fetch more than 1 line at once on islice call.
+
+        # also accepts 0 as being "all the file"
+        if fetch_num == 0:
+            fetch_num = None
+
+        f = open(file_path)
+        #TODO: check if the file really is a csv.
+        reader = csv.reader(f)
+        _ = reader.next()  # throws header away
+        iterator = islice(reader, 0, 1)
+
+        lines_read = 0
+        while True:
+            yield iterator.next()
+            lines_read += 1
+            iterator = islice(reader, 0, 1)
+            if 0 < fetch_num <= lines_read:
+                break
+
+        # remember to clsoe the file :)
+        f.close()
+
 
     def parse_worker_factory_ano(self, file_path, fetchNum = 0):
 
