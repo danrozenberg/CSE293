@@ -57,6 +57,22 @@ class TestDataParser(unittest.TestCase):
             answer.add(file_name)
         self.assertEquals(len(answer), 4)
 
+    # should retrieve lines from files on demand.
+    def test_line_generator(self):
+        parser = DataParser()
+        target_folder = self.config.data_path + "base-ano/"
+
+        lines = []
+
+        lines_to_fetch = 10
+        for file_name in parser.file_name_generator(target_folder, 1):
+            for line in parser.file_line_reader(target_folder + file_name, lines_to_fetch):
+                lines.append(line)
+
+        self.assertEquals(len(lines), lines_to_fetch)
+
+
+
 
 
 
