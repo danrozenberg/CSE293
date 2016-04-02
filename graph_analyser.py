@@ -8,6 +8,7 @@ class GraphAnalyser(object):
         self.graph = graph
 
     def draw(self):
+        pass    
         # network = snap.GenRndGnm(snap.PNEANet, 10, 50)
         #
         # labels = snap.TIntStrH()
