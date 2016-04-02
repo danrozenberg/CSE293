@@ -1,1 +1,2 @@
-data_path=../../data/rais/
+data_path=../../data/rais/base_pis12/
+image_output_path=../../output_images/

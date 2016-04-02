@@ -71,10 +71,5 @@ class TestDataParser(unittest.TestCase):
 
         self.assertEquals(len(lines), lines_to_fetch)
 
-
-
-
-
-
 if __name__ == "__main__":
     unittest.main()
