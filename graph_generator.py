@@ -1,20 +1,31 @@
 import snap
 
-class GraphGenerator(object):
+class AbstractGraphGenerator(object):
+
     """ Abstract class | This is here to implement the strategy pattern that
     returns a usable graph.
     """
 
-    def get_graph(self):
+    def random_graph(self):
+        """
+        :return: some random graph, mostly for testing purposes
+        """
+        raise NotImplementedError("Method cannot be called from abstract base class.")
+
+    def add_node(self):
+        raise NotImplementedError("Method cannot be called from abstract base class.")
+
+    def add_edge(self, node1, node2, information = None):
         raise NotImplementedError("Method cannot be called from abstract base class.")
 
 
-class SnapRandomGraphGenerator(GraphGenerator):
+class SnapRandomGraphGenerator(AbstractGraphGenerator):
 
-    def get_graph(self):
+    def random_graph(self):
+        # TODO: make it not save the random graph.
         FOut = snap.TFOut("test.graph")
-        asd = snap.GenRndDegK(100, 12)
-        asd.Save(FOut)
+        rand_graph = snap.GenRndDegK(100, 12)
+        rand_graph.Save(FOut)
         FOut.Flush()
-        return asd
+        return rand_graph
 
