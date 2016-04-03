@@ -79,25 +79,4 @@ class DataParser(object):
         f.close()
 
 
-    def parse_worker_factory_ano(self, file_path, fetchNum = 0):
 
-        f = open(file_path)
-        reader = csv.reader(f)
-        header = reader.next()
-        pis_column = header.index("PIS")
-        year_column = header.index("ANO")
-        plant_column = header.index("IDENTIFICAD")  #TODO: make sure this is the plan id.
-
-        linesRead = 0
-        for line in reader:
-            pis = line[pis_column]
-            year = line[year_column]
-            plant = line[plant_column]
-            yield [pis, year, plant]
-
-            linesRead += 1
-            if 0 < fetchNum <= linesRead:
-                break
-
-        # remember to clsoe the file :)
-        f.close()
