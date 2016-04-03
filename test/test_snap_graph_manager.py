@@ -15,7 +15,7 @@ class TestDataParser(unittest.TestCase):
     def test_drawing(self):
 
         output_file_path = self.config.get_image_output_path() + \
-                           "test_file.png"
+                           "my_test_file.png"
 
         # delete file first..
         if os.path.isfile(output_file_path):
@@ -27,7 +27,11 @@ class TestDataParser(unittest.TestCase):
             labels[node.GetId()] = str(node.GetId())
         snap.DrawGViz(network, snap.gvlDot, output_file_path, "MyNetwork ",labels)
 
+        # test if file creation was successful
         self.assertTrue(os.path.isfile(output_file_path))
+
+        # don't leave file hanging around
+        os.remove(output_file_path)
 
 if __name__ == "__main__":
     unittest.main()
