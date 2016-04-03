@@ -1,15 +1,11 @@
 import os
 import csv
-import config_manager
 from  itertools import islice
 
 #TODO: call this data manager?
 class DataParser(object):
 
     def __init__(self):
-        config = config_manager.Config()
-
-        self.data_folder_path = config.data_path
         self.plant_from_id = {}
 
     @staticmethod
@@ -50,7 +46,8 @@ class DataParser(object):
                 if 0 < fetch_num <= names_read:
                     break
 
-    def get_lines(self, file_path, fetch_num = None):
+    @staticmethod
+    def get_lines(file_path, fetch_num = None):
         #TODO: fetch more than 1 line at once on islice call.
 
         # also accepts 0 as being "all the file"
