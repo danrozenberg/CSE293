@@ -2,7 +2,9 @@
 class Config(object):
 
     def __init__(self):
-        self.config_folder_path = "./config/"
+        #TODO: change magic constant...maybe...
+        self.config_file_path = "../config"
+
         self.data_path = None
         self.image_output_path = None
         self.__setup_environment()
@@ -14,12 +16,12 @@ class Config(object):
         return self.image_output_path
 
     def __setup_environment(self):
-        f = open(self.config_folder_path + "environment.txt")
+        f = open(self.config_file_path + "/environment.txt")
         for line in f:
             split_line = line.split("=")
             if split_line[0] == "data_path":
-                self.data_path = split_line[1]
+                self.data_path =  split_line[1].rstrip()
             if split_line[0] == "image_output_path":
-                self.image_output_path = split_line[1]
+                self.image_output_path = split_line[1].rstrip()
 
 
