@@ -22,7 +22,7 @@ class DataParser(object):
     #TODO: replace with itertools
 
     @staticmethod
-    def get_file_names(folder_path, fetch_num = 0):
+    def file_paths(folder_path, fetch_num = 0, file_type="csv"):
         """
         A generator...
         Given a folder, returns names of files inside it.
@@ -35,19 +35,19 @@ class DataParser(object):
         :return: the names of the files inside folder.
         """
         found_files = os.listdir(folder_path)
-
-        names_read = 0
+        paths_read = 0
 
         #TODO: rename subfile variable
         for subfile in found_files:
             if os.path.isfile(folder_path + "/" +  subfile):
-                yield subfile
-                names_read += 1
-                if 0 < fetch_num <= names_read:
-                    break
+                if subfile.endswith(file_type):
+                    yield folder_path + subfile
+                    paths_read += 1
+                    if 0 < fetch_num <= paths_read:
+                        break
 
     @staticmethod
-    def get_lines(file_path, fetch_num = None):
+    def lines(file_path, fetch_num = None):
         #TODO: fetch more than 1 line at once on islice call.
 
         # also accepts 0 as being "all the file"
