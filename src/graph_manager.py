@@ -19,7 +19,13 @@ class AbstractGraphGenerator(object):
         raise NotImplementedError("Method cannot be called from abstract base class.")
 
 
-class SnapRandomGraphGenerator(AbstractGraphGenerator):
+class SnapGenerator(AbstractGraphGenerator):
+
+    def add_node(self):
+        pass
+
+    def add_edge(self, node1, node2, information=None):
+        pass
 
     def random_graph(self):
         # TODO: make it not save the random graph.
