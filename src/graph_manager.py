@@ -1,6 +1,6 @@
 import snap
 
-class AbstractGraphGenerator(object):
+class AbstractGraphManager(object):
 
     """ Abstract class | This is here to implement the strategy pattern that
     returns a usable graph.
@@ -19,7 +19,7 @@ class AbstractGraphGenerator(object):
         raise NotImplementedError("Method cannot be called from abstract base class.")
 
 
-class SnapGenerator(AbstractGraphGenerator):
+class SnapManager(AbstractGraphManager):
 
     def add_node(self):
         pass
