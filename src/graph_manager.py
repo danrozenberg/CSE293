@@ -36,26 +36,27 @@ class SnapManager(object):
     def add_edge(self, src_node, dest_node, EId=-1):
 
         if EId <> -1 and self.network.IsEdge(EId):
-            logging.warning("Could add edge with EId = "
+            logging.warning("Couldn't add edge with EId = "
                             + str(EId) + " because it already exist")
-
-        if self.network.IsNode(src_node):
-            logging.warning("Could add edge from node "
-                            + str(src_node) + " because it doesn't exist")
             return
 
-        if self.network.IsNode(dest_node):
-            logging.warning("Could add edge to node "
-                            + str(dest_node) + " because it doesn't exist")
+        if not self.is_node(src_node):
+            logging.warning("Couldn't add edge from node "
+                            + str(src_node) + " because such node doesn't exist")
             return
 
-        return self.network.AddEdge(src_node, dest_node)
+        if not self.is_node(dest_node):
+            logging.warning("Couldn't add edge to node "
+                            + str(dest_node) + " because such node doesn't exist")
+            return
+
+        self.network.AddEdge(src_node, dest_node, EId)
 
     def get_edges(self):
         return self.network.GetEdges()
 
     def get_edge(self, EId):
-        return self.network.getEI(EId)
+        return self.network.GetEI(EId)
 
     def get_nodes(self):
         return self.network.GetNodes()
@@ -84,7 +85,7 @@ class SnapManager(object):
         if isinstance(value, int):
             self.network.AddIntAttrDatE(edge, value, name)
         elif isinstance(value, float):
-            self.network.AddIntAttrDatE(edge, value, name)
+            self.network.AddFltAttrDatE(edge, value, name)
         elif isinstance(value, str):
             self.network.AddStrAttrDatE(edge, value, name)
         else:
@@ -102,14 +103,33 @@ class SnapManager(object):
         self.network.AttrValueNI(NId, values)
 
         for value in values:
+            # Due to a SNAP bug we are forced to convert attributes
+            #   back to their original type ourselves ;(
             converted_values.append(self.__convert(value))
 
         return dict(zip(names, converted_values))
 
+    def get_edge_attributes(self, EId):
+        """
+        :param EId: the edge to retrieve attributes from
+        :return: a dictionary with 'attr name' - 'attr value' pairs
+        """
+        names = snap.TStrV()
+        values = snap.TStrV()
+        converted_values = []
+        self.network.AttrNameEI(EId, names)
+        self.network.AttrValueEI(EId, values)
 
+        for value in values:
+            # Due to a SNAP bug we are forced to convert attributes
+            #   back to their original type ourselves ;(
+            converted_values.append(self.__convert(value))
 
-    # Due to a SNAP bug we are forced to convert attributes
-    #   back to their original type ourselves ;(
+        return dict(zip(names, converted_values))
+
+    def is_node(self, NId):
+        return self.network.IsNode(NId)
+
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
         try:
