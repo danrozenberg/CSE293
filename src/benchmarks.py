@@ -1,5 +1,5 @@
 import logging
-from data_parser import DataParser
+import data_parser
 from config_manager import Config
 
 def simple_reading():
@@ -16,10 +16,10 @@ def simple_reading():
 
     logging.info("Start simple reading now")
 
-    for file_path in DataParser.file_paths(config.data_path, 0):
+    for file_path in data_parser.file_paths(config.data_path, 0):
         files_read += 1
-        for line in DataParser.lines(file_path, 100):
-            DataParser.parse_line(line)
+        for line in data_parser.lines(file_path, 0):
+            data_parser.parse_line(line)
             lines_read += 1
 
     logging.info("Finished")
