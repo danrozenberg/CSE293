@@ -72,12 +72,11 @@ class SnapManager(object):
         if isinstance(value, int):
             self.network.AddIntAttrDatN(node, value, name)
         elif isinstance(value, float):
-            self.network.AddIntAttrDatN(node, value, name)
+            self.network.AddFltAttrDatN(node, value, name)
         elif isinstance(value, str):
             self.network.AddStrAttrDatN(node, value, name)
         else:
             raise Exception('Invalid data type')
-
 
     def add_edge_attribute(self, EId, name, value):
 
@@ -90,6 +89,34 @@ class SnapManager(object):
             self.network.AddStrAttrDatE(edge, value, name)
         else:
             raise Exception('Invalid data type')
+
+    def get_node_attributes(self, NId):
+        """
+        :param NId: the node to retrieve attributes from
+        :return: a dictionary with 'attr name' - 'attr value' pairs
+        """
+        names = snap.TStrV()
+        values = snap.TStrV()
+        converted_values = []
+        self.network.AttrNameNI(NId, names)
+        self.network.AttrValueNI(NId, values)
+
+        for value in values:
+            converted_values.append(self.__convert(value))
+
+        return dict(zip(names, converted_values))
+
+
+
+    # Due to a SNAP bug we are forced to convert attributes
+    #   back to their original type ourselves ;(
+    # noinspection PyMethodMayBeStatic
+    def __convert(self, value):
+        try:
+            return float(value) if '.' in value else int(value)
+        except ValueError:
+            return value
+
 
 
 
