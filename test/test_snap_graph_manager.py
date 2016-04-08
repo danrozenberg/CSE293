@@ -1,37 +1,77 @@
-import os
-import unittest
 import sys
-import snap
-import config_manager
-sys.path.append('..')
+import unittest
+sys.path.append('../src')
+import graph_manager
 
-class TestDataParser(unittest.TestCase):
+
+class TestSnapManager(unittest.TestCase):
 
     def setUp(self):
-        self.config = config_manager.Config()
+        self.manager = graph_manager.SnapManager()
 
-    # should save a picture in the output folder
-    # this test is useful to check if snap and graphviz are installed correctly.
-    def test_drawing(self):
+    # should initialize allright
+    def test_init(self):
+        manager = graph_manager.SnapManager()
+        self.assertIsNotNone(manager.network)
 
-        output_file_path = self.config.get_image_output_path() + \
-                           "my_test_file.png"
+    # should add node
+    def test_add_node(self):
+        manager = self.manager
 
-        # delete file first..
-        if os.path.isfile(output_file_path):
-            os.remove(output_file_path)
+        # no nodes
+        self.assertEquals(0, self.manager.node_count())
 
-        network = snap.GenRndGnm(snap.PNEANet, 10, 50)
-        labels = snap.TIntStrH()
-        for node in network.Nodes():
-            labels[node.GetId()] = str(node.GetId())
-        snap.DrawGViz(network, snap.gvlDot, output_file_path, "MyNetwork ",labels)
+        # got nodes
+        manager.add_node(-55)
+        self.assertEquals(1, self.manager.node_count())
 
-        # test if file creation was successful
-        self.assertTrue(os.path.isfile(output_file_path))
+        manager.add_node()
+        self.assertEquals(2, self.manager.node_count())
 
-        # don't leave file hanging around
-        os.remove(output_file_path)
+        manager.add_node(33)
+        self.assertEquals(3, self.manager.node_count())
+
+        # don't freak out with adding same node
+        manager.add_node(33)
+        self.assertEquals(3, self.manager.node_count())
+
+    # should delete nodes
+    def test_delete_nod(self):
+        manager = self.manager
+
+        manager.add_node(11)
+        self.assertEquals(1, self.manager.node_count())
+
+        manager.delete_node(11)
+        self.assertEquals(0, self.manager.node_count())
+
+        # don't freak out!
+        manager.delete_node(11)
+        self.assertEquals(0, self.manager.node_count())
+
+    # should add and retrieve attribute to a node
+    def test_add_node_attribute(self):
+        manager = self.manager
+
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node_attribute(1, "one_attr", 13.5)
+        manager.add_node_attribute(2, "another_attr", 5)
+        manager.add_node_attribute(1, "a_third_one", "asd")
+
+        # First node:
+        d = manager.get_node_attributes(1)
+        self.assertEquals(13.5, d["one_attr"])
+        self.assertEquals("asd", d["a_third_one"])
+
+        # Second node:
+        d = manager.get_node_attributes(2)
+        self.assertEquals(5, d["another_attr"])
+
+        # third, empty node
+        d = manager.get_node_attributes(3)
+        self.assertEquals(len(d.keys()), 0)
 
 if __name__ == "__main__":
     unittest.main()
