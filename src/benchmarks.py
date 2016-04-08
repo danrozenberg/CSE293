@@ -22,11 +22,12 @@ def simple_reading():
         for line in data_parser.lines(file_path, 0):
             data_parser.parse_line(line)
             lines_read += 1
-        logging.info("Finished a file: " + file_path)
 
     logging.info("Finished")
     logging.info("Read " + str(files_read) + " files")
     logging.info("Read " + str(lines_read) + " lines")
+
+
 
 
 if __name__ == "__main__":
