@@ -18,9 +18,11 @@ def simple_reading():
 
     for file_path in data_parser.file_paths(config.data_path, 0):
         files_read += 1
+        logging.info("Started a file: " + file_path)
         for line in data_parser.lines(file_path, 0):
             data_parser.parse_line(line)
             lines_read += 1
+        logging.info("Finished a file: " + file_path)
 
     logging.info("Finished")
     logging.info("Read " + str(files_read) + " files")
