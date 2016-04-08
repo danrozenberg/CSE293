@@ -50,7 +50,7 @@ class SnapManager(object):
                             + str(dest_node) + " because such node doesn't exist")
             return
 
-        self.network.AddEdge(src_node, dest_node, EId)
+        return self.network.AddEdge(src_node, dest_node, EId)
 
     def get_edges(self):
         return self.network.GetEdges()
