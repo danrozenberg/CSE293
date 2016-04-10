@@ -1,6 +1,8 @@
 import logging
 import data_parser
 from config_manager import Config
+from graph_manager import SnapManager
+import random
 
 from joblib import Parallel, delayed
 import multiprocessing
@@ -49,10 +51,38 @@ def parallel_reading(file_path, parser):
         read_lines += 1
     return read_lines
 
-def parallel_node_insertion():
+def start_parallel_node_insertion():
+    graph_manager = SnapManager()
+    num_cores = multiprocessing.cpu_count()
+
+    logging.info("Start parallel node addition now")
+
+    node_ids = []
+    for i in range(1, 2000):
+        node_ids.append([random.randint(1,9999999) for _ in range(1,100)])
+    unique_ids = set([item for sublist in node_ids for item in sublist])
+
+    Parallel(n_jobs=num_cores, backend='threading') \
+        (delayed(parallel_node_insertion) \
+             (n, graph_manager) for n in node_ids)
+    logging.info("Finished adding nodes, let's verify...")
+
+    found_all = True
+    for x in unique_ids:
+        if not graph_manager.is_node(x):
+            found_all = False
+            logging.info("ERROR: Couldn't find node with id " + str(x))
+    if found_all:
+        logging.info("Found all node ids!")
+        logging.info("Added " + str(graph_manager.node_count()) + " nodes.")
+
+
+
+def parallel_node_insertion(id_list, graph_manager):
     # Checks if adding nodes is thread safe.
-    pass
+    for ID in id_list:
+        graph_manager.add_node(ID)
 
 if __name__ == "__main__":
     configure_log()
-    start_parallel_reading()
+    start_parallel_node_insertion()
