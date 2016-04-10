@@ -21,7 +21,7 @@ def simple_reading():
         files_read += 1
         logging.info("Started a file: " + file_path)
         for line in parser.lines_reader(file_path, 0):
-            parser.lines_reader(line)
+            parser.parse_line(line)
             lines_read += 1
 
     logging.info("Finished")
