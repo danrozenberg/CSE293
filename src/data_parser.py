@@ -46,22 +46,20 @@ class Pis12DataParser():
         if fetch_num == 0:
             fetch_num = None
 
-        f = open(file_path)
         #TODO: check if the file really is a csv.
-        reader = csv.reader(f)
-        _ = reader.next()  # throws header away
-        iterator = islice(reader, 0, 1)
-
-        lines_read = 0
-        while True:
-            yield iterator.next()
-            lines_read += 1
+        with open(file_path, "rb") as src:
+            reader = csv.reader(src)
+            _ = reader.next()  # throws header away
             iterator = islice(reader, 0, 1)
-            if 0 < fetch_num <= lines_read:
-                break
 
-        # remember to close the file :)
-        f.close()
+            lines_read = 0
+            while True:
+                yield iterator.next()
+                lines_read += 1
+                iterator = islice(reader, 0, 1)
+                if 0 < fetch_num <= lines_read:
+                    break
+
 
     def parse_line(self, line):
         """
