@@ -4,12 +4,14 @@ from config_manager import Config
 
 from joblib import Parallel, delayed
 import multiprocessing
-def simple_reading():
 
-    # TODO: config log somewhere else...
+def configure_log():
     logging.basicConfig(format='%(asctime)s %(message)s',
     datefmt='%d %b - %H:%M:%S -',
     level=logging.DEBUG)
+
+
+def simple_reading():
 
     lines_read = 0
     files_read = 0
@@ -29,12 +31,6 @@ def simple_reading():
     logging.info("Read " + str(lines_read) + " lines")
 
 def start_parallel_reading():
-
-    # TODO: config log somewhere else...
-    logging.basicConfig(format='%(asctime)s %(message)s',
-    datefmt='%d %b - %H:%M:%S -',
-    level=logging.DEBUG)
-
     config = Config()
     parser = data_parser.Pis12DataParser()
     files = parser.find_files(config.data_path, 0)
@@ -45,13 +41,7 @@ def start_parallel_reading():
     logging.info("Finished")
     logging.info("read " + str(sum(lines_read)) + " lines.")
 
-
 def parallel_reading(file_path, parser):
-    # TODO: config log somewhere else...
-    logging.basicConfig(format='%(asctime)s %(message)s',
-    datefmt='%d %b - %H:%M:%S -',
-    level=logging.DEBUG)
-
     logging.info("Started a file: " + file_path)
     read_lines = 0
     for line in parser.lines_reader(file_path, 0):
@@ -59,6 +49,10 @@ def parallel_reading(file_path, parser):
         read_lines += 1
     return read_lines
 
+def parallel_node_insertion():
+    # Checks if adding nodes is thread safe.
+    pass
 
 if __name__ == "__main__":
+    configure_log()
     start_parallel_reading()
