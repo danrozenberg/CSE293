@@ -1,75 +1,143 @@
-from sets import Set
 import unittest
 import sys
-import config_manager
-sys.path.append('..')
-from data_parser import DataParser
+sys.path.insert(0, '../src/')
+from data_parser import Pis12DataParser
 
-class TestDataParser(unittest.TestCase):
+class TestPis12DataParser(unittest.TestCase):
 
-    def setUp(self):
-        self.config = config_manager.Config()
+    def test_find_files(self):
+        parser = Pis12DataParser()
 
-    # name generator should work
-    def test_name_generator(self):
-        parser = DataParser()
-        target_folder = self.config.data_path + "base-ano/"
+        # should return no files for empty folder
+        files = parser.find_files("./empty_folder/")
+        found_files = []
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(0, len(found_files))
+
+        # should return 3 csv files in test folder
+        files = parser.find_files("./test_file_path_folder/")
+        found_files = []
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(3, len(found_files))
+        
+        # should return 3 csv files in test folder
+        files = parser.find_files("./test_file_path_folder/", "csv")
+        found_files = []
+        expected_files = ["./test_file_path_folder/asd.csv",
+                          "./test_file_path_folder/basd.csv",
+                          "./test_file_path_folder/alpha.csv"]
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(3, len(found_files))
+        self.assertItemsEqual(expected_files, found_files)
+
+        
+        # should return 1 txt files in test folder
+        files = parser.find_files("./test_file_path_folder/", file_type="txt")
+        found_files = []
+        expected_files = ["./test_file_path_folder/nope.txt"]
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(1, len(found_files))
+        self.assertItemsEqual(expected_files, found_files)
 
 
-        expected = Set(["ano2005.csv",
-                    "ano2006.csv",
-                    "ano2007.csv",
-                    "ano2008.csv" ])
+        # should return 2 csv files in test folder if requested for only 2
+        files = parser.find_files("./test_file_path_folder/", 2)
+        found_files = []
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(2, len(found_files))
 
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder, 0):
-            answer.add(file_name)
-        self.assertEquals(answer, expected)
+    def test_raw_lines_reader(self):
+        parser = Pis12DataParser()
 
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder):
-            answer.add(file_name)
-        self.assertEquals(answer, expected)
+        # read entire file
+        self.assertIsNone(parser.get_last_read_line())
+        lines_reader = parser.lines_reader("./test_data/raw_graph.csv")
+        lines_read = 0
+        for line in lines_reader:
+            # this data source has 66 fields
+            self.assertEquals(67, len(line))
 
-        # listdir doesn't have a predictable order, let's just count the return numbers
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder, 1):
-            answer.add(file_name)
-        self.assertEquals(len(answer), 1)
+            lines_read += 1
+        self.assertEquals(30, lines_read)
 
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder, 2):
-            answer.add(file_name)
-        self.assertEquals(len(answer), 2)
+        # read just a bit
+        self.assertIsNone(parser.get_last_read_line())
+        lines_reader = parser.lines_reader("./test_data/raw_graph.csv", 22)
+        lines_read = 0
+        for line in lines_reader:
+            # this data source has 66 fields
+            self.assertEquals(67, len(line))
 
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder, 3):
-            answer.add(file_name)
-        self.assertEquals(len(answer), 3)
+            lines_read += 1
+        self.assertEquals(22, lines_read)
 
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder, 4):
-            answer.add(file_name)
-        self.assertEquals(len(answer), 4)
+        # can't read more than what is already there...
+        self.assertIsNone(parser.get_last_read_line())
+        lines_reader = parser.lines_reader("./test_data/raw_graph.csv", 999)
+        lines_read = 0
+        for line in lines_reader:
+            # this data source has 66 fields
+            self.assertEquals(67, len(line))
 
-        answer = Set()
-        for file_name in parser.file_name_generator(target_folder, 100):
-            answer.add(file_name)
-        self.assertEquals(len(answer), 4)
+            lines_read += 1
+        self.assertEquals(30, lines_read)
 
-    # should retrieve lines from files on demand.
-    def test_line_generator(self):
-        parser = DataParser()
-        target_folder = self.config.data_path + "base-ano/"
+    def test_lines_reader(self):
 
-        lines = []
+        parser = Pis12DataParser()
 
-        lines_to_fetch = 10
-        for file_name in parser.file_name_generator(target_folder, 1):
-            for line in parser.file_line_reader(target_folder + file_name, lines_to_fetch):
-                lines.append(line)
+        # read
+        self.assertIsNone(parser.get_last_read_line())
+        lines_reader = parser.lines_reader("./test_data/raw_graph.csv")
+        lines_read = 0
+        for line in lines_reader:
+            # this data source has 66 fields
+            self.assertEquals(67, len(line))
 
-        self.assertEquals(len(lines), lines_to_fetch)
+            lines_read += 1
+        self.assertEquals(30, lines_read)
+
+    def test_parse_line(self):
+        parser = Pis12DataParser()
+
+        with self.assertRaises(ValueError) as bad_call:
+            parser.parse_line([1,2,3])
+        the_exception = bad_call.exception
+        self.assertIn("Unexpected format", the_exception.message)
+
+        valid_line = ['2010', '', '', '', '', '',
+                      '-1', '785', '', '', '', '',
+                      '', '', '', '', '', '', '',
+                      '', '1', '8', '10', '', '',
+                      '100', '', '', '', '', '',
+                      '', '', '', '', '7', '5',
+                      '', '4483', '10', '', '',
+                      '', '', '', '1', '', '',
+                      '', '28,10', '', '30,3',
+                      '', '', '', '1', '1', '25',
+                      '', '19,24', '', '1', '', '',
+                      '1', '', '']
+        answer = parser.parse_line(valid_line)
+
+        # test only a few of the entries in the dictionary
+        self.assertEquals('2010', answer['ANO'])
+        self.assertEquals('1', answer['PIS'])
+        self.assertEquals('100', answer['IDENTIFICAD'])
+
+
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
