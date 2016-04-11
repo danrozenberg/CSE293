@@ -49,7 +49,7 @@ class TestSnapManager(unittest.TestCase):
         manager.delete_node(11)
         self.assertEquals(0, self.manager.node_count())
 
-    # should add and retrieve attribute to a node
+    # should add and retrieve attribute to/from a node
     def test_add_node_attribute(self):
         manager = self.manager
 
@@ -72,6 +72,46 @@ class TestSnapManager(unittest.TestCase):
         # third, empty node
         d = manager.get_node_attributes(3)
         self.assertEquals(len(d.keys()), 0)
+
+    def test_is_node(self):
+        manager = self.manager
+        self.assertFalse(manager.is_node(10))
+        self.assertFalse(manager.is_node(2))
+        manager.add_node(10)
+        manager.add_node(2)
+        self.assertTrue(manager.is_node(10))
+        self.assertTrue(manager.is_node(2))
+
+    # should add and retrieve attribute to/from an edge
+    def test_add_edge_attribute(self):
+        manager = self.manager
+
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+
+        manager.add_edge(1, 2, 1)
+        manager.add_edge(2, 3, 2)
+        manager.add_edge(1, 3, 3)
+        manager.add_edge_attribute(1, "first", 33.33)
+        manager.add_edge_attribute(2, "second", 100)
+        manager.add_edge_attribute(1, "third", "asd")
+
+        # First edge:
+        d = manager.get_edge_attributes(1)
+        self.assertEquals(33.33, d["first"])
+        self.assertEquals("asd", d["third"])
+
+        # Second node:
+        d = manager.get_edge_attributes(2)
+        self.assertEquals(100, d["second"])
+
+        # third, empty node
+        d = manager.get_edge_attributes(3)
+        self.assertEquals(len(d.keys()), 0)
+
+    # Should merge 2 graphs nicely.
+    def test_merge_graphs(self):
 
 if __name__ == "__main__":
     unittest.main()
