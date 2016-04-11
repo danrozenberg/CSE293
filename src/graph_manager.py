@@ -59,6 +59,7 @@ class SnapManager(object):
         return self.network.GetEI(EId)
 
     def get_nodes(self):
+        # TODO: fix this, currently returns the number of nodes
         return self.network.GetNodes()
 
     def get_node(self, NId):
@@ -132,6 +133,9 @@ class SnapManager(object):
 
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
+        # TODO: use SNAP verifications instead because it is
+        # probably faster.
+
         try:
             return float(value) if '.' in value else int(value)
         except ValueError:
