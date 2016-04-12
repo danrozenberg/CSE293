@@ -55,7 +55,6 @@ class TestPis12DataParser(unittest.TestCase):
         parser = Pis12DataParser()
 
         # read entire file
-        self.assertIsNone(parser.get_last_read_line())
         lines_reader = parser.lines_reader("./test_data/raw_graph.csv")
         lines_read = 0
         for line in lines_reader:
@@ -66,7 +65,6 @@ class TestPis12DataParser(unittest.TestCase):
         self.assertEquals(30, lines_read)
 
         # read just a bit
-        self.assertIsNone(parser.get_last_read_line())
         lines_reader = parser.lines_reader("./test_data/raw_graph.csv", 22)
         lines_read = 0
         for line in lines_reader:
@@ -77,7 +75,6 @@ class TestPis12DataParser(unittest.TestCase):
         self.assertEquals(22, lines_read)
 
         # can't read more than what is already there...
-        self.assertIsNone(parser.get_last_read_line())
         lines_reader = parser.lines_reader("./test_data/raw_graph.csv", 999)
         lines_read = 0
         for line in lines_reader:

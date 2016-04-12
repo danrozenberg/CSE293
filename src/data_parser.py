@@ -6,7 +6,7 @@ from  itertools import islice
 class Pis12DataParser():
 
     def __init__(self):
-        self.__line = None
+        pass
 
     def find_files(self, folder_path, fetch_num = 0, file_type="csv"):
         """
@@ -109,9 +109,6 @@ class Pis12DataParser():
                   'ULT_REM ': line[66]}
 
         return answer
-
-    def get_last_read_line(self):
-        return  self.__line
 
 
 
