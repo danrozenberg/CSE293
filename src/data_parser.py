@@ -4,6 +4,7 @@ from  itertools import islice
 
 # noinspection PyMethodMayBeStatic
 class Pis12DataParser():
+    ''' Reads "PIS12" data from disk and parse it.'''
 
     def __init__(self):
         pass
@@ -109,6 +110,38 @@ class Pis12DataParser():
                   'ULT_REM ': line[66]}
 
         return answer
+
+
+import logging
+class Pis12DataInterpreter():
+    """ We need now a way to calculate several attributes, such as time working together...
+     the problem is that there may be several different ways to calculate this,
+        depending on when the data was generated.
+     but we do know that a parsed line returns a dictionary, as seen on 'parse_line'
+     technically, this shouldn't be resonsability of a parser, but...
+     It SHOULD be responsability of a class that deals with PIS12.
+     This is what this class is all about."""
+    def __init__(self, values):
+
+        # configures log
+        # TODO: maybe return log to original state afterwards...
+        logging.basicConfig(format='%(asctime)s %(message)s',
+        datefmt='%d %b - %H:%M:%S -',
+        level=logging.DEBUG)
+
+        self.dict = values
+        self.log_message = "Started"
+
+    @property
+    def year(self):
+        try:
+            return int(self.dict['ANO'])
+        except ValueError:
+            self.log_message = "ANO is not a value in: " + str(self.dict)
+            logging.warning(self.log_message)
+            return 0 # TODO: explain why we don't interrupt program.
+
+
 
 
 

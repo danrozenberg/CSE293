@@ -1,7 +1,10 @@
 import unittest
+import logging
+import io
 import sys
 sys.path.insert(0, '../src/')
 from data_parser import Pis12DataParser
+from data_parser import Pis12DataInterpreter
 
 class TestPis12DataParser(unittest.TestCase):
 
@@ -127,10 +130,27 @@ class TestPis12DataParser(unittest.TestCase):
         self.assertEquals('100', answer['IDENTIFICAD'])
 
 
+class TestPis12DataInterpreter(unittest.TestCase):
+
+    def setUp(self):
+        logging.disable(logging.CRITICAL)
+
+
+    def test_ano(self):
+        interpreter = Pis12DataInterpreter({'ANO':1999})
+        answer = interpreter.year
+        self.assertEquals(1999, answer)
+
+        # Bad value
+        interpreter = Pis12DataInterpreter({'ANO':'asd'})
+        answer = interpreter.year
+        self.assertIn("ANO is not a value", interpreter.log_message)
+        self.assertEquals(0, answer)
 
 
 
 
+    # should raise an informative error message if data makes no sense.
 
 
 
