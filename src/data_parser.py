@@ -199,7 +199,7 @@ class Pis12DataInterpreter():
             return -1
 
     @property
-    def workerd_id(self):
+    def worker_id(self):
         return self.__simple_retrieval('PIS')
 
     def __simple_retrieval(self, field_name):

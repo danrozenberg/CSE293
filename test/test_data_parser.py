@@ -220,6 +220,16 @@ class TestPis12DataInterpreter(unittest.TestCase):
         self.assertIn("MES_DESLIG or DIADESL is invalid in: ", interpreter.log_message)
         self.assertEquals(-1, answer)
 
+    def test_worked_id(self):
+        interpreter = Pis12DataInterpreter({'PIS':'131313'})
+        answer = interpreter.worker_id
+        self.assertEquals(131313, answer)
+
+        interpreter = Pis12DataInterpreter({'PIS':''})
+        answer = interpreter.worker_id
+        self.assertIn("PIS is invalid in", interpreter.log_message)
+        self.assertEquals(-1, answer)
+
 
 
 
