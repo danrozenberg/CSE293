@@ -44,6 +44,7 @@ def start_parallel_reading():
     logging.info("read " + str(sum(lines_read)) + " lines.")
 
 def parallel_reading(file_path, parser):
+    configure_log() #windows needs this here for some reason.
     logging.info("Started a file: " + file_path)
     read_lines = 0
     for line in parser.lines_reader(file_path, 0):
@@ -76,13 +77,12 @@ def start_parallel_node_insertion():
         logging.info("Found all node ids!")
         logging.info("Added " + str(graph_manager.node_count()) + " nodes.")
 
-
-
 def parallel_node_insertion(id_list, graph_manager):
-    # Checks if adding nodes is thread safe.
+    configure_log() #windows needs this here for some reason.
+    
     for ID in id_list:
         graph_manager.add_node(ID)
 
 if __name__ == "__main__":
     configure_log()
-    start_parallel_node_insertion()
+    start_parallel_reading()
