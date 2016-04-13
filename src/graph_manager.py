@@ -58,9 +58,26 @@ class SnapManager(object):
     def get_edge(self, EId):
         return self.network.GetEI(EId)
 
+    # TODO: fix this, currently returns the number of nodes
     def get_nodes(self):
-        # TODO: fix this, currently returns the number of nodes
-        return self.network.GetNodes()
+
+
+        if self.node_count() == 0:
+            return []
+        else:
+            nodes = []
+            node_iterator = self.network.BegNI()
+            nodes.append(node_iterator.GetId())
+
+            # note, the Nodes() method does not work in SNAP, for some reason...
+            # actually, its missing a lot of useful stuff.
+            # gotta do it like this:  =(
+            while node_iterator.Next():
+                try:
+                    nodes.append(node_iterator.GetId())
+                except RuntimeError:
+                    return nodes
+
 
     def get_node(self, NId):
         return self.network.GetNI(NId)
@@ -68,7 +85,7 @@ class SnapManager(object):
     def node_count(self):
         return self.network.GetNodes()
 
-    def add_node_attribute(self, NId, name, value):
+    def add_node_attr(self, NId, name, value):
 
         node = self.get_node(NId)
         if isinstance(value, int):
@@ -80,7 +97,7 @@ class SnapManager(object):
         else:
             raise Exception('Invalid data type')
 
-    def add_edge_attribute(self, EId, name, value):
+    def add_edge_att(self, EId, name, value):
 
         edge = self.get_edge(EId)
         if isinstance(value, int):
@@ -140,8 +157,3 @@ class SnapManager(object):
             return float(value) if '.' in value else int(value)
         except ValueError:
             return value
-
-
-
-
-

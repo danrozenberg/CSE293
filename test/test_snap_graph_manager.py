@@ -50,15 +50,15 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, self.manager.node_count())
 
     # should add and retrieve attribute to/from a node
-    def test_add_node_attribute(self):
+    def test_add_node_attr(self):
         manager = self.manager
 
         manager.add_node(1)
         manager.add_node(2)
         manager.add_node(3)
-        manager.add_node_attribute(1, "one_attr", 13.5)
-        manager.add_node_attribute(2, "another_attr", 5)
-        manager.add_node_attribute(1, "a_third_one", "asd")
+        manager.add_node_attr(1, "one_attr", 13.5)
+        manager.add_node_attr(2, "another_attr", 5)
+        manager.add_node_attr(1, "a_third_one", "asd")
 
         # First node:
         d = manager.get_node_attributes(1)
@@ -93,9 +93,9 @@ class TestSnapManager(unittest.TestCase):
         manager.add_edge(1, 2, 1)
         manager.add_edge(2, 3, 2)
         manager.add_edge(1, 3, 3)
-        manager.add_edge_attribute(1, "first", 33.33)
-        manager.add_edge_attribute(2, "second", 100)
-        manager.add_edge_attribute(1, "third", "asd")
+        manager.add_edge_att(1, "first", 33.33)
+        manager.add_edge_att(2, "second", 100)
+        manager.add_edge_att(1, "third", "asd")
 
         # First edge:
         d = manager.get_edge_attributes(1)
@@ -110,8 +110,48 @@ class TestSnapManager(unittest.TestCase):
         d = manager.get_edge_attributes(3)
         self.assertEquals(len(d.keys()), 0)
 
-    # Should merge 2 graphs nicely.
-    def test_merge_graphs(self):
+    def test_get_nodes(self):
+        manager = self.manager
+
+        expected = []
+        answer = manager.get_nodes()
+        self.assertAlmostEqual(expected, answer)
+
+        manager.add_node(10)
+        expected = [10]
+        answer = manager.get_nodes()
+        self.assertAlmostEqual(expected, answer)
+
+        manager.add_node(20)
+        expected = [10, 20]
+        answer = manager.get_nodes()
+        self.assertListEqual(expected, answer)
+
+        manager.add_node(30)
+        expected = [10, 20, 30]
+        answer = manager.get_nodes()
+        self.assertListEqual(expected, answer)
+
+        manager.delete_node(20)
+        expected = [10, 30]
+        answer = manager.get_nodes()
+        self.assertListEqual(expected, answer)
+
+        manager.delete_node(10)
+        expected = [30]
+        answer = manager.get_nodes()
+        self.assertListEqual(expected, answer)
+
+        manager.delete_node(30)
+        expected = []
+        answer = manager.get_nodes()
+        self.assertListEqual(expected, answer)
+
+
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
