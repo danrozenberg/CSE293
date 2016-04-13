@@ -130,18 +130,15 @@ class Pis12DataInterpreter():
         # TODO: maybe return log to original state afterwards...
         logging.basicConfig(format='%(asctime)s %(message)s',
         datefmt='%d %b - %H:%M:%S -',
-        level=logging.DEBUG)
+        level=logging.WARN)
 
         self.dict = values
         self.log_message = "Started"
-
-        #
 
     @property
     def year(self):
         """ :return: the year the entry relates to """
         return self.__simple_retrieval('ANO')
-
 
     @property
     def admission_date(self):
@@ -205,8 +202,6 @@ class Pis12DataInterpreter():
     @property
     def employer_id(self):
         return self.__simple_retrieval('IDENTIFICAD')
-
-
 
     def __simple_retrieval(self, field_name):
         """
