@@ -140,12 +140,8 @@ class Pis12DataInterpreter():
     @property
     def year(self):
         """ :return: the year the entry relates to """
-        try:
-            return int(self.dict['ANO'])
-        except ValueError:
-            self.log_message = "ANO is invalid in: " + str(self.dict)
-            logging.warning(self.log_message)
-            return -1
+        return self.__simple_retrieval('ANO')
+
 
     @property
     def admission_date(self):
@@ -199,5 +195,21 @@ class Pis12DataInterpreter():
 
         except ValueError:
             self.log_message = "MES_DESLIG or DIADESL is invalid in: " + str(self.dict)
+            logging.warning(self.log_message)
+            return -1
+
+    @property
+    def workerd_id(self):
+        return self.__simple_retrieval('PIS')
+
+    def __simple_retrieval(self, field_name):
+        """
+        for data that is straightforward to get.
+        :return: an integer
+        """
+        try:
+            return int(self.dict[field_name])
+        except ValueError:
+            self.log_message = field_name + " is invalid in: " + str(self.dict)
             logging.warning(self.log_message)
             return -1

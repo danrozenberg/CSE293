@@ -92,7 +92,6 @@ class TestPis12DataParser(unittest.TestCase):
         parser = Pis12DataParser()
 
         # read
-        self.assertIsNone(parser.get_last_read_line())
         lines_reader = parser.lines_reader("./test_data/raw_graph.csv")
         lines_read = 0
         for line in lines_reader:
