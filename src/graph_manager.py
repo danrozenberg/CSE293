@@ -58,10 +58,7 @@ class SnapManager(object):
     def get_edge(self, EId):
         return self.network.GetEI(EId)
 
-    # TODO: fix this, currently returns the number of nodes
     def get_nodes(self):
-
-
         if self.node_count() == 0:
             return []
         else:
