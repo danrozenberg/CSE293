@@ -8,7 +8,7 @@ def process_files(source_folder, data_parser, graph_manager):
     # get a graph from manager
     graph = graph_manager()
 
-    for file_path in data_parser.file_paths(source_folder, 0):
+    for file_path in data_parser.find_files(source_folder, 0):
         process_file(file_path, data_parser, graph)
 
     # graph should be complete at this point
@@ -18,7 +18,7 @@ def process_file(file_path, data_parser, graph):
     """
     :param graph: a graph/graph manager object, which will be changed
     """
-    for line in data_parser.lines(file_path, 0):
+    for line in data_parser.lines_reader(file_path, 0):
             parsed_line = data_parser.parse_line(line)
 
             # line is parsed as a dictionary, but needs interpretation.
@@ -55,7 +55,6 @@ def create_edges(interpreter, graph):
     edge = graph.add_edge()
     graph.add_edge_attr(edge, "YEAR", year)
     graph.add_edge_attr(edge, "TIME_AT_WORKER",time_at_worker)
-
 
 if __name__ == '__main__':
 
