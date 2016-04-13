@@ -202,6 +202,12 @@ class Pis12DataInterpreter():
     def worker_id(self):
         return self.__simple_retrieval('PIS')
 
+    @property
+    def employer_id(self):
+        return self.__simple_retrieval('IDENTIFICAD')
+
+
+
     def __simple_retrieval(self, field_name):
         """
         for data that is straightforward to get.
