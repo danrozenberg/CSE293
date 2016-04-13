@@ -1,6 +1,6 @@
 import unittest
 import logging
-import io
+import datetime
 import sys
 sys.path.insert(0, '../src/')
 from data_parser import Pis12DataParser
@@ -132,6 +132,9 @@ class TestPis12DataParser(unittest.TestCase):
 
 class TestPis12DataInterpreter(unittest.TestCase):
 
+    """Note, KeyError should not happen in RL,
+            if it does, we will not treat exception"""
+
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
@@ -144,13 +147,82 @@ class TestPis12DataInterpreter(unittest.TestCase):
         # Bad value
         interpreter = Pis12DataInterpreter({'ANO':'asd'})
         answer = interpreter.year
-        self.assertIn("ANO is not a value", interpreter.log_message)
+        self.assertIn("ANO is invalid", interpreter.log_message)
+        self.assertEquals(-1, answer)
+
+        # Bad value
+        interpreter = Pis12DataInterpreter({'ANO':''})
+        answer = interpreter.year
+        self.assertIn("ANO is invalid", interpreter.log_message)
+        self.assertEquals(-1, answer)
+
+    def test_job_start_date(self):
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'10082015'})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(2015,8,10), answer)
+
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'5041986'})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(1986,4,5), answer)
+
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'05041986'})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(1986,4,5), answer)
+
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'28092007',
+                                            'MES_ADM':'01',
+                                            'ANO_ADM':'2001'})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(2007,9,28), answer)
+
+
+        # with no dt_admissao
+        interpreter = Pis12DataInterpreter({'MES_ADM':'1',
+                                            'ANO_ADM':'2001',
+                                            'DT_ADMISSAO':''})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(2001,1,1), answer)
+
+        interpreter = Pis12DataInterpreter({'MES_ADM':'5',
+                                            'ANO_ADM':'1999',
+                                            'DT_ADMISSAO':''})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(1999,5,1), answer)
+
+    def test_job_end_date(self):
+        interpreter = Pis12DataInterpreter({'DIADESL':'NAO DESL ANO'})
+        answer = interpreter.demission_date
         self.assertEquals(0, answer)
 
+        interpreter = Pis12DataInterpreter({'ANO':'1999',
+                                            'DIADESL':'24',
+                                            'MES_DESLIG':'12'})
+        answer = interpreter.demission_date
+        self.assertEquals(datetime.datetime(1999,12,24), answer)
+
+        interpreter = Pis12DataInterpreter({'ANO':'1999',
+                                            'DIADESL':'0',
+                                            'MES_DESLIG':'12'})
+        answer = interpreter.demission_date
+        self.assertIn("Inconsistent MES_DESLIG or DIADESL", interpreter.log_message)
+        self.assertEquals(-1, answer)
+
+        interpreter = Pis12DataInterpreter({'ANO':'1999',
+                                            'DIADESL':'10',
+                                            'MES_DESLIG':'-12'})
+        answer = interpreter.demission_date
+        self.assertIn("Inconsistent MES_DESLIG or DIADESL", interpreter.log_message)
+        self.assertEquals(-1, answer)
+
+        interpreter = Pis12DataInterpreter({'ANO':'1999',
+                                            'DIADESL':'',
+                                            'MES_DESLIG':'12'})
+        answer = interpreter.demission_date
+        self.assertIn("MES_DESLIG or DIADESL is invalid in: ", interpreter.log_message)
+        self.assertEquals(-1, answer)
 
 
 
-    # should raise an informative error message if data makes no sense.
 
 
 

@@ -1,5 +1,6 @@
 import os
 import csv
+import datetime
 from  itertools import islice
 
 # noinspection PyMethodMayBeStatic
@@ -121,6 +122,8 @@ class Pis12DataInterpreter():
      technically, this shouldn't be resonsability of a parser, but...
      It SHOULD be responsability of a class that deals with PIS12.
      This is what this class is all about."""
+
+    # TODO: explain why we don't interrupt program.
     def __init__(self, values):
 
         # configures log
@@ -132,22 +135,69 @@ class Pis12DataInterpreter():
         self.dict = values
         self.log_message = "Started"
 
+        #
+
     @property
     def year(self):
+        """ :return: the year the entry relates to """
         try:
             return int(self.dict['ANO'])
         except ValueError:
-            self.log_message = "ANO is not a value in: " + str(self.dict)
+            self.log_message = "ANO is invalid in: " + str(self.dict)
             logging.warning(self.log_message)
-            return 0 # TODO: explain why we don't interrupt program.
+            return -1
 
+    @property
+    def admission_date(self):
 
+        # TODO: does tipo_adm change anything?
 
+        if self.dict['DT_ADMISSAO'] <> '':
+            # gotta pad the string with 0...
+            padded_string = self.dict['DT_ADMISSAO']\
+                .lstrip("0").\
+                replace(" 0", " ")
+            return datetime.datetime.strptime(padded_string,'%d%m%Y')
+        elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :
+            # In this case, day dafaults to 01...
+            adm_day = 1
+            adm_month = int(self.dict['MES_ADM'])
+            adm_year = int(self.dict['ANO_ADM'])
+            return datetime.datetime(adm_year, adm_month, adm_day)
+        else:
+            self.log_message = "could not get admission date for: " + str(self.dict)
+            logging.warning(self.log_message)
+            return -1
 
+    @property
+    def demission_date(self):
+        """ :return: demission date, or 0 if there was no demission.  """
 
+        # Sometimes, we have a message in DIADESL
+        if self.dict['DIADESL'] == 'NAO DESL ANO':
+            return 0
 
+        try:
+            dem_month = int(self.dict['MES_DESLIG'])
+            dem_day = int(self.dict['DIADESL'])
+            dem_year = self.year
 
+            # inconsistent data:
+            # TODO: inconsistency in EMP_EM_31_12??
+            if (dem_month > 0 and dem_day <= 0) or \
+            (dem_month <= 0 and dem_day > 0) :
+                self.log_message = "Inconsistent MES_DESLIG or DIADESL in: " + str(self.dict)
+                logging.warning(self.log_message)
+                return -1
 
+            # all 0, then not let go by company
+            elif dem_month == 0 and dem_day == 0:
+                return 0
 
+            else:
+                return datetime.datetime(dem_year, dem_month, dem_day)
 
-
+        except ValueError:
+            self.log_message = "MES_DESLIG or DIADESL is invalid in: " + str(self.dict)
+            logging.warning(self.log_message)
+            return -1
