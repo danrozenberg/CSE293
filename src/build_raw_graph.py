@@ -3,7 +3,7 @@ from config_manager import Config
 import graph_manager
 import data_parser
 
-def process_files(source_folder, data_parser, graph_manager):
+def process_files(source_folder, data_parser, interpreter_class, graph_manager):
 
     # get a graph from manager
     graph = graph_manager()
@@ -14,7 +14,7 @@ def process_files(source_folder, data_parser, graph_manager):
     # graph should be complete at this point
     return graph
 
-def process_file(file_path, data_parser, graph):
+def process_file(file_path, data_parser, interpreter_class, graph):
     """
     :param graph: a graph/graph manager object, which will be changed
     """
@@ -23,7 +23,7 @@ def process_file(file_path, data_parser, graph):
 
             # line is parsed as a dictionary, but needs interpretation.
             # This is because our data is wacky wacky!
-            interpreter = data_parser.Pis12DataInterpreter(parsed_line)
+            interpreter = interpreter_class(parsed_line)
             process_line(interpreter, graph)
 
 def process_line(interpreter, graph):

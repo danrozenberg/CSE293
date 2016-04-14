@@ -14,10 +14,14 @@ class TestDataAnalysis(unittest.TestCase):
     def test_process_files(self, process_file_mock):
         src_folder = "./test_file_path_folder/"
         parser = data_parser.Pis12DataParser()
+        interpreter_class = data_parser.Pis12DataInterpreter
         manager = graph_manager.SnapManager
 
-        process_files(src_folder, parser, manager)
+        process_files(src_folder, parser, interpreter_class, manager)
         self.assertEquals(3, process_file_mock.call_count)
+
+    def test_process_file(self):
+        pass
 
 
 
