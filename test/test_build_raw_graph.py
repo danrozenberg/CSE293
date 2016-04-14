@@ -1,22 +1,32 @@
-from mock import patch
-from mock import Mock
 import unittest
 import sys
+import mock
 sys.path.insert(0, '../src/')
-from data_analysis import DataAnalysis
+from build_raw_graph import *
 import data_parser
+import graph_manager
+
 
 class TestDataAnalysis(unittest.TestCase):
 
-    @patch('data_parser.file_paths', return_value=['a'])
-    @patch('data_parser.lines')
-    def test_build_employee_employer_graph(self, lines, file_paths):
+    # TODO: if there is enough time, decouple from other classes.
+    @mock.patch('build_raw_graph.process_file')
+    def test_process_files(self, process_file_mock):
+        src_folder = "./test_file_path_folder/"
+        parser = data_parser.Pis12DataParser()
+        manager = graph_manager.SnapManager
 
-        mock_manager = Mock()
+        process_files(src_folder, parser, manager)
+        self.assertEquals(3, process_file_mock.call_count)
 
-        # call everything
-        analysis = DataAnalysis(mock_manager)
-        analysis.build_employee_employer_graph()
+
+
+
+
+
+# class MockGraphManager():
+
+
 
 
 
