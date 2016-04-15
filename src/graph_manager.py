@@ -18,8 +18,9 @@ class SnapManager(object):
         if NId <> -1 and self.network.IsNode(NId):
             logging.warning("Could not add node with id = "
                             + str(NId) + " because it already existed" )
+            return NId
         else:
-            self.network.AddNode(NId)
+            return self.network.AddNode(NId)
 
     def delete_node(self, NId):
         """
@@ -59,6 +60,7 @@ class SnapManager(object):
         return self.network.GetEI(EId)
 
     def get_nodes(self):
+        # TODO: make my own node iterator, since snap doesnt give us a REAL one.
         if self.node_count() == 0:
             return []
         else:
@@ -74,7 +76,6 @@ class SnapManager(object):
                     nodes.append(node_iterator.GetId())
                 except RuntimeError:
                     return nodes
-
 
     def get_node(self, NId):
         return self.network.GetNI(NId)

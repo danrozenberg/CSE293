@@ -22,18 +22,26 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, self.manager.node_count())
 
         # got nodes
-        manager.add_node(-55)
+        NId = manager.add_node(-55)
         self.assertEquals(1, self.manager.node_count())
+        self.assertEquals(-55, NId)
 
-        manager.add_node()
+        NId = manager.add_node()
         self.assertEquals(2, self.manager.node_count())
+        self.assertEquals(0, NId)
 
-        manager.add_node(33)
+        NId = manager.add_node()
         self.assertEquals(3, self.manager.node_count())
+        self.assertEquals(1, NId)
+
+        NId = manager.add_node(33)
+        self.assertEquals(4, self.manager.node_count())
+        self.assertEquals(33, NId)
 
         # don't freak out with adding same node
-        manager.add_node(33)
-        self.assertEquals(3, self.manager.node_count())
+        NId = manager.add_node(33)
+        self.assertEquals(4, self.manager.node_count())
+        self.assertEquals(33, NId)
 
     # should delete nodes
     def test_delete_nod(self):
@@ -146,12 +154,6 @@ class TestSnapManager(unittest.TestCase):
         expected = []
         answer = manager.get_nodes()
         self.assertListEqual(expected, answer)
-
-
-
-
-
-
 
 if __name__ == "__main__":
     unittest.main()
