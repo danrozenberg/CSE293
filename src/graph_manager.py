@@ -80,6 +80,62 @@ class SnapManager(object):
     def get_node(self, NId):
         return self.network.GetNI(NId)
 
+    def get_node_attributes(self, NId):
+        """
+        :param NId: the node to retrieve attributes from
+        :return: a dictionary with 'attr name' - 'attr value' pairs
+        """
+        names = snap.TStrV()
+        values = snap.TStrV()
+        converted_values = []
+        self.network.AttrNameNI(NId, names)
+        self.network.AttrValueNI(NId, values)
+
+        for value in values:
+            # Due to a SNAP bug we are forced to convert attributes
+            #   back to their original type ourselves ;(
+            converted_values.append(self.__convert(value))
+
+        return dict(zip(names, converted_values))
+
+    def get_node_attribute(self, NId, attr_name):
+        # Probably not the most efficient way of doing this...
+        attributes = self.get_node_attributes(NId)
+
+        try:
+            return attributes[attr_name]
+        except KeyError:
+            raise RuntimeError("Node " + str(NId) + " does not have attribute '" +
+                                               attr_name + "'")
+
+    def get_edge_attributes(self, EId):
+        """
+        :param EId: the edge to retrieve attributes from
+        :return: a dictionary with 'attr name' - 'attr value' pairs
+        """
+        names = snap.TStrV()
+        values = snap.TStrV()
+        converted_values = []
+        self.network.AttrNameEI(EId, names)
+        self.network.AttrValueEI(EId, values)
+
+        for value in values:
+            # Due to a SNAP bug we are forced to convert attributes
+            #   back to their original type ourselves ;(
+            converted_values.append(self.__convert(value))
+
+        return dict(zip(names, converted_values))
+
+    def get_edge_attribute(self, EId, attr_name):
+        # Probably not the most efficient way of doing this...
+        attributes = self.get_edge_attributes(EId)
+
+        try:
+            return attributes[attr_name]
+        except KeyError:
+            raise RuntimeError("Edge " + str(EId) + " does not have attribute '" +
+                                               attr_name + "'")
+
     def node_count(self):
         return self.network.GetNodes()
 
@@ -106,42 +162,6 @@ class SnapManager(object):
             self.network.AddStrAttrDatE(edge, value, name)
         else:
             raise Exception('Invalid data type')
-
-    def get_node_attributes(self, NId):
-        """
-        :param NId: the node to retrieve attributes from
-        :return: a dictionary with 'attr name' - 'attr value' pairs
-        """
-        names = snap.TStrV()
-        values = snap.TStrV()
-        converted_values = []
-        self.network.AttrNameNI(NId, names)
-        self.network.AttrValueNI(NId, values)
-
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
-
-        return dict(zip(names, converted_values))
-
-    def get_edge_attributes(self, EId):
-        """
-        :param EId: the edge to retrieve attributes from
-        :return: a dictionary with 'attr name' - 'attr value' pairs
-        """
-        names = snap.TStrV()
-        values = snap.TStrV()
-        converted_values = []
-        self.network.AttrNameEI(EId, names)
-        self.network.AttrValueEI(EId, values)
-
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
-
-        return dict(zip(names, converted_values))
 
     def is_node(self, NId):
         return self.network.IsNode(NId)

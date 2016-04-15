@@ -58,6 +58,7 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, self.manager.node_count())
 
     # should add and retrieve attribute to/from a node
+    # also tests get node attrs/attr
     def test_add_node_attr(self):
         manager = self.manager
 
@@ -72,14 +73,24 @@ class TestSnapManager(unittest.TestCase):
         d = manager.get_node_attributes(1)
         self.assertEquals(13.5, d["one_attr"])
         self.assertEquals("asd", d["a_third_one"])
+        self.assertEquals("asd", manager.get_node_attribute(1, 'a_third_one'))
+        self.assertEquals(13.5, manager.get_node_attribute(1, 'one_attr'))
 
         # Second node:
         d = manager.get_node_attributes(2)
         self.assertEquals(5, d["another_attr"])
+        self.assertEquals(5, manager.get_node_attribute(2, 'another_attr'))
 
         # third, empty node
         d = manager.get_node_attributes(3)
         self.assertEquals(len(d.keys()), 0)
+
+        # Error
+        with self.assertRaises(RuntimeError) as bad_call:
+            manager.get_node_attribute(3, "i dont exist")
+        the_exception = bad_call.exception
+        self.assertIn("does not have attribute", the_exception.message)
+
 
     def test_is_node(self):
         manager = self.manager
@@ -91,6 +102,7 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(manager.is_node(2))
 
     # should add and retrieve attribute to/from an edge
+    # also tests get edge attrs/attr
     def test_add_edge_attribute(self):
         manager = self.manager
 
@@ -109,14 +121,21 @@ class TestSnapManager(unittest.TestCase):
         d = manager.get_edge_attributes(1)
         self.assertEquals(33.33, d["first"])
         self.assertEquals("asd", d["third"])
+        self.assertEquals(33.33, manager.get_edge_attribute(1, 'first'))
+        self.assertEquals("asd", manager.get_edge_attribute(1, 'third'))
 
         # Second node:
         d = manager.get_edge_attributes(2)
         self.assertEquals(100, d["second"])
+        self.assertEquals(100, manager.get_edge_attribute(2, 'second'))
 
         # third, empty node
         d = manager.get_edge_attributes(3)
         self.assertEquals(len(d.keys()), 0)
+        with self.assertRaises(RuntimeError) as bad_call:
+            manager.get_edge_attribute(3, "i dont exist")
+        the_exception = bad_call.exception
+        self.assertIn("does not have attribute", the_exception.message)
 
     def test_get_nodes(self):
         manager = self.manager
