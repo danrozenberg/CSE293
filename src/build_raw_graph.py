@@ -9,7 +9,7 @@ def process_files(source_folder, data_parser, interpreter_class, graph_manager):
     graph = graph_manager()
 
     for file_path in data_parser.find_files(source_folder, 0):
-        process_file(file_path, data_parser, graph)
+        process_file(file_path, data_parser, interpreter_class, graph)
 
     # graph should be complete at this point
     return graph
