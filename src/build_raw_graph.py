@@ -34,11 +34,16 @@ def process_line(interpreter, graph):
     create_edges(interpreter, graph)
 
 def create_nodes(interpreter, graph):
-    # Manager only does it if they don't exist yet.
+    ''' Manager only does it if they don't exist yet.
+        It will add one for the worker, one for the employer'''
 
     # add worker node and a 'worker' property
+    NId = graph.add_node(interpreter.worker_id)
+    graph.add_node_attr(NId, "type", "worker")
+
     # add employer node and a 'employer' property
-    raise NotImplementedError
+    NId = graph.add_node(interpreter.employer_id)
+    graph.add_node_attr(NId, "type", "employer")
 
 def create_edges(interpreter, graph):
     """
@@ -48,7 +53,7 @@ def create_edges(interpreter, graph):
     :return:
     """
     # get values here to, mostly, make lines shorter :)
-    time_at_worker = interpreter.time_at_worker
+    time_at_worker = interpreter.time_at_employer
     year = interpreter.year
 
     # add values as edge attributes
