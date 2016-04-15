@@ -56,7 +56,6 @@ class SnapManager(object):
     def get_edges(self):
         raise NotImplementedError
 
-
     def get_edge(self, EId):
         return self.network.GetEI(EId)
 
@@ -155,7 +154,7 @@ class SnapManager(object):
         else:
             raise Exception('Invalid data type')
 
-    def add_edge_att(self, EId, name, value):
+    def add_edge_attr(self, EId, name, value):
 
         edge = self.get_edge(EId)
         if isinstance(value, int):
