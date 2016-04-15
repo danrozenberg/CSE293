@@ -111,14 +111,17 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node(2)
         manager.add_node(3)
 
-        manager.add_edge(1, 2, 1)
+        edge = manager.add_edge(1, 2, 1)
         self.assertEquals(1, manager.get_edge_count())
+        self.assertEquals(1, edge)
 
-        manager.add_edge(2, 3, 2)
+        edge = manager.add_edge(2, 3, 2)
         self.assertEquals(2, manager.get_edge_count())
+        self.assertEquals(2, edge)
 
-        manager.add_edge(1, 3, 3)
+        edge = manager.add_edge(1, 3, 3)
         self.assertEquals(3, manager.get_edge_count())
+        self.assertEquals(3, edge)
 
         manager.add_edge_attr(1, "first", 33.33)
         manager.add_edge_attr(2, "second", 100)
