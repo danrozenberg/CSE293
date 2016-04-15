@@ -12,7 +12,8 @@ class TestDataAnalysis(unittest.TestCase):
     # TODO: if there is enough time, decouple from other classes.
 
     def setUp(self):
-        logging.disable(logging.CRITICAL)
+        # logging.disable(logging.CRITICAL)
+        pass
 
     @mock.patch('build_raw_graph.process_file')
     def test_process_files(self, process_file_mock):
@@ -86,6 +87,45 @@ class TestDataAnalysis(unittest.TestCase):
         self.assertEquals('worker', graph.get_node_attribute(33, 'type'))
         self.assertEquals('employer', graph.get_node_attribute(3333, 'type'))
 
+    def test_create_edges(self):
+
+        interpreter = FakeInterpreter()
+
+        # graph with only nodes, no edges...
+        graph = graph_manager.SnapManager()
+        graph.add_node(19)
+        graph.add_node(888)
+        graph.add_node(123)
+        graph.add_node(456)
+
+
+        self.assertEquals(0, graph.get_edge_count())
+
+        # just adding an edge
+        interpreter.worker_id = 19
+        interpreter.employer_id = 888
+        create_edges(interpreter, graph)
+        self.assertEquals(1, graph.get_edge_count())
+
+        # same ids, we still add an edge!
+        interpreter.worker_id = 19
+        interpreter.employer_id = 888
+        create_edges(interpreter, graph)
+        self.assertEquals(2, graph.get_edge_count())
+
+        # different ids, same thing...
+        interpreter.worker_id = 123
+        interpreter.employer_id = 456
+        create_edges(interpreter, graph)
+        self.assertEquals(3, graph.get_edge_count())
+
+        # a bit fancy now...but same thing
+        interpreter.worker_id = 19
+        interpreter.employer_id = 456
+        create_edges(interpreter, graph)
+        self.assertEquals(4, graph.get_edge_count())
+
+
 
 
 # todo, make interpreter an ABC
@@ -97,13 +137,7 @@ class FakeInterpreter():
         self.demission_date = 0
         self.worker_id = 0
         self.employer_id = 0
-
-
-
-
-
-
-
+        self.time_at_worker = 0
 
 
 
