@@ -54,7 +54,8 @@ class SnapManager(object):
         return self.network.AddEdge(src_node, dest_node, EId)
 
     def get_edges(self):
-        return self.network.GetEdges()
+        raise NotImplementedError
+
 
     def get_edge(self, EId):
         return self.network.GetEI(EId)
@@ -138,6 +139,9 @@ class SnapManager(object):
 
     def node_count(self):
         return self.network.GetNodes()
+
+    def get_edge_count(self):
+        return self.network.GetEdges()
 
     def add_node_attr(self, NId, name, value):
 

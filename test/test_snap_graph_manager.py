@@ -105,14 +105,21 @@ class TestSnapManager(unittest.TestCase):
     # also tests get edge attrs/attr
     def test_add_edge_attribute(self):
         manager = self.manager
+        self.assertEquals(0, manager.get_edge_count())
 
         manager.add_node(1)
         manager.add_node(2)
         manager.add_node(3)
 
         manager.add_edge(1, 2, 1)
+        self.assertEquals(1, manager.get_edge_count())
+
         manager.add_edge(2, 3, 2)
+        self.assertEquals(2, manager.get_edge_count())
+
         manager.add_edge(1, 3, 3)
+        self.assertEquals(3, manager.get_edge_count())
+
         manager.add_edge_att(1, "first", 33.33)
         manager.add_edge_att(2, "second", 100)
         manager.add_edge_att(1, "third", "asd")
