@@ -3,16 +3,19 @@ from config_manager import Config
 import graph_manager
 import data_parser
 
-def process_files(source_folder, data_parser, interpreter_class, graph_manager):
+def process_files(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
 
     # get a graph from manager
-    graph = graph_manager()
+    manager = graph_manager()
 
     for file_path in data_parser.find_files(source_folder, 0):
-        process_file(file_path, data_parser, interpreter_class, graph)
+        process_file(file_path, data_parser, interpreter_class, manager)
 
+    if save_path is not None:
+        manager.save_graph(save_path)
     # graph should be complete at this point
-    return graph
+
+    return manager
 
 def process_file(file_path, data_parser, interpreter_class, graph):
     """

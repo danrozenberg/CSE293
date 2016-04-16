@@ -1,5 +1,5 @@
 import unittest
-import sys
+import sys, os
 import mock
 import logging
 sys.path.insert(0, '../src/')
@@ -18,13 +18,32 @@ class TestDataAnalysis(unittest.TestCase):
     @mock.patch('build_raw_graph.process_file')
     def test_process_files(self, process_file_mock):
 
-        # should process 3 files
+        save_path = "./test.graph"
+
+        # should process 3 files, don't save
         src_folder = "./test_file_path_folder/"
         parser = data_parser.Pis12DataParser()
         interpreter_class = data_parser.Pis12DataInterpreter
         manager = graph_manager.SnapManager
         process_files(src_folder, parser, interpreter_class, manager)
         self.assertEquals(3, process_file_mock.call_count)
+        self.assertFalse(os.path.isfile(save_path))
+
+        # should process 3 files and save
+        src_folder = "./test_file_path_folder/"
+        parser = data_parser.Pis12DataParser()
+        interpreter_class = data_parser.Pis12DataInterpreter
+        manager = graph_manager.SnapManager
+        process_files(src_folder, parser, interpreter_class, manager, save_path)
+
+        # we add 3 more calls to process_file...
+        self.assertEquals(6, process_file_mock.call_count)
+        self.assertTrue(os.path.isfile(save_path))
+
+        # cleanup
+        os.remove(save_path)
+
+
 
     def test_process_file(self):
 
@@ -38,7 +57,7 @@ class TestDataAnalysis(unittest.TestCase):
 
         # from raw_graph, we should see 3 worker nodes
         # we should also see 3 employer nodes.
-        self.assertEquals(3, graph.node_count())
+        self.assertEquals(3, graph.get_node_count())
 
 
     def test_create_nodes(self):
