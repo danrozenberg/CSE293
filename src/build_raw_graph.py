@@ -60,5 +60,5 @@ if __name__ == '__main__':
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
                   graph_manager.SnapManager,
-                  "./test.graph")
+                  "../test/test.graph")
 
