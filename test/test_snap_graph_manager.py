@@ -1,4 +1,5 @@
 import sys
+import os
 import unittest
 sys.path.append('../src')
 import graph_manager
@@ -19,28 +20,28 @@ class TestSnapManager(unittest.TestCase):
         manager = self.manager
 
         # no nodes
-        self.assertEquals(0, self.manager.node_count())
+        self.assertEquals(0, self.manager.get_node_count())
 
         # got nodes
         NId = manager.add_node(-55)
-        self.assertEquals(1, self.manager.node_count())
+        self.assertEquals(1, self.manager.get_node_count())
         self.assertEquals(-55, NId)
 
         NId = manager.add_node()
-        self.assertEquals(2, self.manager.node_count())
+        self.assertEquals(2, self.manager.get_node_count())
         self.assertEquals(0, NId)
 
         NId = manager.add_node()
-        self.assertEquals(3, self.manager.node_count())
+        self.assertEquals(3, self.manager.get_node_count())
         self.assertEquals(1, NId)
 
         NId = manager.add_node(33)
-        self.assertEquals(4, self.manager.node_count())
+        self.assertEquals(4, self.manager.get_node_count())
         self.assertEquals(33, NId)
 
         # don't freak out with adding same node
         NId = manager.add_node(33)
-        self.assertEquals(4, self.manager.node_count())
+        self.assertEquals(4, self.manager.get_node_count())
         self.assertEquals(33, NId)
 
     # should delete nodes
@@ -48,14 +49,14 @@ class TestSnapManager(unittest.TestCase):
         manager = self.manager
 
         manager.add_node(11)
-        self.assertEquals(1, self.manager.node_count())
+        self.assertEquals(1, self.manager.get_node_count())
 
         manager.delete_node(11)
-        self.assertEquals(0, self.manager.node_count())
+        self.assertEquals(0, self.manager.get_node_count())
 
         # don't freak out!
         manager.delete_node(11)
-        self.assertEquals(0, self.manager.node_count())
+        self.assertEquals(0, self.manager.get_node_count())
 
     # should add and retrieve attribute to/from a node
     # also tests get node attrs/attr
@@ -183,6 +184,26 @@ class TestSnapManager(unittest.TestCase):
         expected = []
         answer = manager.get_nodes()
         self.assertListEqual(expected, answer)
+
+    def test_save_and_load_graph(self):
+        manager = self.manager
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        file_path = "./test.graph"
+        manager.save_graph(file_path)
+
+        # file is saved
+        self.assertTrue(os.path.isfile(file_path))
+
+        # file gets loaded
+        manager = graph_manager.SnapManager()
+        manager.load_graph(file_path)
+        self.assertEquals(3, manager.get_node_count())
+
+        # cleanup
+        os.remove(file_path)
+
 
 if __name__ == "__main__":
     unittest.main()

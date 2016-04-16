@@ -61,7 +61,7 @@ class SnapManager(object):
 
     def get_nodes(self):
         # TODO: make my own node iterator, since snap doesnt give us a REAL one.
-        if self.node_count() == 0:
+        if self.get_node_count() == 0:
             return []
         else:
             nodes = []
@@ -136,7 +136,7 @@ class SnapManager(object):
             raise RuntimeError("Edge " + str(EId) + " does not have attribute '" +
                                                attr_name + "'")
 
-    def node_count(self):
+    def get_node_count(self):
         return self.network.GetNodes()
 
     def get_edge_count(self):
@@ -168,6 +168,16 @@ class SnapManager(object):
 
     def is_node(self, NId):
         return self.network.IsNode(NId)
+
+    def save_graph(self, file_path):
+        FOut = snap.TFOut(file_path)
+        self.network.Save(FOut)
+        FOut.Flush()
+
+    def load_graph(self, file_path):
+        FIn = snap.TFIn(file_path)
+        self.network = snap.TNEANet.Load(FIn)
+        return self
 
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
