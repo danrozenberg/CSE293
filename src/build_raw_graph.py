@@ -56,10 +56,7 @@ def create_edges(interpreter, graph):
 
 if __name__ == '__main__':
 
-    # TODO: don't use config like this, pass it as a parameter or something..
-    config = Config()
-    source_folder = config.get_data_path()
-    process_files(source_folder,
+    process_files("../test/test_data/",
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
                   graph_manager.SnapManager,
