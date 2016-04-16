@@ -204,6 +204,12 @@ class TestSnapManager(unittest.TestCase):
         # cleanup
         os.remove(file_path)
 
+        # except if not found
+        with self.assertRaises(RuntimeError) as bad_call:
+            manager.load_graph("i dont exist")
+        the_exception = bad_call.exception
+        self.assertIn("Can not open file", the_exception.message)
+
 
 if __name__ == "__main__":
     unittest.main()
