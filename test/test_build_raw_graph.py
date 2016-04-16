@@ -117,7 +117,6 @@ class TestDataAnalysis(unittest.TestCase):
         graph.add_node(123)
         graph.add_node(456)
 
-
         self.assertEquals(0, graph.get_edge_count())
 
         # just adding an edge
@@ -144,9 +143,6 @@ class TestDataAnalysis(unittest.TestCase):
         create_edges(interpreter, graph)
         self.assertEquals(4, graph.get_edge_count())
 
-
-
-
 # todo, make interpreter an ABC
 class FakeInterpreter():
     ''' This class makes our lives easier when testing'''
@@ -156,7 +152,7 @@ class FakeInterpreter():
         self.demission_date = 0
         self.worker_id = 0
         self.employer_id = 0
-        self.time_at_worker = 0
+        self.test_time_at_employer = 0
 
 
 

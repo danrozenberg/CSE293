@@ -51,7 +51,7 @@ def create_edges(interpreter, graph):
 
     edge = graph.add_edge(src_node_id, dest_node_id)
     graph.add_edge_attr(edge, "year", interpreter.year)
-    graph.add_edge_attr(edge, "time_at_worker",interpreter.time_at_worker)
+    graph.add_edge_attr(edge, "time_at_worker",interpreter.test_time_at_employer)
     # We should add more edge attributes here as they are needed.
 
 if __name__ == '__main__':
@@ -59,7 +59,9 @@ if __name__ == '__main__':
     # TODO: don't use config like this, pass it as a parameter or something..
     config = Config()
     source_folder = config.get_data_path()
-
     process_files(source_folder,
                   data_parser.Pis12DataParser(),
-                 graph_manager.SnapManager)
+                  data_parser.Pis12DataInterpreter,
+                  graph_manager.SnapManager,
+                  "./test.graph")
+
