@@ -63,6 +63,7 @@ class Pis12DataParser():
                     break
 
 
+    # TODO: maybe put this in the interpreter instead...
     def parse_line(self, line):
         """
         Since this class deals with PIS12 data only, we can be very
@@ -124,6 +125,8 @@ class Pis12DataInterpreter():
      This is what this class is all about."""
 
     # TODO: explain why we don't interrupt program.
+    # TODO: perhaps, have the object "update" its state, currently
+        # we create a new object per line, kinda not good..
     def __init__(self, values):
 
         # configures log
@@ -142,7 +145,6 @@ class Pis12DataInterpreter():
 
     @property
     def admission_date(self):
-
         # TODO: does tipo_adm change anything?
 
         if self.dict['DT_ADMISSAO'] <> '':
@@ -159,8 +161,8 @@ class Pis12DataInterpreter():
             return datetime.datetime(adm_year, adm_month, adm_day)
         else:
             self.log_message = "could not get admission date for: " + str(self.dict)
-            logging.warning(self.log_message)
-            return -1
+            logging.info(self.log_message)
+            return 0
 
     @property
     def demission_date(self):
@@ -170,23 +172,22 @@ class Pis12DataInterpreter():
         if self.dict['DIADESL'] == 'NAO DESL ANO':
             return 0
 
+        # if all empty, then not let go by company
+        if self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '':
+            return 0
+
         try:
             dem_month = int(self.dict['MES_DESLIG'])
             dem_day = int(self.dict['DIADESL'])
             dem_year = self.year
 
-            # inconsistent data:
             # TODO: inconsistency in EMP_EM_31_12??
-            if (dem_month > 0 and dem_day <= 0) or \
-            (dem_month <= 0 and dem_day > 0) :
+            # check inconsistent data:
+            if (dem_month > 0 >= dem_day) or \
+            (dem_month <= 0 < dem_day) :
                 self.log_message = "Inconsistent MES_DESLIG or DIADESL in: " + str(self.dict)
                 logging.warning(self.log_message)
                 return -1
-
-            # all 0, then not let go by company
-            elif dem_month == 0 and dem_day == 0:
-                return 0
-
             else:
                 return datetime.datetime(dem_year, dem_month, dem_day)
 
@@ -194,6 +195,35 @@ class Pis12DataInterpreter():
             self.log_message = "MES_DESLIG or DIADESL is invalid in: " + str(self.dict)
             logging.warning(self.log_message)
             return -1
+
+    @property
+    def time_at_employer(self):
+        '''
+        :return: the number of days (including weekends) that the worker
+        was working for that employer.
+        '''
+        admission_date = self.admission_date
+        demission_date = self.demission_date
+        year = self.year
+
+        # pretend worker starts on Jan-1st if date is from a previous year
+        #   or if it has no admission date ( Isuppose that means he/shw was not
+        #   hired that year....)
+        if type(admission_date) == datetime.datetime and \
+           admission_date.year < year:
+            admission_date = datetime.datetime(year, 1, 1)
+        if type(admission_date) == int and admission_date == 0:
+            admission_date = datetime.datetime(year, 1, 1)
+
+
+        # if we get a 0 for demission date, we suppose the worker was not
+        #   fired that year, give it a Dec-31 date...
+        if type(demission_date) == int and demission_date == 0:
+            demission_date = datetime.datetime(year, 12, 31)
+
+        # Finally, return...
+        return (demission_date - admission_date).days
+
 
     @property
     def worker_id(self):
