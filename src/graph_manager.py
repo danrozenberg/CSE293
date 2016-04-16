@@ -16,7 +16,7 @@ class SnapManager(object):
         Note that: Adding a node takes constant time.
         """
         if NId <> -1 and self.network.IsNode(NId):
-            loggign.debug("Could not add node with id = "
+            logging.debug("Could not add node with id = "
                             + str(NId) + " because it already existed" )
             return NId
         else:
@@ -31,23 +31,23 @@ class SnapManager(object):
         if self.network.IsNode(NId):
             self.network.DelNode(NId)
         else:
-            loggign.debug("Could not delete node with id = "
+            logging.debug("Could not delete node with id = "
                             + str(NId) + " because it doesn't exist" )
 
     def add_edge(self, src_node, dest_node, EId=-1):
 
         if EId <> -1 and self.network.IsEdge(EId):
-            loggign.debug("Couldn't add edge with EId = "
+            logging.debug("Couldn't add edge with EId = "
                             + str(EId) + " because it already exist")
             return EId
 
         if not self.is_node(src_node):
-            loggign.debug("Couldn't add edge from node "
+            logging.debug("Couldn't add edge from node "
                             + str(src_node) + " because such node doesn't exist")
             return None
 
         if not self.is_node(dest_node):
-            loggign.debug("Couldn't add edge to node "
+            logging.debug("Couldn't add edge to node "
                             + str(dest_node) + " because such node doesn't exist")
             return None
 
