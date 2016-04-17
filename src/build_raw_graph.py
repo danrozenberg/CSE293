@@ -36,14 +36,12 @@ def process_line(interpreter, graph):
 def create_nodes(interpreter, graph):
 
     # add worker node and a 'worker' property
-    NId = graph.add_node()
+    NId = graph.add_node(interpreter.worker_id)
     graph.add_node_attr(NId, "type", "worker")
-    graph.add_node_attr(NId, "worker_id", interpreter.worker_id)
 
     # add employer node and a 'employer' property
-    NId = graph.add_node()
+    NId = graph.add_node(interpreter.employer_id)
     graph.add_node_attr(NId, "type", "employer")
-    graph.add_node_attr(NId, "employer_id", interpreter.employer_id)
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
