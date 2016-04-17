@@ -97,10 +97,14 @@ class TestSnapManager(unittest.TestCase):
         manager = self.manager
         self.assertFalse(manager.is_node(10))
         self.assertFalse(manager.is_node(2))
-        manager.add_node(10)
-        manager.add_node(2)
-        self.assertTrue(manager.is_node(10))
-        self.assertTrue(manager.is_node(2))
+        node1 = manager.add_node(10)
+        node2 = manager.add_node(2)
+        self.assertTrue(manager.is_node(node1))
+        self.assertTrue(manager.is_node(node2))
+        node1 = manager.add_node()
+        node2 = manager.add_node()
+        self.assertTrue(manager.is_node(node1))
+        self.assertTrue(manager.is_node(node2))
 
     # should add and retrieve attribute to/from an edge
     # also tests get edge attrs/attr

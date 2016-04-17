@@ -14,6 +14,7 @@ class SnapManager(object):
         Adds a node to the network, if it doesn't exist yet.
         Note that: Accessing arbitrary node takes constant time.
         Note that: Adding a node takes constant time.
+        Note: id is a c++ (32 bit) integer, so be careful not to overflow.
         """
         if NId <> -1 and self.network.IsNode(NId):
             logging.debug("Could not add node with id = "
