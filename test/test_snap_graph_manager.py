@@ -44,6 +44,11 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(4, self.manager.get_node_count())
         self.assertEquals(33, NId)
 
+        # need to be able to add big values
+        NId = manager.add_node(999999999999)
+        self.assertEquals(5, self.manager.get_node_count())
+        self.assertEquals(999999999999, NId)
+
     # should delete nodes
     def test_delete_nod(self):
         manager = self.manager
@@ -101,10 +106,10 @@ class TestSnapManager(unittest.TestCase):
         node2 = manager.add_node(2)
         self.assertTrue(manager.is_node(node1))
         self.assertTrue(manager.is_node(node2))
-        node1 = manager.add_node()
-        node2 = manager.add_node()
-        self.assertTrue(manager.is_node(node1))
-        self.assertTrue(manager.is_node(node2))
+        manager.add_node(10)
+        manager.add_node(2)
+        self.assertTrue(manager.is_node(10))
+        self.assertTrue(manager.is_node(2))
 
     # should add and retrieve attribute to/from an edge
     # also tests get edge attrs/attr
