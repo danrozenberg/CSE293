@@ -232,7 +232,6 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'DT_ADMISSAO':'',
                                             'DIADESL':'',
                                             'MES_DESLIG':''})
-        print interpreter.demission_date
         self.assertEquals(0, interpreter.demission_date)
 
 
