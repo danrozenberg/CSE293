@@ -51,7 +51,7 @@ def create_edges(interpreter, graph):
 
     edge = graph.add_edge(src_node_id, dest_node_id)
     graph.add_edge_attr(edge, "year", interpreter.year)
-    graph.add_edge_attr(edge, "time_at_worker",interpreter.time_at_employer)
+    graph.add_edge_attr(edge, "time_at_employer",interpreter.time_at_employer)
     # We should add more edge attributes here as they are needed.
 
 if __name__ == '__main__':

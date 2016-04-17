@@ -43,8 +43,6 @@ class TestDataAnalysis(unittest.TestCase):
         # cleanup
         os.remove(save_path)
 
-
-
     def test_process_file(self):
 
         # should call process_line 30 times
@@ -152,7 +150,7 @@ class FakeInterpreter():
         self.demission_date = 0
         self.worker_id = 0
         self.employer_id = 0
-        self.test_time_at_employer = 0
+        self.time_at_employer = 0
 
 
 
