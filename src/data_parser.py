@@ -157,9 +157,22 @@ class Pis12DataInterpreter():
                 logging.warning(self.log_message)
                 return -1
 
+        elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'].isdigit():
+
+            if self.dict['MES_ADM'] == '0':
+                # This happens in older records...for our purposes, let's
+                # assume that they were hired long long ago, in 1900 or something.
+                return datetime.datetime(1990, 1, 1)
+            else:
+                # I am assuming that in these cases, the worker was hired in the
+                # current year.
+                adm_month = int(self.dict['MES_ADM'])
+                return datetime.datetime(self.year, adm_month, 1)
+
+
         elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'] == '0':
             # This happens in older records...for our purposes, let's
-            # assume that they were hired long long ago, in 1900 or something.
+            #
             return datetime.datetime(1990, 1, 1)
 
         elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :

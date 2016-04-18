@@ -187,9 +187,18 @@ class TestPis12DataInterpreter(unittest.TestCase):
         # with 0 as MES_ADM and ANO_ADM = ''
         interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'',
                                             'MES_ADM':'0',
-                                            'ANO_ADM':''})
+                                            'ANO_ADM':'',
+                                            'ANO':'2002'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1990,1,1), answer)
+
+        # with a number in MES_ADM and ANO_ADM = ''
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'',
+                                            'MES_ADM':'7',
+                                            'ANO_ADM':'',
+                                            'ANO':'2002'})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(2002,7,1), answer)
 
 
         # with no dt_admissao
