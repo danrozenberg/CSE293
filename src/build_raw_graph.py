@@ -30,8 +30,22 @@ def process_file(file_path, data_parser, interpreter_class, graph):
             process_line(interpreter, graph)
 
 def process_line(interpreter, graph):
-    create_nodes(interpreter, graph)
-    create_edges(interpreter, graph)
+
+    if passes_filter(interpreter):
+        create_nodes(interpreter, graph)
+        create_edges(interpreter, graph)
+
+def passes_filter(interpreter):
+    """
+    Checks if the interpreted data is good enough to be considered
+    :return: true or false
+    """
+    # contains PIS rule
+    # sometimes line has no worker id? Why is this even in the database?
+    if interpreter.worker_id == -1:
+        return False
+
+    return True
 
 def create_nodes(interpreter, graph):
 
