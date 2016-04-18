@@ -141,7 +141,7 @@ class Pis12DataInterpreter():
     @property
     def year(self):
         """ :return: the year the entry relates to """
-        return self.__simple_retrieval('ANO')
+        return self.__simple_retrieval('ANO', 'info')
 
     @property
     def admission_date(self):
@@ -238,7 +238,7 @@ class Pis12DataInterpreter():
 
     @property
     def worker_id(self):
-        return self.__simple_retrieval('PIS')
+        return self.__simple_retrieval('PIS', 'info')
 
     @property
     def employer_id(self):

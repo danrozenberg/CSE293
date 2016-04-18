@@ -40,7 +40,7 @@ def passes_filter(interpreter):
     Checks if the interpreted data is good enough to be considered
     :return: true or false
     """
-    # contains PIS rule
+    # contains worker_id rule
     # sometimes line has no worker id? Why is this even in the database?
     if interpreter.worker_id == -1:
         return False
@@ -48,6 +48,11 @@ def passes_filter(interpreter):
     # contains IDENTIFICAD rule
     # sometimes line has no employer id? Why is this even in the database?
     if interpreter.employer_id == -1:
+        return False
+
+    # contains year rule
+    # sometimes line has no year? Huh?
+    if interpreter.year == -1:
         return False
 
     return True

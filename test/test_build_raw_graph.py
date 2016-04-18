@@ -163,9 +163,8 @@ class TestDataAnalysis(unittest.TestCase):
         self.assertEquals(4, graph.get_edge_count())
 
     def test_passes_filter(self):
-        interpreter = FakeInterpreter()
-
         # no worker_id rule
+        interpreter = FakeInterpreter()
         interpreter.worker_id = 33
         self.assertTrue(passes_filter(interpreter))
 
@@ -173,11 +172,20 @@ class TestDataAnalysis(unittest.TestCase):
         self.assertFalse(passes_filter(interpreter))
 
         # no employer_id rule
+        interpreter = FakeInterpreter()
         interpreter.worker_id = 222
         self.assertTrue(passes_filter(interpreter))
 
         interpreter.worker_id = -1
         self.assertFalse(passes_filter(interpreter))
+
+        # no year rule
+        interpreter = FakeInterpreter()
+        interpreter.year = -1
+        self.assertFalse(passes_filter(interpreter))
+
+        interpreter.year = 1999
+        self.assertTrue(passes_filter(interpreter))
 
 
 # todo, make interpreter an ABC
