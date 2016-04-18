@@ -154,7 +154,7 @@ class Pis12DataInterpreter():
                 return datetime.datetime.strptime(date_string,'%d%m%Y')
             except ValueError:
                 self.log_message = "Could not parse DT_ADMISSAO for: " + str(self.dict)
-                logging.info(self.log_message)
+                logging.warning(self.log_message)
                 return -1
 
         elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'] == '0':
@@ -170,7 +170,7 @@ class Pis12DataInterpreter():
             return datetime.datetime(adm_year, adm_month, adm_day)
         else:
             self.log_message = "could not get admission date for: " + str(self.dict)
-            logging.info(self.log_message)
+            logging.warning(self.log_message)
             return -1
 
     @property
