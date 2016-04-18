@@ -211,6 +211,13 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'MES_DESLIG':'0'})
         self.assertEquals(0 , interpreter.demission_date)
 
+        # got mes_deslig but no diadesl
+        interpreter = Pis12DataInterpreter({'ANO':'2000',
+                                            'DIADESL':'',
+                                            'MES_DESLIG':'3'})
+        self.assertEquals(datetime.datetime(2000,3,1)
+                          ,interpreter.demission_date)
+
 
 
         interpreter = Pis12DataInterpreter({'ANO':'1999',
@@ -225,13 +232,6 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'MES_DESLIG':'-12'})
         answer = interpreter.demission_date
         self.assertIn("Inconsistent MES_DESLIG or DIADESL", interpreter.log_message)
-        self.assertEquals(-1, answer)
-
-        interpreter = Pis12DataInterpreter({'ANO':'1999',
-                                            'DIADESL':'',
-                                            'MES_DESLIG':'12'})
-        answer = interpreter.demission_date
-        self.assertIn("MES_DESLIG or DIADESL is invalid in: ", interpreter.log_message)
         self.assertEquals(-1, answer)
 
         interpreter = Pis12DataInterpreter({'ANO':'2015',

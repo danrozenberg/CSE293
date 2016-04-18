@@ -173,12 +173,20 @@ class Pis12DataInterpreter():
             return 0
 
         # if all empty, then not let go by company
-        if self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '':
+        elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '':
             return 0
 
         # Another variation of 'not let go by company'
-        if self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '0':
+        elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '0':
             return 0
+
+        # MES_DESLIG (different from 0), but no DIADESL, let's assume that
+        # the worker was let go at the first day of the month.
+        elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'].isdigit():
+            dem_month = int(self.dict['MES_DESLIG'])
+            dem_day = 1
+            dem_year = self.year
+            return datetime.datetime(dem_year, dem_month, dem_day)
 
         try:
             dem_month = int(self.dict['MES_DESLIG'])
