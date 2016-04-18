@@ -149,10 +149,13 @@ class Pis12DataInterpreter():
 
         if self.dict['DT_ADMISSAO'] <> '':
             # gotta pad the string with 0...
-            padded_string = self.dict['DT_ADMISSAO']\
-                .lstrip("0").\
-                replace(" 0", " ")
-            return datetime.datetime.strptime(padded_string,'%d%m%Y')
+            try:
+                date_string = self.dict['DT_ADMISSAO']
+                return datetime.datetime.strptime(date_string,'%d%m%Y')
+            except ValueError:
+                self.log_message = "Could not parse DT_ADMISSAO for: " + str(self.dict)
+                logging.info(self.log_message)
+                return  0
         elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :
             # In this case, day dafaults to 01...
             adm_day = 1

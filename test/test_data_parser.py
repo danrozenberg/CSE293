@@ -168,6 +168,15 @@ class TestPis12DataInterpreter(unittest.TestCase):
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1986,4,5), answer)
 
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'541986'})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(1986,4,5), answer)
+
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'5486'})
+        answer = interpreter.admission_date
+        self.assertEquals(0, answer)
+        self.assertIn("Could not parse DT_ADMISSAO for: ", interpreter.log_message)
+
         interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'28092007',
                                             'MES_ADM':'01',
                                             'ANO_ADM':'2001'})
