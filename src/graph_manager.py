@@ -9,50 +9,67 @@ class SnapManager(object):
     def __init__(self):
         self.network = snap.TNEANet()
 
-    def add_node(self, NId=-1):
+        # The following dictionaries basically transform a CEI or CNJP into
+        #   values that fit a C++ integers. We want CEI and CNPJ to be
+        #   our IDs, but their values do not fit SNAP integers which are
+        #   used as node ids :(
+        # This is the reason you can see the use of the following dictionaries:
+        self.NId_from_id = {}
+        self.id_from_NId = {}
+
+    def add_node(self, node_id):
         """
         Adds a node to the network, if it doesn't exist yet.
         Note that: Accessing arbitrary node takes constant time.
         Note that: Adding a node takes constant time.
         Note: id is a c++ (32 bit) integer, so be careful not to overflow.
         """
-        if NId <> -1 and self.network.IsNode(NId):
+        if self.is_node(node_id):
+            # no need to change any state...
             logging.debug("Could not add node with id = "
-                            + str(NId) + " because it already existed" )
-            return NId
+                            + str(node_id) + " because it already existed" )
         else:
-            return self.network.AddNode(NId)
+            new_NId = self.network.AddNode(-1)
+            self.NId_from_id[node_id] = new_NId
+            self.id_from_NId[new_NId] = node_id
 
-    def delete_node(self, NId):
+        return node_id
+
+    def delete_node(self, node_id):
         """
         Deletes a node, but only if it exists.
         Note that: Accessing arbitrary node takes constant time.
         :param NId: the id of the node to delete
         """
+        NId = self.NId_from_id[node_id]
+
         if self.network.IsNode(NId):
             self.network.DelNode(NId)
         else:
             logging.debug("Could not delete node with id = "
                             + str(NId) + " because it doesn't exist" )
 
-    def add_edge(self, src_node, dest_node, EId=-1):
+    def add_edge(self, src_id, dest_id, EId=-1):
 
         if EId <> -1 and self.network.IsEdge(EId):
             logging.debug("Couldn't add edge with EId = "
                             + str(EId) + " because it already exist")
             return EId
 
-        if not self.is_node(src_node):
+        if not self.is_node(src_id):
             logging.debug("Couldn't add edge from node "
-                            + str(src_node) + " because such node doesn't exist")
+                            + str(src_id) + " because such node doesn't exist")
             return None
 
-        if not self.is_node(dest_node):
+        if not self.is_node(dest_id):
             logging.debug("Couldn't add edge to node "
-                            + str(dest_node) + " because such node doesn't exist")
+                            + str(dest_id) + " because such node doesn't exist")
             return None
 
-        return self.network.AddEdge(src_node, dest_node, EId)
+        src_NId = self.NId_from_id[src_id]
+        dest_NId = self.NId_from_id[dest_id]
+        return self.network.AddEdge(src_NId, dest_NId, EId)
+        return self.network.AddEdge(src_NId, dest_NId, EId)
 
     def get_edges(self):
         raise NotImplementedError
@@ -67,25 +84,26 @@ class SnapManager(object):
         else:
             nodes = []
             node_iterator = self.network.BegNI()
-            nodes.append(node_iterator.GetId())
+            found_NId = self.id_from_NId[node_iterator.GetId()]
+            nodes.append(found_NId)
 
             # note, the Nodes() method does not work in SNAP, for some reason...
             # actually, its missing a lot of useful stuff.
             # gotta do it like this:  =(
             while node_iterator.Next():
                 try:
-                    nodes.append(node_iterator.GetId())
+                    found_NId = self.id_from_NId[node_iterator.GetId()]
+                    nodes.append(found_NId)
                 except RuntimeError:
                     return nodes
 
-    def get_node(self, NId):
-        return self.network.GetNI(NId)
-
-    def get_node_attributes(self, NId):
+    def get_node_attributes(self, node_id):
         """
         :param NId: the node to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
         """
+        NId = self.NId_from_id[node_id]
+
         names = snap.TStrV()
         values = snap.TStrV()
         converted_values = []
@@ -99,14 +117,14 @@ class SnapManager(object):
 
         return dict(zip(names, converted_values))
 
-    def get_node_attribute(self, NId, attr_name):
+    def get_node_attribute(self, node_id, attr_name):
         # Probably not the most efficient way of doing this...
-        attributes = self.get_node_attributes(NId)
+        attributes = self.get_node_attributes(node_id)
 
         try:
             return attributes[attr_name]
         except KeyError:
-            raise RuntimeError("Node " + str(NId) + " does not have attribute '" +
+            raise RuntimeError("Node " + str(node_id) + " does not have attribute '" +
                                                attr_name + "'")
 
     def get_edge_attributes(self, EId):
@@ -143,9 +161,10 @@ class SnapManager(object):
     def get_edge_count(self):
         return self.network.GetEdges()
 
-    def add_node_attr(self, NId, name, value):
+    def add_node_attr(self, node_id, name, value):
+        NId = self.NId_from_id[node_id]
 
-        node = self.get_node(NId)
+        node = self.network.GetNI(NId)
         if isinstance(value, int):
             self.network.AddIntAttrDatN(node, value, name)
         elif isinstance(value, float):
@@ -167,8 +186,15 @@ class SnapManager(object):
         else:
             raise Exception('Invalid data type')
 
-    def is_node(self, NId):
-        return self.network.IsNode(NId)
+    def is_node(self, node_id):
+        if node_id in self.NId_from_id:
+            NId = self.NId_from_id[node_id]
+
+            # should be always True at this point
+            # but its good to have it here for test purposes.
+            return self.network.IsNode(NId)
+        else:
+            return False
 
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)

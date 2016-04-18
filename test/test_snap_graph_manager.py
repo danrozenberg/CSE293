@@ -23,45 +23,66 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, self.manager.get_node_count())
 
         # got nodes
-        NId = manager.add_node(-55)
+        node_id = manager.add_node(-55)
         self.assertEquals(1, self.manager.get_node_count())
-        self.assertEquals(-55, NId)
+        self.assertEquals(-55, node_id)
 
-        NId = manager.add_node()
+        node_id = manager.add_node(0)
         self.assertEquals(2, self.manager.get_node_count())
-        self.assertEquals(0, NId)
+        self.assertEquals(0, node_id)
 
-        NId = manager.add_node()
+        node_id = manager.add_node(1)
         self.assertEquals(3, self.manager.get_node_count())
-        self.assertEquals(1, NId)
+        self.assertEquals(1, node_id)
 
-        NId = manager.add_node(33)
+        node_id = manager.add_node(33)
         self.assertEquals(4, self.manager.get_node_count())
-        self.assertEquals(33, NId)
+        self.assertEquals(33, node_id)
 
         # don't freak out with adding same node
-        NId = manager.add_node(33)
+        node_id = manager.add_node(33)
         self.assertEquals(4, self.manager.get_node_count())
-        self.assertEquals(33, NId)
+        self.assertEquals(33, node_id)
 
         # need to be able to add big values
-        NId = manager.add_node(999999999999)
+        node_id = manager.add_node(999999999999)
         self.assertEquals(5, self.manager.get_node_count())
-        self.assertEquals(999999999999, NId)
+        self.assertEquals(999999999999, node_id)
 
     # should delete nodes
-    def test_delete_nod(self):
+    def test_delete_node(self):
         manager = self.manager
 
         manager.add_node(11)
         self.assertEquals(1, self.manager.get_node_count())
+        remaining_nodes = manager.get_nodes()
+        self.assertListEqual([11], remaining_nodes)
+
+        manager.add_node(22)
+        self.assertEquals(2, self.manager.get_node_count())
+        remaining_nodes = manager.get_nodes()
+        self.assertListEqual([11, 22], remaining_nodes)
+
+        manager.add_node(33)
+        self.assertEquals(3, self.manager.get_node_count())
+        remaining_nodes = manager.get_nodes()
+        self.assertListEqual([11, 22, 33], remaining_nodes)
 
         manager.delete_node(11)
-        self.assertEquals(0, self.manager.get_node_count())
+        self.assertEquals(2, self.manager.get_node_count())
+        remaining_nodes = manager.get_nodes()
+        self.assertListEqual([22, 33], remaining_nodes)
+
+        manager.delete_node(22)
+        self.assertEquals(1, self.manager.get_node_count())
+        remaining_nodes = manager.get_nodes()
+        self.assertListEqual([33], remaining_nodes)
 
         # don't freak out!
         manager.delete_node(11)
-        self.assertEquals(0, self.manager.get_node_count())
+        self.assertEquals(1, self.manager.get_node_count())
+        remaining_nodes = manager.get_nodes()
+        self.assertListEqual([33], remaining_nodes)
 
     # should add and retrieve attribute to/from a node
     # also tests get node attrs/attr
@@ -162,12 +183,12 @@ class TestSnapManager(unittest.TestCase):
 
         expected = []
         answer = manager.get_nodes()
-        self.assertAlmostEqual(expected, answer)
+        self.assertListEqual(expected, answer)
 
         manager.add_node(10)
         expected = [10]
         answer = manager.get_nodes()
-        self.assertAlmostEqual(expected, answer)
+        self.assertListEqual(expected, answer)
 
         manager.add_node(20)
         expected = [10, 20]
