@@ -51,11 +51,10 @@ class TestDataAnalysis(unittest.TestCase):
         interpreter_class = data_parser.Pis12DataInterpreter
         graph = graph_manager.SnapManager()
         process_file(file_path, parser, interpreter_class, graph)
-        self.assertEquals(30, process_line_mock.call_count)
 
-        # from raw_graph, we should see 3 worker nodes
+        # from raw_graph, we should see 5 worker nodes
         # we should also see 3 employer nodes.
-        self.assertEquals(3, graph.get_node_count())
+        self.assertEquals(8, graph.get_node_count())
 
 
     def test_create_nodes(self):
