@@ -45,6 +45,11 @@ def passes_filter(interpreter):
     if interpreter.worker_id == -1:
         return False
 
+    # contains IDENTIFICAD rule
+    # sometimes line has no employer id? Why is this even in the database?
+    if interpreter.employer_id == -1:
+        return False
+
     return True
 
 def create_nodes(interpreter, graph):

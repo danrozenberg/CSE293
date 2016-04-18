@@ -172,6 +172,13 @@ class TestDataAnalysis(unittest.TestCase):
         interpreter.worker_id = -1
         self.assertFalse(passes_filter(interpreter))
 
+        # no employer_id rule
+        interpreter.worker_id = 222
+        self.assertTrue(passes_filter(interpreter))
+
+        interpreter.worker_id = -1
+        self.assertFalse(passes_filter(interpreter))
+
 
 # todo, make interpreter an ABC
 class FakeInterpreter():
