@@ -155,7 +155,7 @@ class Pis12DataInterpreter():
             except ValueError:
                 self.log_message = "Could not parse DT_ADMISSAO for: " + str(self.dict)
                 logging.info(self.log_message)
-                return  0
+                return -1
         elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :
             # In this case, day dafaults to 01...
             adm_day = 1
@@ -165,7 +165,7 @@ class Pis12DataInterpreter():
         else:
             self.log_message = "could not get admission date for: " + str(self.dict)
             logging.info(self.log_message)
-            return 0
+            return -1
 
     @property
     def demission_date(self):
@@ -220,6 +220,11 @@ class Pis12DataInterpreter():
         admission_date = self.admission_date
         demission_date = self.demission_date
         year = self.year
+
+        if admission_date == -1 or demission_date == -1 or year == -1:
+            self.log_message = "Unable to calculate start date for:" + str(self.dict)
+            logging.warning(self.log_message)
+            return -1
 
         # pretend worker starts on Jan-1st if date is from a previous year
         #   or if it has no admission date ( Isuppose that means he/shw was not

@@ -174,7 +174,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
 
         interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'5486'})
         answer = interpreter.admission_date
-        self.assertEquals(0, answer)
+        self.assertEquals(-1, answer)
         self.assertIn("Could not parse DT_ADMISSAO for: ", interpreter.log_message)
 
         interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'28092007',
@@ -291,15 +291,15 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'MES_DESLIG':'12'})
         self.assertEquals(357, interpreter.time_at_employer)
 
-        # no start date, because start working on 1/1
+        # no start date, should return invalid (that is, -1)
         interpreter = Pis12DataInterpreter({'ANO':'2015',
                                             'ANO_ADM':'',
                                             'MES_ADM':'',
                                             'DT_ADMISSAO':'',
                                             'DIADESL':'',
                                             'MES_DESLIG':''})
-        print interpreter.demission_date
-        self.assertEquals(364, interpreter.time_at_employer)
+        self.assertEquals(-1, interpreter.time_at_employer)
+        self.assertIn("Unable to calculate start date for:", interpreter.log_message)
 
 
 
