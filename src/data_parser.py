@@ -176,6 +176,10 @@ class Pis12DataInterpreter():
         if self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '':
             return 0
 
+        # Another variation of 'not let go by company'
+        if self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '0':
+            return 0
+
         try:
             dem_month = int(self.dict['MES_DESLIG'])
             dem_day = int(self.dict['DIADESL'])
@@ -223,7 +227,6 @@ class Pis12DataInterpreter():
 
         # Finally, return...
         return (demission_date - admission_date).days
-
 
     @property
     def worker_id(self):
