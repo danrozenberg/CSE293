@@ -156,6 +156,12 @@ class Pis12DataInterpreter():
                 self.log_message = "Could not parse DT_ADMISSAO for: " + str(self.dict)
                 logging.info(self.log_message)
                 return -1
+
+        elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'] == '0':
+            # This happens in older records...for our purposes, let's
+            # assume that they were hired long long ago, in 1900 or something.
+            return datetime.datetime(1990, 1, 1)
+
         elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :
             # In this case, day dafaults to 01...
             adm_day = 1
@@ -222,7 +228,7 @@ class Pis12DataInterpreter():
         year = self.year
 
         if admission_date == -1 or demission_date == -1 or year == -1:
-            self.log_message = "Unable to calculate start date for:" + str(self.dict)
+            self.log_message = "Unable to calculate time_at_employer for:" + str(self.dict)
             logging.warning(self.log_message)
             return -1
 

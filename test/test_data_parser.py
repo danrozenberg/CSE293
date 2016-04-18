@@ -184,6 +184,14 @@ class TestPis12DataInterpreter(unittest.TestCase):
         self.assertEquals(datetime.datetime(2007,9,28), answer)
 
 
+        # with 0 as MES_ADM and ANO_ADM = ''
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'',
+                                            'MES_ADM':'0',
+                                            'ANO_ADM':''})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(1990,1,1), answer)
+
+
         # with no dt_admissao
         interpreter = Pis12DataInterpreter({'MES_ADM':'1',
                                             'ANO_ADM':'2001',
@@ -201,7 +209,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'ANO_ADM':'',
                                             'DT_ADMISSAO':''})
         answer = interpreter.admission_date
-        self.assertEquals(0 , answer)
+        self.assertEquals(-1 , answer)
 
     def test_job_end_date(self):
         interpreter = Pis12DataInterpreter({'DIADESL':'NAO DESL ANO'})
@@ -299,7 +307,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'DIADESL':'',
                                             'MES_DESLIG':''})
         self.assertEquals(-1, interpreter.time_at_employer)
-        self.assertIn("Unable to calculate start date for:", interpreter.log_message)
+        self.assertIn("Unable to calculate time_at_employer for:", interpreter.log_message)
 
 
 
