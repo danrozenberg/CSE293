@@ -252,6 +252,11 @@ class Pis12DataInterpreter():
         try:
             return int(self.dict[field_name])
         except ValueError:
+            # we don't want the execution to stop in this case
+            # it is more useful to have the program log all lines that
+            # are invalid, so that we can investigate all problematic cases,
+            # after a single run. Otherwise, we will run the program once per
+            # new problem that appears.
             self.log_message = field_name + " is invalid in: " + str(self.dict)
             logging.warning(self.log_message)
             return -1
