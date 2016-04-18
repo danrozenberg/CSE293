@@ -242,7 +242,6 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'MES_DESLIG':''})
         self.assertEquals(0, interpreter.demission_date)
 
-
     def test_worker_id(self):
         interpreter = Pis12DataInterpreter({'PIS':'131313'})
         answer = interpreter.worker_id

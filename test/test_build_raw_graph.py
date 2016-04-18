@@ -56,6 +56,28 @@ class TestDataAnalysis(unittest.TestCase):
         # we should also see 3 employer nodes.
         self.assertEquals(8, graph.get_node_count())
 
+    @mock.patch('build_raw_graph.create_nodes')
+    @mock.patch('build_raw_graph.create_edges')
+    @mock.patch('build_raw_graph.passes_filter', return_value=True)
+    def test_process_line_if_filter_is_ok(self, mock_filter,
+                           mock_edges, mock_nodes):
+
+        process_line(FakeInterpreter(), graph_manager.SnapManager())
+        self.assertEquals(1, mock_nodes.call_count)
+        self.assertEquals(1, mock_filter.call_count)
+        self.assertEquals(1, mock_edges.call_count)
+
+    @mock.patch('build_raw_graph.create_nodes')
+    @mock.patch('build_raw_graph.create_edges')
+    @mock.patch('build_raw_graph.passes_filter', return_value=False)
+    def test_process_line_if_filter_is_not_ok(self, mock_filter,
+                           mock_edges, mock_nodes):
+
+        process_line(FakeInterpreter(), graph_manager.SnapManager())
+        self.assertEquals(1, mock_filter.call_count)
+        self.assertEquals(0, mock_edges.call_count)
+        self.assertEquals(0, mock_nodes.call_count)
+
 
     def test_create_nodes(self):
 
@@ -139,6 +161,17 @@ class TestDataAnalysis(unittest.TestCase):
         interpreter.employer_id = 456
         create_edges(interpreter, graph)
         self.assertEquals(4, graph.get_edge_count())
+
+    def test_passes_filter(self):
+        interpreter = FakeInterpreter()
+
+        # no worker_id rule
+        interpreter.worker_id = 33
+        self.assertTrue(passes_filter(interpreter))
+
+        interpreter.worker_id = -1
+        self.assertFalse(passes_filter(interpreter))
+
 
 # todo, make interpreter an ABC
 class FakeInterpreter():

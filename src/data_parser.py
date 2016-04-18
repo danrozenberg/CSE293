@@ -242,9 +242,9 @@ class Pis12DataInterpreter():
 
     @property
     def employer_id(self):
-        return self.__simple_retrieval('IDENTIFICAD')
+        return self.__simple_retrieval('IDENTIFICAD', 'info')
 
-    def __simple_retrieval(self, field_name):
+    def __simple_retrieval(self, field_name, alert_level='warn'):
         """
         for data that is straightforward to get.
         :return: an integer
@@ -257,6 +257,15 @@ class Pis12DataInterpreter():
             # are invalid, so that we can investigate all problematic cases,
             # after a single run. Otherwise, we will run the program once per
             # new problem that appears.
+
+            # In any case, we want this only for new unexpected errors.
+            # For example, if we know a field could fail, we should not 'warn'.
+            #    we should instead 'info' it in its own property method.
+
             self.log_message = field_name + " is invalid in: " + str(self.dict)
-            logging.warning(self.log_message)
+
+            if alert_level == 'warn':
+                logging.warning(self.log_message)
+            else:
+                logging.info(self.log_message)
             return -1
