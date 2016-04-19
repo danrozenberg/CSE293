@@ -151,6 +151,10 @@ class Pis12DataInterpreter():
             # gotta pad the string with 0...
             try:
                 date_string = self.dict['DT_ADMISSAO']
+
+                # add missing zeroes to day of month
+                if len(date_string) == 7:
+                    date_string = '0' + str(date_string)
                 return datetime.datetime.strptime(date_string,'%d%m%Y')
             except ValueError:
                 self.log_message = "Could not parse DT_ADMISSAO for: " + str(self.dict)

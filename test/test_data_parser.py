@@ -137,7 +137,6 @@ class TestPis12DataInterpreter(unittest.TestCase):
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
-
     def test_ano(self):
         interpreter = Pis12DataInterpreter({'ANO':1999})
         answer = interpreter.year
@@ -219,6 +218,15 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'DT_ADMISSAO':''})
         answer = interpreter.admission_date
         self.assertEquals(-1 , answer)
+
+        # DT_ADMISSAO with a funky format
+        # should be interpreted as 3/12/2005 as in 3rd of december...
+        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'3122005',
+                                            'MES_ADM':'',
+                                            'ANO_ADM':'',
+                                            'ANO':''})
+        answer = interpreter.admission_date
+        self.assertEquals(datetime.datetime(2005,12,3), answer)
 
     def test_job_end_date(self):
         interpreter = Pis12DataInterpreter({'DIADESL':'NAO DESL ANO'})
