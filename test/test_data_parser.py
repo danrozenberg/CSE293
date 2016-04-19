@@ -244,6 +244,11 @@ class TestPis12DataInterpreter(unittest.TestCase):
         self.assertEquals(datetime.datetime(2000,3,1)
                           ,interpreter.demission_date)
 
+        # mes_deslig and diadesl both equal to '0'
+        interpreter = Pis12DataInterpreter({'ANO':'2001',
+                                            'DIADESL':'0',
+                                            'MES_DESLIG':'0'})
+        self.assertEquals(0 ,interpreter.demission_date)
 
 
         interpreter = Pis12DataInterpreter({'ANO':'1999',

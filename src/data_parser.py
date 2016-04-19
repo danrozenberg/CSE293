@@ -202,6 +202,10 @@ class Pis12DataInterpreter():
         elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '0':
             return 0
 
+        # Another variation of 'not let go by company'
+        elif self.dict['DIADESL'] == '0' and self.dict['MES_DESLIG'] == '0':
+            return 0
+
         # MES_DESLIG (different from 0), but no DIADESL, let's assume that
         # the worker was let go at the first day of the month.
         elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'].isdigit():
