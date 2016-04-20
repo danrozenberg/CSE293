@@ -8,14 +8,41 @@ import connect_workers
 
 class ConnectWorkersTest(unittest.TestCase):
 
-    @mock.patch('build_raw_graph.passes_filter', return_value=100)
-    def test_a_few_simple_cases(self):
+    def test_get_worker_iterator(self):
         manager = graph_manager.SnapManager()
 
-        # add the first worker
-        w1 = manager.add_node(1)
-        manager.add_node_attr(w1, "type", "worker")
-        manager.add_node_attr(w1, "type", "worker")
+        # add a few nodes
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        manager.add_node(40)
+        manager.add_node(50)
+        manager.add_node(60)
+        manager.add_node(70)
+
+        # make some worker nodes, others as employer nodes
+        manager.add_node_attr(10, "type", "worker")
+        manager.add_node_attr(20, "type", "employer")
+        manager.add_node_attr(30, "type", "worker")
+        manager.add_node_attr(40, "type", "employer")
+        manager.add_node_attr(50, "type", "worker")
+        manager.add_node_attr(60, "type", "employer")
+        manager.add_node_attr(70, "type", "worker")
+
+        # get iterator
+        it = connect_workers.get_worker_iterator(manager)
+
+        # test it
+        found_ids = []
+        for node in it:
+            self.assertEquals("worker",
+                              manager.get_node_attribute(node, "type"))
+            found_ids.append(node)
+
+        self.assertListEqual([10,30,50,70], found_ids)
+
+
+
 
 
 

@@ -1,9 +1,13 @@
 def is_valid_node(node):
     raise NotImplementedError
 
-def get_worker_iterator(association_graph):
-    raise NotImplementedError
 
+def get_worker_iterator(association_graph):
+    node_iterator = association_graph.get_node_iterator()
+    for node in node_iterator:
+        node_type = association_graph.get_node_attribute(node, "type")
+        if node_type == "worker":
+            yield node
 
 def get_employers(worker):
     raise NotImplementedError
