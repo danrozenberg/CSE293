@@ -95,19 +95,27 @@ class SnapManager(object):
         # in case we get this far...
         return edges
 
-
     def get_edge(self, EId):
         return self.network.GetEI(EId)
 
     def get_nodes(self):
-        # TODO: make my own node iterator, since snap doesnt give us a REAL one.
+        return list(self.get_node_iterator())
+
+    def get_node_iterator(self):
+        """
+        this returns a python generator, as evidenced by the yield command
+        also, SNAP doesn't give us a decent note iterator, so we have to have
+        this funky code instead.
+        :return: A generator that traverses nodes, returning their ids.
+        """
+
         if self.get_node_count() == 0:
-            return []
+            # got nothing, return empty iterator
+            return
         else:
-            nodes = []
             node_iterator = self.network.BegNI()
             found_NId = self.id_from_NId[node_iterator.GetId()]
-            nodes.append(found_NId)
+            yield found_NId
 
             # note, the Nodes() method does not work in SNAP, for some reason...
             # actually, its missing a lot of useful stuff.
@@ -115,9 +123,9 @@ class SnapManager(object):
             while node_iterator.Next():
                 try:
                     found_NId = self.id_from_NId[node_iterator.GetId()]
-                    nodes.append(found_NId)
+                    yield found_NId
                 except RuntimeError:
-                    return nodes
+                    break
 
     def get_node_attributes(self, node_id):
         """

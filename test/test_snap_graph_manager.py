@@ -118,7 +118,6 @@ class TestSnapManager(unittest.TestCase):
         the_exception = bad_call.exception
         self.assertIn("does not have attribute", the_exception.message)
 
-
     def test_is_node(self):
         manager = self.manager
         self.assertFalse(manager.is_node(10))
@@ -277,6 +276,38 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, len(manager.get_edges_between(20, 30)))
         self.assertListEqual([1,2,3,6,7], manager.get_edges_between(10, 20))
         self.assertListEqual([4,5], manager.get_edges_between(10, 30))
+
+    def test_node_generator(self):
+
+        manager = self.manager
+
+        # no nodes, should have empty iterator
+        it = manager.get_node_iterator()
+        for node in it:
+            self.fail("iteraor should be empty")
+
+        # add some nodes
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        found_nodes = []
+        it = manager.get_node_iterator()
+        for node in it:
+            found_nodes.append(node)
+        self.assertListEqual([10,20,30], found_nodes)
+
+        # try again with more nodes
+        manager.add_node(40)
+        manager.add_node(50)
+        manager.add_node(30) #should ignore this
+        found_nodes = []
+        it = manager.get_node_iterator()
+        for node in it:
+            found_nodes.append(node)
+        self.assertListEqual([10,20,30,40,50], found_nodes)
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
