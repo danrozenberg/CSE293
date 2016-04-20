@@ -86,6 +86,10 @@ class Pis12DataParser():
 
 import logging
 class Pis12DataInterpreter():
+    # TODO: make this faster. Don't create a new object all the time
+    # TODO: don't recalculate a value if it has been calculated already
+    # TODO: instead, check if previously calculated and return that instead.
+
     """ We need now a way to calculate several attributes, such as time working together...
      the problem is that there may be several different ways to calculate this,
         depending on when the data was generated.
