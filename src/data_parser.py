@@ -7,9 +7,6 @@ from  itertools import islice
 class Pis12DataParser():
     ''' Reads "PIS12" data from disk and parse it.'''
 
-    def __init__(self):
-        pass
-
     def find_files(self, folder_path, fetch_num = 0, file_type="csv"):
         """
         A generator...
