@@ -173,7 +173,6 @@ class Pis12DataInterpreter():
                 adm_month = int(self.dict['MES_ADM'])
                 return datetime.datetime(self.year, adm_month, 1)
 
-
         elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'] == '0':
             # This happens in older records...for our purposes, let's
             # assume worker was hired long ago.
@@ -222,6 +221,17 @@ class Pis12DataInterpreter():
             dem_month = int(self.dict['MES_DESLIG'])
             dem_day = int(self.dict['DIADESL'])
             dem_year = self.year
+
+            # We have weird instances where MES_DESLIG is 2 and
+            # the day is 29,30,31... This is pretty common
+            # Let us assume those demissions happened in march 1st
+            # We do this so that we don't have a gazzillion errors in the
+            # output...
+            if dem_month == 2 and dem_day > 28:
+                dem_month = 3
+                dem_day = 1
+                self.log_message = "Weird february date in: " + str(self.dict)
+                logging.info(self.log_message)
 
             # TODO: inconsistency in EMP_EM_31_12??
             # check inconsistent data:

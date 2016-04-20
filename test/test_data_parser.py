@@ -281,11 +281,13 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                             'MES_DESLIG':''})
         self.assertEquals(0, interpreter.demission_date)
 
-        # a confusing date...is not a valid date...
+        # a confusing date...put it as march 1st...
         interpreter = Pis12DataInterpreter({'ANO':'2005',
                                             'DIADESL':'29',
                                             'MES_DESLIG':'2'})
-        self.assertEquals(-1, interpreter.demission_date)
+        self.assertEquals(datetime.datetime(2005,3,1)
+                          , interpreter.demission_date)
+        self.assertIn("Weird february date in: ", interpreter.log_message)
 
     def test_worker_id(self):
         interpreter = Pis12DataInterpreter({'PIS':'131313'})
