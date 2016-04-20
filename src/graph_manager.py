@@ -69,10 +69,32 @@ class SnapManager(object):
         src_NId = self.NId_from_id[src_id]
         dest_NId = self.NId_from_id[dest_id]
         return self.network.AddEdge(src_NId, dest_NId, EId)
-        return self.network.AddEdge(src_NId, dest_NId, EId)
 
-    def get_edges(self):
-        raise NotImplementedError
+    def get_edges_between(self, node1, node2):
+        # TODO: make this less aweful, maybe using GetInEdges or something.
+        # Again, there are important methods missing from SNAP.py
+        # The manual says its there, but LIES! ;(
+        # For this reason this method is super-funky!
+        NId1 = self.NId_from_id[node1]
+        NId2 = self.NId_from_id[node2]
+        edges = []
+        try:
+            edge_iterator = self.network.GetEI(NId1, NId2)
+            # iterator may 'overflow' to next set o nodes
+            if edge_iterator.GetSrcNId() == NId1 and \
+                edge_iterator.GetDstNId() == NId2:
+                    edges.append(edge_iterator.GetId())
+            while edge_iterator.Next():
+                # iterator may 'overflow' to next set o nodes
+                if edge_iterator.GetSrcNId() == NId1 and \
+                    edge_iterator.GetDstNId() == NId2:
+                    edges.append(edge_iterator.GetId())
+        except RuntimeError:
+            return edges
+
+        # in case we get this far...
+        return edges
+
 
     def get_edge(self, EId):
         return self.network.GetEI(EId)
