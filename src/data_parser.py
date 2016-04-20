@@ -176,7 +176,7 @@ class Pis12DataInterpreter():
 
         elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'] == '0':
             # This happens in older records...for our purposes, let's
-            #
+            # assume worker was hired long ago.
             return datetime.datetime(1990, 1, 1)
 
         elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :
