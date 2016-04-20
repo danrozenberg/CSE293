@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from config_manager import Config
 import graph_manager
@@ -78,8 +79,14 @@ def create_edges(interpreter, graph):
     graph.add_edge_attr(edge, "time_at_employer",interpreter.time_at_employer)
     # We should add more edge attributes here as they are needed.
 
+def enable_logging(log_level):
+    logging.basicConfig(format='%(asctime)s %(message)s',
+    datefmt='%d %b - %H:%M:%S -',
+    level=log_level)
+
 if __name__ == '__main__':
 
+    enable_logging(logging.WARN)
     process_files("../test/test_data/",
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,

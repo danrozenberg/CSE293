@@ -102,13 +102,6 @@ class Pis12DataInterpreter():
     # TODO: perhaps, have the object "update" its state, currently
         # we create a new object per line, kinda not good..
     def __init__(self, values):
-
-        # configures log
-        # TODO: maybe return log to original state afterwards...
-        logging.basicConfig(format='%(asctime)s %(message)s',
-        datefmt='%d %b - %H:%M:%S -',
-        level=logging.WARN)
-
         self.dict = values
         self.log_message = "Started"
 
