@@ -247,36 +247,36 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node(30)
 
         # no edges yet.
-        self.assertEquals(0, len(manager.get_edges(10, 20)))
-        self.assertEquals(0, len(manager.get_edges(10, 30)))
-        self.assertEquals(0, len(manager.get_edges(20, 30)))
+        self.assertEquals(0, len(manager.get_edges_between(10, 20)))
+        self.assertEquals(0, len(manager.get_edges_between(10, 30)))
+        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
 
         # add 3 edges between nodes 10 and 20
         manager.add_edge(10, 20, 1)
         manager.add_edge(10, 20, 2)
         manager.add_edge(10, 20, 3)
-        self.assertEquals(3, len(manager.get_edges(10, 20)))
-        self.assertEquals(0, len(manager.get_edges(10, 30)))
-        self.assertEquals(0, len(manager.get_edges(20, 30)))
-        self.assertListEqual([1,2,3], manager.get_edges(10, 20))
+        self.assertEquals(3, len(manager.get_edges_between(10, 20)))
+        self.assertEquals(0, len(manager.get_edges_between(10, 30)))
+        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
+        self.assertListEqual([1,2,3], manager.get_edges_between(10, 20))
 
         # Hmm, add some edges between 10 and 30
         manager.add_edge(10, 30, 4)
         manager.add_edge(10, 30, 5)
-        self.assertEquals(3, len(manager.get_edges(10, 20)))
-        self.assertEquals(2, len(manager.get_edges(10, 30)))
-        self.assertEquals(0, len(manager.get_edges(20, 30)))
-        self.assertListEqual([1,2,3], manager.get_edges(10, 20))
-        self.assertListEqual([4,5], manager.get_edges(10, 30))
+        self.assertEquals(3, len(manager.get_edges_between(10, 20)))
+        self.assertEquals(2, len(manager.get_edges_between(10, 30)))
+        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
+        self.assertListEqual([1,2,3], manager.get_edges_between(10, 20))
+        self.assertListEqual([4,5], manager.get_edges_between(10, 30))
 
         # Hmm, add more edges to first pair
         manager.add_edge(10, 20, 6)
         manager.add_edge(10, 20, 7)
-        self.assertEquals(5, len(manager.get_edges(10, 20)))
-        self.assertEquals(2, len(manager.get_edges(10, 30)))
-        self.assertEquals(0, len(manager.get_edges(20, 30)))
-        self.assertListEqual([1,2,3,6,7], manager.get_edges(10, 20))
-        self.assertListEqual([4,5], manager.get_edges(10, 30))
+        self.assertEquals(5, len(manager.get_edges_between(10, 20)))
+        self.assertEquals(2, len(manager.get_edges_between(10, 30)))
+        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
+        self.assertListEqual([1,2,3,6,7], manager.get_edges_between(10, 20))
+        self.assertListEqual([4,5], manager.get_edges_between(10, 30))
 
 if __name__ == "__main__":
     unittest.main()
