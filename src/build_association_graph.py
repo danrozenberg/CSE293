@@ -22,6 +22,7 @@ def process_file(file_path, data_parser, interpreter_class, graph):
     """
     :param graph: a graph/graph manager object, which will be changed
     """
+    logging.warn("Started processing file " + file_path)
     for line in data_parser.lines_reader(file_path, 0):
             parsed_line = data_parser.parse_line(line)
 
