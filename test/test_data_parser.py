@@ -138,204 +138,215 @@ class TestPis12DataInterpreter(unittest.TestCase):
         logging.disable(logging.CRITICAL)
 
     def test_ano(self):
-        interpreter = Pis12DataInterpreter({'ANO':1999})
+        interpreter = Pis12DataInterpreter()
+
+        interpreter.feed_line({'ANO':1999})
         answer = interpreter.year
         self.assertEquals(1999, answer)
 
         # Bad value
-        interpreter = Pis12DataInterpreter({'ANO':'asd'})
+        interpreter.feed_line({'ANO':'asd'})
         answer = interpreter.year
         self.assertIn("ANO is invalid", interpreter.log_message)
         self.assertEquals(-1, answer)
 
         # Bad value
-        interpreter = Pis12DataInterpreter({'ANO':''})
+        interpreter.feed_line({'ANO':''})
         answer = interpreter.year
         self.assertIn("ANO is invalid", interpreter.log_message)
         self.assertEquals(-1, answer)
 
     def test_job_start_date(self):
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'10082015'})
+        interpreter = Pis12DataInterpreter()
+
+        interpreter.feed_line({'DT_ADMISSAO':'10082015'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(2015,8,10), answer)
 
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'5041986'})
+        interpreter.feed_line({'DT_ADMISSAO':'5041986'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1986,4,5), answer)
 
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'05041986'})
+        interpreter.feed_line({'DT_ADMISSAO':'05041986'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1986,4,5), answer)
 
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'541986'})
+        interpreter.feed_line({'DT_ADMISSAO':'541986'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1986,4,5), answer)
 
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'5486'})
+        interpreter.feed_line({'DT_ADMISSAO':'5486'})
         answer = interpreter.admission_date
         self.assertEquals(-1, answer)
         self.assertIn("Could not parse DT_ADMISSAO for: ", interpreter.log_message)
 
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'28092007',
-                                            'MES_ADM':'01',
-                                            'ANO_ADM':'2001'})
+        interpreter.feed_line({'DT_ADMISSAO':'28092007',
+                                'MES_ADM':'01',
+                                'ANO_ADM':'2001'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(2007,9,28), answer)
 
 
         # with 0 as MES_ADM and ANO_ADM = ''
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'',
-                                            'MES_ADM':'0',
-                                            'ANO_ADM':'',
-                                            'ANO':'2002'})
+        interpreter.feed_line({'DT_ADMISSAO':'',
+                                'MES_ADM':'0',
+                                'ANO_ADM':'',
+                                'ANO':'2002'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1990,1,1), answer)
 
         # with a number in MES_ADM and ANO_ADM = ''
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'',
-                                            'MES_ADM':'7',
-                                            'ANO_ADM':'',
-                                            'ANO':'2002'})
+        interpreter.feed_line({'DT_ADMISSAO':'',
+                                'MES_ADM':'7',
+                                'ANO_ADM':'',
+                                'ANO':'2002'})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(2002,7,1), answer)
 
 
         # with no dt_admissao
-        interpreter = Pis12DataInterpreter({'MES_ADM':'1',
-                                            'ANO_ADM':'2001',
-                                            'DT_ADMISSAO':''})
+        interpreter.feed_line({'MES_ADM':'1',
+                                'ANO_ADM':'2001',
+                                'DT_ADMISSAO':''})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(2001,1,1), answer)
 
-        interpreter = Pis12DataInterpreter({'MES_ADM':'5',
-                                            'ANO_ADM':'1999',
-                                            'DT_ADMISSAO':''})
+        interpreter.feed_line({'MES_ADM':'5',
+                                'ANO_ADM':'1999',
+                                'DT_ADMISSAO':''})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(1999,5,1), answer)
 
-        interpreter = Pis12DataInterpreter({'MES_ADM':'',
-                                            'ANO_ADM':'',
-                                            'DT_ADMISSAO':''})
+        interpreter.feed_line({'MES_ADM':'',
+                                'ANO_ADM':'',
+                                'DT_ADMISSAO':''})
         answer = interpreter.admission_date
         self.assertEquals(-1 , answer)
 
         # DT_ADMISSAO with a funky format
         # should be interpreted as 3/12/2005 as in 3rd of december...
-        interpreter = Pis12DataInterpreter({'DT_ADMISSAO':'3122005',
-                                            'MES_ADM':'',
-                                            'ANO_ADM':'',
-                                            'ANO':''})
+        interpreter.feed_line({'DT_ADMISSAO':'3122005',
+                                'MES_ADM':'',
+                                'ANO_ADM':'',
+                                'ANO':''})
         answer = interpreter.admission_date
         self.assertEquals(datetime.datetime(2005,12,3), answer)
 
     def test_job_end_date(self):
-        interpreter = Pis12DataInterpreter({'DIADESL':'NAO DESL ANO'})
+        interpreter = Pis12DataInterpreter()
+
+        interpreter.feed_line({'DIADESL':'NAO DESL ANO'})
         answer = interpreter.demission_date
         self.assertEquals(0, answer)
 
-        interpreter = Pis12DataInterpreter({'ANO':'1999',
-                                            'DIADESL':'24',
-                                            'MES_DESLIG':'12'})
+        interpreter.feed_line({'ANO':'1999',
+                                'DIADESL':'24',
+                                'MES_DESLIG':'12'})
         answer = interpreter.demission_date
         self.assertEquals(datetime.datetime(1999,12,24), answer)
 
 
-        interpreter = Pis12DataInterpreter({'ANO':'1999',
-                                            'DIADESL':'',
-                                            'MES_DESLIG':'0'})
+        interpreter.feed_line({'ANO':'1999',
+                                'DIADESL':'',
+                                'MES_DESLIG':'0'})
         self.assertEquals(0 , interpreter.demission_date)
 
         # got mes_deslig but no diadesl
-        interpreter = Pis12DataInterpreter({'ANO':'2000',
-                                            'DIADESL':'',
-                                            'MES_DESLIG':'3'})
+        interpreter.feed_line({'ANO':'2000',
+                                'DIADESL':'',
+                                'MES_DESLIG':'3'})
         self.assertEquals(datetime.datetime(2000,3,1)
                           ,interpreter.demission_date)
 
         # mes_deslig and diadesl both equal to '0'
-        interpreter = Pis12DataInterpreter({'ANO':'2001',
-                                            'DIADESL':'0',
-                                            'MES_DESLIG':'0'})
+        interpreter.feed_line({'ANO':'2001',
+                                'DIADESL':'0',
+                                'MES_DESLIG':'0'})
         self.assertEquals(0 ,interpreter.demission_date)
 
 
-        interpreter = Pis12DataInterpreter({'ANO':'1999',
-                                            'DIADESL':'0',
-                                            'MES_DESLIG':'12'})
+        interpreter.feed_line({'ANO':'1999',
+                                'DIADESL':'0',
+                                'MES_DESLIG':'12'})
         answer = interpreter.demission_date
         self.assertIn("Inconsistent MES_DESLIG or DIADESL", interpreter.log_message)
         self.assertEquals(-1, answer)
 
-        interpreter = Pis12DataInterpreter({'ANO':'1999',
-                                            'DIADESL':'10',
-                                            'MES_DESLIG':'-12'})
+        interpreter.feed_line({'ANO':'1999',
+                                'DIADESL':'10',
+                                'MES_DESLIG':'-12'})
         answer = interpreter.demission_date
         self.assertIn("Inconsistent MES_DESLIG or DIADESL", interpreter.log_message)
         self.assertEquals(-1, answer)
 
-        interpreter = Pis12DataInterpreter({'ANO':'2015',
-                                            'ANO_ADM':'',
-                                            'MES_ADM':'',
-                                            'DT_ADMISSAO':'',
-                                            'DIADESL':'',
-                                            'MES_DESLIG':''})
+        interpreter.feed_line({'ANO':'2015',
+                                'ANO_ADM':'',
+                                'MES_ADM':'',
+                                'DT_ADMISSAO':'',
+                                'DIADESL':'',
+                                'MES_DESLIG':''})
         self.assertEquals(0, interpreter.demission_date)
 
         # a confusing date...put it as march 1st...
-        interpreter = Pis12DataInterpreter({'ANO':'2005',
-                                            'DIADESL':'29',
-                                            'MES_DESLIG':'2'})
+        interpreter.feed_line({'ANO':'2005',
+                                'DIADESL':'29',
+                                'MES_DESLIG':'2'})
         self.assertEquals(datetime.datetime(2005,3,1)
                           , interpreter.demission_date)
         self.assertIn("Weird february date in: ", interpreter.log_message)
 
     def test_worker_id(self):
-        interpreter = Pis12DataInterpreter({'PIS':'131313'})
+        interpreter = Pis12DataInterpreter()
+
+        interpreter.feed_line({'PIS':'131313'})
         answer = interpreter.worker_id
         self.assertEquals(131313, answer)
 
-        interpreter = Pis12DataInterpreter({'PIS':''})
+        interpreter.feed_line({'PIS':''})
         answer = interpreter.worker_id
         self.assertIn("PIS is invalid in", interpreter.log_message)
         self.assertEquals(-1, answer)
 
     def test_employer_id(self):
-        interpreter = Pis12DataInterpreter({'IDENTIFICAD':'888'})
+        interpreter = Pis12DataInterpreter()
+
+        interpreter.feed_line({'IDENTIFICAD':'888'})
         answer = interpreter.employer_id
         self.assertEquals(888, answer)
 
-        interpreter = Pis12DataInterpreter({'IDENTIFICAD':'asd'})
+        interpreter.feed_line({'IDENTIFICAD':'asd'})
         answer = interpreter.employer_id
         self.assertIn("IDENTIFICAD is invalid in", interpreter.log_message)
         self.assertEquals(-1, answer)
 
     def test_time_at_employer(self):
+        interpreter = Pis12DataInterpreter()
 
         # testing with admission date in a past year
-        interpreter = Pis12DataInterpreter({'ANO':'2015',
-                                            'ANO_ADM':'',
-                                            'MES_ADM':'',
-                                            'DT_ADMISSAO':'10081999',
-                                            'DIADESL':'24',
-                                            'MES_DESLIG':'12'})
+        interpreter.feed_line({'ANO':'2015',
+                                'ANO_ADM':'',
+                                'MES_ADM':'',
+                                'DT_ADMISSAO':'10081999',
+                                'DIADESL':'24',
+                                'MES_DESLIG':'12'})
         self.assertEquals(357, interpreter.time_at_employer)
 
         # same result, because start working on 1/1
-        interpreter = Pis12DataInterpreter({'ANO':'2015',
-                                            'ANO_ADM':'2015',
-                                            'MES_ADM':'1',
-                                            'DT_ADMISSAO':'',
-                                            'DIADESL':'24',
-                                            'MES_DESLIG':'12'})
+        interpreter.feed_line({'ANO':'2015',
+                                'ANO_ADM':'2015',
+                                'MES_ADM':'1',
+                                'DT_ADMISSAO':'',
+                                'DIADESL':'24',
+                                'MES_DESLIG':'12'})
         self.assertEquals(357, interpreter.time_at_employer)
 
         # no start date, should return invalid (that is, -1)
-        interpreter = Pis12DataInterpreter({'ANO':'2015',
-                                            'ANO_ADM':'',
-                                            'MES_ADM':'',
-                                            'DT_ADMISSAO':'',
-                                            'DIADESL':'',
-                                            'MES_DESLIG':''})
+        interpreter.feed_line({'ANO':'2015',
+                                'ANO_ADM':'',
+                                'MES_ADM':'',
+                                'DT_ADMISSAO':'',
+                                'DIADESL':'',
+                                'MES_DESLIG':''})
         self.assertEquals(-1, interpreter.time_at_employer)
         self.assertIn("Unable to calculate time_at_employer for:", interpreter.log_message)
 

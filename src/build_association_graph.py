@@ -24,13 +24,13 @@ def start_parallel_build(source_folder, data_parser, interpreter_class, graph_ma
     if save_path is not None:
         manager.save_graph(save_path)
 
-def process_files(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
+def process_files(source_folder, data_parser, interpreter, graph_manager, save_path=None):
 
     # get a graph from manager
     manager = graph_manager()
 
     for file_path in data_parser.find_files(source_folder, 0):
-        process_file(file_path, data_parser, interpreter_class, manager)
+        process_file(file_path, data_parser, interpreter, manager)
 
     if save_path is not None:
         manager.save_graph(save_path)
@@ -38,7 +38,7 @@ def process_files(source_folder, data_parser, interpreter_class, graph_manager, 
 
     return manager
 
-def process_file(file_path, data_parser, interpreter_class, graph):
+def process_file(file_path, data_parser, interpreter, graph):
     """
     :param graph: a graph/graph manager object, which will be changed
     """
@@ -48,7 +48,7 @@ def process_file(file_path, data_parser, interpreter_class, graph):
 
             # line is parsed as a dictionary, but needs interpretation.
             # This is because our data is wacky wacky!
-            interpreter = interpreter_class(parsed_line)
+            interpreter.feed_line(parsed_line)
             process_line(interpreter, graph)
 
 def process_line(interpreter, graph):
@@ -106,8 +106,8 @@ def enable_logging(log_level):
     level=log_level)
 
 if __name__ == '__main__':
-    start_parallel_build("../test/test_data/",
+    start_parallel_build("../test/parallel_graph_manip_test_1/",
                   data_parser.Pis12DataParser(),
-                  data_parser.Pis12DataInterpreter,
+                  data_parser.Pis12DataInterpreter(),
                   graph_manager.SnapManager,
                   "../output_graphs/test.graph")

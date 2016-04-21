@@ -22,18 +22,18 @@ class TestBuildAssociationGraph(unittest.TestCase):
         # should process 3 files, don't save
         src_folder = "./test_file_path_folder/"
         parser = data_parser.Pis12DataParser()
-        interpreter_class = data_parser.Pis12DataInterpreter
+        interpreter = data_parser.Pis12DataInterpreter()
         manager = graph_manager.SnapManager
-        process_files(src_folder, parser, interpreter_class, manager)
+        process_files(src_folder, parser, interpreter, manager)
         self.assertEquals(3, process_file_mock.call_count)
         self.assertFalse(os.path.isfile(save_path))
 
         # should process 3 files and save
         src_folder = "./test_file_path_folder/"
         parser = data_parser.Pis12DataParser()
-        interpreter_class = data_parser.Pis12DataInterpreter
+        interpreter = data_parser.Pis12DataInterpreter()
         manager = graph_manager.SnapManager
-        process_files(src_folder, parser, interpreter_class, manager, save_path)
+        process_files(src_folder, parser, interpreter, manager, save_path)
 
         # we add 3 more calls to process_file...
         self.assertEquals(6, process_file_mock.call_count)
@@ -47,9 +47,9 @@ class TestBuildAssociationGraph(unittest.TestCase):
         # should call process_line 30 times
         file_path = './test_data/raw_graph.csv'
         parser = data_parser.Pis12DataParser()
-        interpreter_class = data_parser.Pis12DataInterpreter
+        interpreter = data_parser.Pis12DataInterpreter()
         graph = graph_manager.SnapManager()
-        process_file(file_path, parser, interpreter_class, graph)
+        process_file(file_path, parser, interpreter, graph)
 
         # from association_graph, we should see 5 worker nodes
         # we should also see 3 employer nodes.
