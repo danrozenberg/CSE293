@@ -8,22 +8,6 @@ import data_parser
 from joblib import Parallel, delayed
 import multiprocessing
 
-def start_parallel_build(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
-    # --Still in experimental stage--
-
-    # get a graph from manager
-    manager = graph_manager()
-
-    enable_logging(logging.WARN)
-    files = data_parser.find_files(source_folder, 0)
-    num_cores = multiprocessing.cpu_count()
-    Parallel(n_jobs=num_cores, backend='threading') \
-        (delayed(process_file) \
-             (f, data_parser, interpreter_class, manager) for f in files)
-
-    if save_path is not None:
-        manager.save_graph(save_path)
-
 def process_files(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
 
     # get a graph from manager
@@ -107,7 +91,7 @@ def enable_logging(log_level):
     level=log_level)
 
 if __name__ == '__main__':
-    start_parallel_build("../test/parallel_graph_manip_test_1/",
+    process_files("../test/parallel_graph_manip_test_1/",
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
                   graph_manager.ThreadSafeSnapManager,
