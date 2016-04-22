@@ -255,6 +255,30 @@ class SnapManager(object):
         self.network = snap.TNEANet.Load(FIn)
         return self
 
+    def copy_node(self, node_id, dst_graph):
+        """
+        :param node_id: id of the node to be copied into dst_graph
+        :param dst_graph: a different graph manager object, where
+         we will create deep copy a new node, mirroring all characteristics
+         of the node with id = node_id, which is present in this object.
+        :return whether we suceeded or not.
+        """
+        # can't copy what doesn't exist
+        if not self.is_node(node_id):
+            return False
+
+        # can't copy if node already exist at target
+        if dst_graph.is_node(node_id):
+            return False
+
+        dst_graph.add_node(node_id)
+        attr_dictionary = self.get_node_attributes(node_id)
+        for attr_name in attr_dictionary:
+            attr_value = attr_dictionary[attr_name]
+            dst_graph.add_node_attr(node_id, attr_name, attr_value)
+
+        return True
+
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
         # TODO: use SNAP verifications instead because it is

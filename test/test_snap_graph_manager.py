@@ -396,5 +396,42 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(True, manager.is_edge(500))
         self.assertEquals(True, manager.is_edge(600))
 
+    def test_copy_node(self):
+
+        src_graph = graph_manager.SnapManager()
+        dst_graph = graph_manager.SnapManager()
+
+        # can't copy what doesn't exist
+        self.assertFalse(src_graph.copy_node(10, dst_graph))
+        self.assertEquals(0, src_graph.get_node_count())
+        self.assertEquals(0, dst_graph.get_node_count())
+
+        src_graph.add_node(2)
+        src_graph.add_node_attr(2, "firstAttr", "Cool!")
+        src_graph.add_node_attr(2, "secondAttr", "Awesome!")
+
+        src_graph.add_node(1)
+        src_graph.add_node_attr(1, "firstAttr", "Lame")
+        src_graph.add_node_attr(1, "secondAttr", "Bummer")
+
+        # copy node 2
+        src_graph.copy_node(2, dst_graph)
+        self.assertEquals(2, src_graph.get_node_count())
+        self.assertEquals(1, dst_graph.get_node_count())
+
+        original_attrs = src_graph.get_node_attributes(2)
+        copied_attrs = dst_graph.get_node_attributes(2)
+        self.assertEquals(original_attrs, copied_attrs)
+
+        # can't copy the same node id
+        self.assertFalse(src_graph.copy_node(2, dst_graph))
+
+        # also, changes in one doesn't reflect changes in another
+        src_graph.add_node_attr(2, "ThirdAttr", "Tubular!")
+        original_attrs = src_graph.get_node_attributes(2)
+        copied_attrs = dst_graph.get_node_attributes(2)
+        self.assertEquals(3, len(original_attrs))
+        self.assertEquals(2, len(copied_attrs))
+
 if __name__ == "__main__":
     unittest.main()
