@@ -334,6 +334,40 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(manager.is_edge(400))
         self.assertTrue(manager.is_edge(500))
 
+    def test_get_neighboring_nodes(self):
+        manager = graph_manager.SnapManager()
+
+        # add a few nodes
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        manager.add_node(40)
+        manager.add_node(50)
+        manager.add_node(60)
+
+        # make some worker nodes, others as employer nodes
+        manager.add_node_attr(10, "type", "worker")
+        manager.add_node_attr(20, "type", "worker")
+        manager.add_node_attr(30, "type", "employer")
+        manager.add_node_attr(40, "type", "employer")
+        manager.add_node_attr(50, "type", "employer")
+        manager.add_node_attr(60, "type", "employer")
+
+        manager.add_edge(10, 30, 200)
+        manager.add_edge(20, 30, 400)
+        manager.add_edge(10, 60, 300)
+        manager.add_edge(20, 40, 500)
+        manager.add_edge(20, 50, 600)
+        manager.add_edge(10, 40, 100)
+
+        # check for node 10
+        self.assertListEqual(sorted([30,40,60]),
+                             sorted(manager.get_neighboring_nodes(10)))
+
+        # check for node 20
+        self.assertListEqual(sorted([30,40,50]),
+                      sorted(manager.get_neighboring_nodes(20)))
+
 
     def test_deleting_nodes_also_deletes_edges(self):
 

@@ -191,6 +191,16 @@ class SnapManager(object):
     def get_edge_count(self):
         return self.network.GetEdges()
 
+    def get_neighboring_nodes(self, node_id):
+        NId = self.NId_from_id[node_id]
+        nodeI = self.network.GetNI(NId)
+        num_neighbours = nodeI.GetOutDeg()
+
+        neighboring_nodes = []
+        for i in xrange(num_neighbours):
+            neighboring_nodes.append(self.id_from_NId[nodeI.GetNbrNId(i)])
+        return neighboring_nodes
+
     def add_node_attr(self, node_id, name, value):
         NId = self.NId_from_id[node_id]
 
