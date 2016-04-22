@@ -47,9 +47,9 @@ class TestBuildAssociationGraph(unittest.TestCase):
         # should call process_line 30 times
         file_path = './test_data/raw_graph.csv'
         parser = data_parser.Pis12DataParser()
-        interpreter = data_parser.Pis12DataInterpreter()
+        interpreter_class = data_parser.Pis12DataInterpreter
         graph = graph_manager.SnapManager()
-        process_file(file_path, parser, interpreter, graph)
+        process_file(file_path, parser, interpreter_class, graph)
 
         # from association_graph, we should see 5 worker nodes
         # we should also see 3 employer nodes.

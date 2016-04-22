@@ -24,24 +24,25 @@ def start_parallel_build(source_folder, data_parser, interpreter_class, graph_ma
     if save_path is not None:
         manager.save_graph(save_path)
 
-def process_files(source_folder, data_parser, interpreter, graph_manager, save_path=None):
+def process_files(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
 
     # get a graph from manager
     manager = graph_manager()
 
     for file_path in data_parser.find_files(source_folder, 0):
-        process_file(file_path, data_parser, interpreter, manager)
+        process_file(file_path, data_parser, interpreter_class, manager)
 
+    # graph should be complete at this point
     if save_path is not None:
         manager.save_graph(save_path)
-    # graph should be complete at this point
 
     return manager
 
-def process_file(file_path, data_parser, interpreter, graph):
+def process_file(file_path, data_parser, interpreter_class, graph):
     """
     :param graph: a graph/graph manager object, which will be changed
     """
+    interpreter = interpreter_class()
     logging.warn("Started processing file " + file_path)
     for line in data_parser.lines_reader(file_path, 0):
             parsed_line = data_parser.parse_line(line)
@@ -108,6 +109,6 @@ def enable_logging(log_level):
 if __name__ == '__main__':
     start_parallel_build("../test/parallel_graph_manip_test_1/",
                   data_parser.Pis12DataParser(),
-                  data_parser.Pis12DataInterpreter(),
-                  graph_manager.SnapManager,
+                  data_parser.Pis12DataInterpreter,
+                  graph_manager.ThreadSafeSnapManager,
                   "../output_graphs/test.graph")
