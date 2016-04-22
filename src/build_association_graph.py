@@ -67,12 +67,12 @@ def passes_filter(interpreter):
 def create_nodes(interpreter, graph):
 
     # add worker node and a 'worker' property
-    NId = graph.add_node(interpreter.worker_id)
-    graph.add_node_attr(NId, "type", "worker")
+    node_id = graph.add_node(interpreter.worker_id)
+    graph.add_node_attr(node_id, "type", "worker")
 
     # add employer node and a 'employer' property
-    NId = graph.add_node(interpreter.employer_id)
-    graph.add_node_attr(NId, "type", "employer")
+    node_id = graph.add_node(interpreter.employer_id)
+    graph.add_node_attr(node_id, "type", "employer")
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
