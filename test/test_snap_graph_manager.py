@@ -306,6 +306,65 @@ class TestSnapManager(unittest.TestCase):
             found_nodes.append(node)
         self.assertListEqual([10,20,30,40,50], found_nodes)
 
+    def test_is_edge(self):
+
+        manager = self.manager
+
+        # add some nodes
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+
+        manager.add_edge(1,2, 100)
+        manager.add_edge(1,2, 200)
+
+        self.assertTrue(manager.is_edge(100))
+        self.assertTrue(manager.is_edge(200))
+        self.assertFalse(manager.is_edge(300))
+        self.assertFalse(manager.is_edge(400))
+        self.assertFalse(manager.is_edge(500))
+
+        manager.add_edge(1,3, 300)
+        manager.add_edge(1,3, 400)
+        manager.add_edge(2,3, 500)
+
+        self.assertTrue(manager.is_edge(100))
+        self.assertTrue(manager.is_edge(200))
+        self.assertTrue(manager.is_edge(300))
+        self.assertTrue(manager.is_edge(400))
+        self.assertTrue(manager.is_edge(500))
+
+
+    def test_deleting_nodes_also_deletes_edges(self):
+
+        manager = self.manager
+
+        # add some nodes
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+
+        manager.add_edge(1,2, 100)
+        manager.add_edge(1,2, 200)
+        manager.add_edge(1,3, 300)
+        manager.add_edge(1,3, 400)
+        manager.add_edge(2,3, 500)
+        manager.add_edge(2,3, 600)
+
+        # delete node 1, should remove all associated edges
+        manager.delete_node(1)
+        self.assertEquals(False, manager.is_edge(100))
+        self.assertEquals(False, manager.is_edge(200))
+        self.assertEquals(False, manager.is_edge(300))
+        self.assertEquals(False, manager.is_edge(400))
+
+        # other edges should remain
+        self.assertEquals(True, manager.is_edge(500))
+        self.assertEquals(True, manager.is_edge(600))
+
+
+
+
 class TestThreadSafeSnapManager(unittest.TestCase):
 
     def setUp(self):

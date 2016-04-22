@@ -226,6 +226,15 @@ class SnapManager(object):
         else:
             return False
 
+    def is_edge(self, edge_id):
+        try:
+            # if we got an iterator, then edge exists
+            self.network.GetEI(edge_id)
+            return True
+        except RuntimeError:
+            # couldn't get iterator means that edge doesn't exist
+            return False
+
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)
         self.network.Save(FOut)
