@@ -91,6 +91,7 @@ def enable_logging(log_level):
     level=log_level)
 
 if __name__ == '__main__':
+    enable_logging(logging.INFO)
     process_files("../test/parallel_graph_manip_test_1/",
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
