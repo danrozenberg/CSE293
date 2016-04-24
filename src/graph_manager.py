@@ -52,17 +52,17 @@ class SnapManager(object):
     def add_edge(self, src_id, dest_id, EId=-1):
 
         if EId <> -1 and self.network.IsEdge(EId):
-            logging.debug("Couldn't add edge with EId = "
+            logging.info("Couldn't add edge with EId = "
                             + str(EId) + " because it already exist")
             return EId
 
         if not self.is_node(src_id):
-            logging.debug("Couldn't add edge from node "
+            logging.info("Couldn't add edge from node "
                             + str(src_id) + " because such node doesn't exist")
             return None
 
         if not self.is_node(dest_id):
-            logging.debug("Couldn't add edge to node "
+            logging.info("Couldn't add edge to node "
                             + str(dest_id) + " because such node doesn't exist")
             return None
 
