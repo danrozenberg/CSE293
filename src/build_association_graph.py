@@ -1,12 +1,6 @@
 import logging
-from datetime import datetime
-from config_manager import Config
 import graph_manager
 import data_parser
-
-# parallelization
-from joblib import Parallel, delayed
-import multiprocessing
 
 def process_files(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
 
