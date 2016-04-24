@@ -388,7 +388,7 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node_attr(50, "type", "employer")
         manager.add_node_attr(60, "type", "employer")
 
-        manager.add_edge(10, 30, 200)
+        manager.add_edge(30, 10, 200)
         manager.add_edge(20, 30, 400)
         manager.add_edge(10, 60, 300)
         manager.add_edge(20, 40, 500)
