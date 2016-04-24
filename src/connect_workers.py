@@ -1,7 +1,3 @@
-def is_valid_node(node):
-    raise NotImplementedError
-
-
 def get_worker_iterator(association_graph):
     node_iterator = association_graph.get_node_iterator()
     for node in node_iterator:
@@ -9,54 +5,42 @@ def get_worker_iterator(association_graph):
         if node_type == "worker":
             yield node
 
-def get_employers(worker):
-    raise NotImplementedError
-
-
-def remove_worker_edges(employer_out_edges, worker):
-    raise NotImplementedError
-
-
-def get_employer_out_edges(employer):
-    raise NotImplementedError
-
-
-def delete_edges_from_node(worker):
-    raise NotImplementedError
-
-
-def connect_workers(association_graph, graph_manager):
+def connect_workers(association_graph, new_graph):
     """
-    :param raw_graph: an association graph between workers-employers.
-    :return: a new graph, created with the graph manager
+    Connects workers as long as they have worked in the same company
+      at any given point, including if they never worked together
+      during the same period of time. This is the most simple way to
+      connect the workers.
+
+    :param association_graph: an association graph between workers-plants.
+    :param graph_manager: a graph manager that we will use to create a
+     new graph.
+    :return: the new graph, with only workers and edges between them.
     """
-    new_graph = graph_manager()
 
     # we get a special worker iterator
-    worker_iterator = get_worker_iterator(association_graph)
+    for worker in get_worker_iterator(association_graph):
 
-    # should only consider 'worker' nodes
-    for worker in worker_iterator:
+        # add this worker to the new graph
+        association_graph.copy_node(worker, new_graph)
 
-        # if it passes the filter
-        if is_valid_node(worker):
+        # In an association graph, we can get the employers just by
+        # following the edges from worker and retrieving the neighbors.
+        employer_nodes = association_graph.get_neighboring_nodes(worker)
 
-            # should be easy to get companies, since its an association graph.
-            worker_out_edges = association_graph.get_out_edges(worker)
-            employer_nodes = get_employers(worker)
+        # We don't need to consider the worker node or its edges again.
+        #  so we could delete it...
+        # Its kind of a bad vibe to delete the node inside a node iterator
+        #   just make sure that iterator can deal with it and that
+        #   when you delete a node the manager will delete the edges..
+        association_graph.delete_node(worker)
 
-            # get all edges coming out of the employer nodes
-            employer_out_edges = []
-            for employer in employer_nodes:
-                employer_out_edges.append(get_employer_out_edges(employer))
+        for employer in employer_nodes:
+            for coworker in association_graph.get_neighboring_nodes(employer):
+                print
+                new_graph.add_node(coworker)
+                new_graph.add_edge(worker, coworker)
 
-            # remove all edges that refer to the worker
-            remove_worker_edges(employer_out_edges, worker)
-
-            # we don't need to consider the worker node or its edges again
-            # kind of a bad vibe to delete the node inside a node iterator
-            # let's delete only the edges, which should work just as fine.
-            delete_edges_from_node(worker)
     return new_graph
 
 
