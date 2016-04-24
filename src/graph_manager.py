@@ -255,7 +255,11 @@ class SnapManager(object):
     def is_edge_between(self, src_id, dest_id):
         src_NId = self.NId_from_id[src_id]
         dest_NId = self.NId_from_id[dest_id]
-        return self.network.IsEdge(src_NId, dest_NId)
+
+        answer =  self.network.IsEdge(src_NId, dest_NId) or \
+                  self.network.IsEdge(dest_NId, src_NId)
+
+        return answer
 
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)

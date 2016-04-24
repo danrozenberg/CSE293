@@ -360,6 +360,14 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(manager.is_edge_between(30, 60))
         self.assertTrue(manager.is_edge_between(40, 50))
 
+        # invert order to make sure
+        self.assertTrue(manager.is_edge_between(20, 10))
+        self.assertTrue(manager.is_edge_between(30, 10))
+        self.assertTrue(manager.is_edge_between(30, 20))
+        self.assertTrue(manager.is_edge_between(10, 20))
+        self.assertTrue(manager.is_edge_between(60, 30))
+        self.assertTrue(manager.is_edge_between(50, 40))
+
         # some edges that do not exist
         self.assertFalse(manager.is_edge_between(40, 10))
         self.assertFalse(manager.is_edge_between(10, 60))
