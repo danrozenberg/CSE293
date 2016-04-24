@@ -245,6 +245,11 @@ class SnapManager(object):
             # couldn't get iterator means that edge doesn't exist
             return False
 
+    def is_edge_between(self, src_id, dest_id):
+        src_NId = self.NId_from_id[src_id]
+        dest_NId = self.NId_from_id[dest_id]
+        return self.network.IsEdge(src_NId, dest_NId)
+
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)
         self.network.Save(FOut)

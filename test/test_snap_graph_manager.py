@@ -334,6 +334,41 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(manager.is_edge(400))
         self.assertTrue(manager.is_edge(500))
 
+    def test_is_edge_between(self):
+        manager = graph_manager.SnapManager()
+
+        # add a few nodes
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        manager.add_node(40)
+        manager.add_node(50)
+        manager.add_node(60)
+
+        manager.add_edge(40, 50)
+        manager.add_edge(10, 30)
+        manager.add_edge(20, 10)
+        manager.add_edge(20, 30)
+        manager.add_edge(30, 60)
+        manager.add_edge(10, 20)
+
+        # some edges that do exist
+        self.assertTrue(manager.is_edge_between(10, 20))
+        self.assertTrue(manager.is_edge_between(10, 30))
+        self.assertTrue(manager.is_edge_between(20, 30))
+        self.assertTrue(manager.is_edge_between(20, 10))
+        self.assertTrue(manager.is_edge_between(30, 60))
+        self.assertTrue(manager.is_edge_between(40, 50))
+
+        # some edges that do not exist
+        self.assertFalse(manager.is_edge_between(40, 10))
+        self.assertFalse(manager.is_edge_between(10, 60))
+        self.assertFalse(manager.is_edge_between(10, 10))
+        self.assertFalse(manager.is_edge_between(60, 60))
+        self.assertFalse(manager.is_edge_between(60, 20))
+        self.assertFalse(manager.is_edge_between(30, 40))
+
+
     def test_get_neighboring_nodes(self):
         manager = graph_manager.SnapManager()
 
