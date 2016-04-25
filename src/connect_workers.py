@@ -37,9 +37,12 @@ def connect_workers(association_graph, new_graph):
 
         for employer in employer_nodes:
             for coworker in association_graph.get_neighboring_nodes(employer):
-                print
                 new_graph.add_node(coworker)
-                new_graph.add_edge(worker, coworker)
+
+                # don't want repeated edges. This could happen if
+                # worker and coworker worked together in 2 different plants.
+                if not new_graph.is_edge_between(worker, coworker):
+                    new_graph.add_edge(worker, coworker)
 
     return new_graph
 
