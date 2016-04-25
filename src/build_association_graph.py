@@ -86,8 +86,12 @@ def enable_logging(log_level):
 
 if __name__ == '__main__':
     enable_logging(logging.INFO)
-    process_files("../test/parallel_graph_manip_test_1/",
+    source_folder = "../test/parallel_graph_manip_test_1/"
+    output_file_path = "../output_graphs/test.graph"
+
+
+    process_files(source_folder,
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
                   graph_manager.SnapManager,
-                  "../output_graphs/test.graph")
+                  output_file_path)
