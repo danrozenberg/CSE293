@@ -1,7 +1,6 @@
 import os
 import csv
 import datetime
-from  itertools import islice
 
 # noinspection PyMethodMayBeStatic
 class Pis12DataParser():
@@ -39,8 +38,6 @@ class Pis12DataParser():
         :return: an iterator. The iterator yields lists of values.
         """
 
-        #TODO: fetch more than 1 line at once on islice call.
-
         # also accepts 0 as being "all the file"
         if fetch_num == 0:
             fetch_num = None
@@ -49,13 +46,11 @@ class Pis12DataParser():
         with open(file_path, "rb") as src:
             reader = csv.reader(src)
             _ = reader.next()  # throws header away
-            iterator = islice(reader, 0, 1)
 
             lines_read = 0
             while True:
-                yield iterator.next()
+                yield reader.next()
                 lines_read += 1
-                iterator = islice(reader, 0, 1)
                 if 0 < fetch_num <= lines_read:
                     break
 
