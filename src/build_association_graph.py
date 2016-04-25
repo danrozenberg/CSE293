@@ -89,5 +89,5 @@ if __name__ == '__main__':
     process_files("../test/parallel_graph_manip_test_1/",
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
-                  graph_manager.ThreadSafeSnapManager,
+                  graph_manager.SnapManager,
                   "../output_graphs/test.graph")
