@@ -14,8 +14,8 @@ class SnapManager(object):
         #   our IDs, but their values do not fit SNAP integers which are
         #   used as node ids :(
         # This is the reason you can see the use of the following dictionaries:
-        self.NId_from_id = snap.TIntIntH()
-        self.id_from_NId = snap.TIntIntH()
+        self.NId_from_id = {}
+        self.id_from_NId = {}
 
     def add_node(self, node_id):
         """
@@ -234,14 +234,9 @@ class SnapManager(object):
             raise Exception('Invalid data type')
 
     def is_node(self, node_id):
-        if node_id in self.NId_from_id:
-            NId = self.NId_from_id[node_id]
-
-            # should be always True at this point
-            # but its good to have it here for test purposes.
-            return self.network.IsNode(NId)
-        else:
-            return False
+        # this will give bad results if we mess with self.NId_from_id
+        # from outside.
+        return node_id in self.NId_from_id
 
     def is_edge(self, edge_id):
         try:
