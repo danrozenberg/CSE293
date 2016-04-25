@@ -48,50 +48,7 @@ class ConnectWorkersTest(unittest.TestCase):
 
     def test_connect_workers(self):
         manager = graph_manager.SnapManager()
-
-        # 9 workers
-        manager.add_node(1)
-        manager.add_node(2)
-        manager.add_node(3)
-        manager.add_node(4)
-        manager.add_node(5)
-        manager.add_node(6)
-        manager.add_node(7)
-        manager.add_node(8)
-        manager.add_node(9)
-        manager.add_node_attr(1, "type", "worker")
-        manager.add_node_attr(2, "type", "worker")
-        manager.add_node_attr(3, "type", "worker")
-        manager.add_node_attr(4, "type", "worker")
-        manager.add_node_attr(5, "type", "worker")
-        manager.add_node_attr(6, "type", "worker")
-        manager.add_node_attr(7, "type", "worker")
-        manager.add_node_attr(8, "type", "worker")
-        manager.add_node_attr(9, "type", "worker")
-
-
-        # 3 plants
-        manager.add_node(10)
-        manager.add_node(20)
-        manager.add_node(30)
-        manager.add_node_attr(10, "type", "employer")
-        manager.add_node_attr(20, "type", "employer")
-        manager.add_node_attr(30, "type", "employer")
-
-        # connect them
-        manager.add_edge(1, 10)
-        manager.add_edge(2, 10)
-        manager.add_edge(3, 10)
-        manager.add_edge(9, 10)
-
-        manager.add_edge(4, 20)
-        manager.add_edge(5, 20)
-        manager.add_edge(6, 20)
-        manager.add_edge(9, 20)
-
-        manager.add_edge(4, 30)
-        manager.add_edge(5, 30)
-        manager.add_edge(7, 30)
+        self.create_association_graph(manager)
 
         new_graph = graph_manager.SnapManager()
         connect_workers.connect_workers(manager,new_graph)
@@ -122,6 +79,50 @@ class ConnectWorkersTest(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(9,7))
         self.assertFalse(new_graph.is_edge_between(1,7))
         self.assertFalse(new_graph.is_edge_between(1,5))
+
+    def create_association_graph(self, manager):
+        # 9 workers
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(4)
+        manager.add_node(5)
+        manager.add_node(6)
+        manager.add_node(7)
+        manager.add_node(8)
+        manager.add_node(9)
+        manager.add_node_attr(1, "type", "worker")
+        manager.add_node_attr(2, "type", "worker")
+        manager.add_node_attr(3, "type", "worker")
+        manager.add_node_attr(4, "type", "worker")
+        manager.add_node_attr(5, "type", "worker")
+        manager.add_node_attr(6, "type", "worker")
+        manager.add_node_attr(7, "type", "worker")
+        manager.add_node_attr(8, "type", "worker")
+        manager.add_node_attr(9, "type", "worker")
+
+        # 3 plants
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        manager.add_node_attr(10, "type", "employer")
+        manager.add_node_attr(20, "type", "employer")
+        manager.add_node_attr(30, "type", "employer")
+
+        # connect them
+        manager.add_edge(1, 10)
+        manager.add_edge(2, 10)
+        manager.add_edge(3, 10)
+        manager.add_edge(9, 10)
+
+        manager.add_edge(4, 20)
+        manager.add_edge(5, 20)
+        manager.add_edge(6, 20)
+        manager.add_edge(9, 20)
+
+        manager.add_edge(4, 30)
+        manager.add_edge(5, 30)
+        manager.add_edge(7, 30)
 
 
 
