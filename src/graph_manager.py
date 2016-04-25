@@ -16,6 +16,7 @@ class SnapManager(object):
         # This is the reason you can see the use of the following dictionaries:
         self.NId_from_id = {}
         self.id_from_NId = {}
+        # TODO: try using compiled SNAP hashes instead here.
 
     def add_node(self, node_id):
         """
