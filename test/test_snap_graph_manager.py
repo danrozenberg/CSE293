@@ -396,12 +396,18 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node_attr(50, "type", "employer")
         manager.add_node_attr(60, "type", "employer")
 
-        manager.add_edge(30, 10, 200)
         manager.add_edge(20, 30, 400)
         manager.add_edge(10, 60, 300)
         manager.add_edge(20, 40, 500)
         manager.add_edge(20, 50, 600)
         manager.add_edge(10, 40, 100)
+
+        # we should get unique nodes only, let's
+        # try to trick the class by doing this:
+        manager.add_edge(10, 30)
+        manager.add_edge(30, 10)
+        manager.add_edge(10, 30)
+        manager.add_edge(10, 30)
 
         # check for node 10
         self.assertListEqual(sorted([30,40,60]),
@@ -410,6 +416,10 @@ class TestSnapManager(unittest.TestCase):
         # check for node 20
         self.assertListEqual(sorted([30,40,50]),
                       sorted(manager.get_neighboring_nodes(20)))
+
+        # check for node 30
+        self.assertListEqual(sorted([10,20]),
+                      sorted(manager.get_neighboring_nodes(30)))
 
 
     def test_deleting_nodes_also_deletes_edges(self):

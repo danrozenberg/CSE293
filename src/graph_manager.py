@@ -196,18 +196,18 @@ class SnapManager(object):
         """
 
         :param node_id: the id of the node in question.
-        :return: all nodes connected by an edge to the node in question.
+        :return: set of nodes connected by an edge to the node in question.
         """
         NId = self.NId_from_id[node_id]
         nodeI = self.network.GetNI(NId)
         num_neighbours = nodeI.GetOutDeg() + nodeI.GetInDeg()
 
-        neighboring_nodes = []
+        neighboring_nodes = set()
         for i in xrange(num_neighbours):
-            neighboring_nodes.append(self.id_from_NId[nodeI.GetNbrNId(i)])
+            neighboring_nodes.add(self.id_from_NId[nodeI.GetNbrNId(i)])
 
 
-        return neighboring_nodes
+        return list(neighboring_nodes)
 
     def add_node_attr(self, node_id, name, value):
         NId = self.NId_from_id[node_id]
