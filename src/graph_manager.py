@@ -7,7 +7,7 @@ class SnapManager(object):
     """
 
     def __init__(self):
-        self.network = snap.TNEANet()
+        self.network = snap.TNEANet().New()
 
         # The following dictionaries basically transform a CEI or CNJP into
         #   values that fit a C++ integers. We want CEI and CNPJ to be
