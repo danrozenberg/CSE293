@@ -24,11 +24,7 @@ class SnapManager(object):
         Note that: Adding a node takes constant time.
         Note: id is a c++ (32 bit) integer, so be careful not to overflow.
         """
-        if self.is_node(node_id):
-            # no need to change any state...
-            logging.debug("Could not add node with id = "
-                            + str(node_id) + " because it already existed" )
-        else:
+        if not self.is_node(node_id):
             new_NId = self.network.AddNode(-1)
             self.NId_from_id[node_id] = new_NId
             self.id_from_NId[new_NId] = node_id
