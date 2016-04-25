@@ -14,9 +14,8 @@ class SnapManager(object):
         #   our IDs, but their values do not fit SNAP integers which are
         #   used as node ids :(
         # This is the reason you can see the use of the following dictionaries:
-        self.NId_from_id = {}
-        self.id_from_NId = {}
-        # TODO: try using compiled SNAP hashes instead here.
+        self.NId_from_id = snap.TIntIntH()
+        self.id_from_NId = snap.TIntIntH()
 
     def add_node(self, node_id):
         """
