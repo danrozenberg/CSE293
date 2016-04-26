@@ -38,11 +38,11 @@ class Pis12DataParser():
         :return: an iterator. The iterator yields lists of values.
         """
 
+        #TODO: use Pands instead because it seems that its way faster.
         # also accepts 0 as being "all the file"
         if fetch_num == 0:
             fetch_num = None
 
-        #TODO: check if the file really is a csv.
         with open(file_path, "rb") as src:
             reader = csv.reader(src)
             _ = reader.next()  # throws header away
@@ -318,7 +318,6 @@ class Pis12DataInterpreter():
             # In any case, we want this only for new unexpected errors.
             # For example, if we know a field could fail, we should not 'warn'.
             #    we should instead 'info' it in its own property method.
-
             self.log_message = field_name + " is invalid in: " + str(self.dict)
 
             if alert_level == 'warn':
