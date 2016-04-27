@@ -127,14 +127,19 @@ class Pis12DataInterpreter():
 
     @property
     def admission_date(self):
-        # TODO: does tipo_adm change anything?
+        # TODO: check if tipo_adm change anything?
+
         if self.__admission_date is not None:
             return self.__admission_date
 
-        if self.dict['DT_ADMISSAO'] <> '':
+        dt_admissao = self.dict['DT_ADMISSAO']
+        ano_adm = self.dict['ANO_ADM']
+        mes_adm = self.dict['MES_ADM']
+
+        if dt_admissao <> '':
             # gotta pad the string with 0...
             try:
-                date_string = self.dict['DT_ADMISSAO']
+                date_string = dt_admissao
 
                 # add missing zeroes to day of month
                 if len(date_string) == 7:
@@ -147,9 +152,9 @@ class Pis12DataInterpreter():
                 self.__admission_date = -1
                 return self.__admission_date
 
-        elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'].isdigit():
+        elif ano_adm == '' and mes_adm.isdigit():
 
-            if self.dict['MES_ADM'] == '0':
+            if mes_adm == '0':
                 # This happens in older records...for our purposes, let's
                 # assume that they were hired long long ago, in 1900 or something.
                 self.__admission_date = datetime.datetime(1990, 1, 1)
@@ -157,21 +162,21 @@ class Pis12DataInterpreter():
             else:
                 # I am assuming that in these cases, the worker was hired in the
                 # current year.
-                adm_month = int(self.dict['MES_ADM'])
+                adm_month = int(mes_adm)
                 self.__admission_date = datetime.datetime(self.year, adm_month, 1)
                 return self.__admission_date
 
-        elif self.dict['ANO_ADM'] == '' and self.dict['MES_ADM'] == '0':
+        elif ano_adm == '' and mes_adm == '0':
             # This happens in older records...for our purposes, let's
             # assume worker was hired long ago.
             self.__admission_date = datetime.datetime(1990, 1, 1)
             return self.__admission_date
 
-        elif self.dict['ANO_ADM'] <> '' and self.dict['MES_ADM'] <> '' :
+        elif ano_adm <> '' and mes_adm <> '' :
             # In this case, day dafaults to 01...
             adm_day = 1
-            adm_month = int(self.dict['MES_ADM'])
-            adm_year = int(self.dict['ANO_ADM'])
+            adm_month = int(mes_adm)
+            adm_year = int(ano_adm)
             self.__admission_date = datetime.datetime(adm_year, adm_month, adm_day)
             return self.__admission_date
         else:
