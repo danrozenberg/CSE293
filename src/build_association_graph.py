@@ -90,7 +90,7 @@ def enable_logging(log_level):
     level=log_level)
 
 if __name__ == '__main__':
-    enable_logging(logging.INFO)
+    enable_logging(logging.WARNING)
     source_folder = "../test/parallel_graph_manip_test_1/"
     output_file_path = "../output_graphs/test.graph"
 
