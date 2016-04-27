@@ -177,6 +177,12 @@ class TestSnapManager(unittest.TestCase):
         the_exception = bad_call.exception
         self.assertIn("does not have attribute", the_exception.message)
 
+        # what if we add the same attribute again?
+        manager.add_edge_attr(1, "third", "basd")
+        d = manager.get_edge_attributes(1)
+        self.assertEquals("basd", d["third"])
+
+
     def test_get_nodes(self):
         manager = self.manager
 
