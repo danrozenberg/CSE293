@@ -187,38 +187,41 @@ class Pis12DataInterpreter():
         if self.__demission_date is not None:
             return self.__demission_date
 
+        dia_desl = self.dict['DIADESL']
+        mes_deslig = self.dict['MES_DESLIG']
+
         # Sometimes, we have a message in DIADESL
-        if self.dict['DIADESL'] == 'NAO DESL ANO':
+        if dia_desl == 'NAO DESL ANO':
             self.__demission_date = 0
             return self.__demission_date
 
         # if all empty, then not let go by company
-        elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '':
+        elif dia_desl == '' and mes_deslig == '':
             self.__demission_date = 0
             return self.__demission_date
 
         # Another variation of 'not let go by company'
-        elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'] == '0':
+        elif dia_desl == '' and mes_deslig == '0':
             self.__demission_date = 0
             return self.__demission_date
 
         # Another variation of 'not let go by company'
-        elif self.dict['DIADESL'] == '0' and self.dict['MES_DESLIG'] == '0':
+        elif dia_desl == '0' and mes_deslig == '0':
             self.__demission_date = 0
             return self.__demission_date
 
         # MES_DESLIG (different from 0), but no DIADESL, let's assume that
         # the worker was let go at the first day of the month.
-        elif self.dict['DIADESL'] == '' and self.dict['MES_DESLIG'].isdigit():
-            dem_month = int(self.dict['MES_DESLIG'])
+        elif dia_desl == '' and mes_deslig.isdigit():
+            dem_month = int(mes_deslig)
             dem_day = 1
             dem_year = self.year
             self.__demission_date = datetime.datetime(dem_year, dem_month, dem_day)
             return self.__demission_date
 
         try:
-            dem_month = int(self.dict['MES_DESLIG'])
-            dem_day = int(self.dict['DIADESL'])
+            dem_month = int(mes_deslig)
+            dem_day = int(dia_desl)
             dem_year = self.year
 
             # We have weird instances where MES_DESLIG is 2 and
