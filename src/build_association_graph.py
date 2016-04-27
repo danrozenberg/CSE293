@@ -70,13 +70,20 @@ def create_nodes(interpreter, graph):
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
-
     src_node_id = interpreter.worker_id
     dest_node_id = interpreter.employer_id
 
-    edge = graph.add_edge(src_node_id, dest_node_id)
-    graph.add_edge_attr(edge, "year", interpreter.year)
-    graph.add_edge_attr(edge, "time_at_employer",interpreter.time_at_employer)
+    # here we guarantee that there will be only 1 edge per pair of nodes.
+    edge_id = graph.get_edge_between(src_node_id, dest_node_id)
+    if edge_id is None:
+        edge_id = graph.add_edge(src_node_id, dest_node_id)
+
+    year = interpreter.year
+
+    graph.add_edge_attr(edge_id, "year", year)
+    graph.add_edge_attr(edge_id, str(year) + "_time_at_employer",
+                        interpreter.time_at_employer)
+
     # We should add more edge attributes here as they are needed.
 
 def enable_logging(log_level):

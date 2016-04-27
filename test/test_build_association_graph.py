@@ -125,7 +125,6 @@ class TestBuildAssociationGraph(unittest.TestCase):
         self.assertEquals('employer', graph.get_node_attribute(3333, 'type'))
 
     def test_create_edges(self):
-
         interpreter = FakeInterpreter()
 
         # graph with only nodes, no edges...
@@ -140,26 +139,37 @@ class TestBuildAssociationGraph(unittest.TestCase):
         # just adding an edge
         interpreter.worker_id = 19
         interpreter.employer_id = 888
+        interpreter.year = 2015
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
+        attributes = graph.get_edge_attributes(graph.get_edge_between(19,888))
+        self.assertTrue('2015_time_at_employer' in  attributes)
+        self.assertFalse('2014_time_at_employer' in  attributes)
 
-        # same ids, we still add an edge!
+        # same ids, we DON'T add an edge!
+        # but we do add another attribute!
         interpreter.worker_id = 19
         interpreter.employer_id = 888
+        interpreter.year = 2014
         create_edges(interpreter, graph)
-        self.assertEquals(2, graph.get_edge_count())
+        self.assertEquals(1, graph.get_edge_count())
+        attributes = graph.get_edge_attributes(graph.get_edge_between(19,888))
+        self.assertTrue('2015_time_at_employer' in  attributes)
+        self.assertTrue('2014_time_at_employer' in  attributes)
 
-        # different ids, same thing...
+        # different ids, add an edge...
         interpreter.worker_id = 123
         interpreter.employer_id = 456
+        interpreter.year = 2015
         create_edges(interpreter, graph)
-        self.assertEquals(3, graph.get_edge_count())
+        self.assertEquals(2, graph.get_edge_count())
 
         # a bit fancy now...but same thing
         interpreter.worker_id = 19
         interpreter.employer_id = 456
+        interpreter.year = 2015
         create_edges(interpreter, graph)
-        self.assertEquals(4, graph.get_edge_count())
+        self.assertEquals(3, graph.get_edge_count())
 
     def test_passes_filter(self):
         # no worker_id rule
