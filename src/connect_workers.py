@@ -1,3 +1,6 @@
+from datetime import datetime
+from collections import namedtuple
+
 def get_worker_iterator(association_graph):
     node_iterator = association_graph.get_node_iterator()
     for node in node_iterator:
@@ -5,7 +8,7 @@ def get_worker_iterator(association_graph):
         if node_type == "worker":
             yield node
 
-def connect_workers(association_graph, new_graph):
+def connect_workers(association_graph, new_graph, connector):
     """
     Connects workers as long as they have worked in the same company
       at any given point, including if they never worked together
@@ -13,6 +16,9 @@ def connect_workers(association_graph, new_graph):
       connect the workers.
 
     :param association_graph: an association graph between workers-plants.
+    We expect this association graph to have ONLY ONE EDGE BETWEEN ANY
+     PAIR OF NODES.
+
     :param graph_manager: a graph manager that we will use to create a
      new graph.
     :return: the new graph, with only workers and edges between them.
@@ -45,6 +51,44 @@ def connect_workers(association_graph, new_graph):
                     new_graph.add_edge(worker, coworker)
 
     return new_graph
+
+def get_overlapping_time(start_1, end_1, start_2, end_2):
+    # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
+    Range = namedtuple('Range', ['start', 'end'])
+    r1 = Range(start=start_1, end=end_1)
+    r2 = Range(start=start_2, end=end_2)
+    latest_start = max(r1.start, r2.start)
+    earliest_end = min(r1.end, r2.end)
+    return max((earliest_end - latest_start).days + 1, 0)
+
+class WorkerConnector():
+    def should_connect(self, worker, coworker):
+        raise NotImplementedError
+
+
+class SimpleConnector(WorkerConnector):
+    """ Connects workers if they have worked together
+    at any point in time.
+    """
+    def __init__(self, graph):
+        self.graph = graph
+
+    def should_connect(self, worker, coworker):
+        """
+        :param worker: id of a worker
+        :param coworker: id of another worker
+        :return: wether we should add an edge between them.
+        """
+        pass
+
+
+
+    def _get_time_at_worker_attrs(self, node_id):
+        pass
+
+
+
+
 
 
 
