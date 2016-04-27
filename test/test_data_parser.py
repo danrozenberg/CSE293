@@ -1,7 +1,6 @@
 import unittest
 import logging
 import datetime
-import sys
 sys.path.insert(0, '../src/')
 from data_parser import Pis12DataParser
 from data_parser import Pis12DataInterpreter
@@ -349,8 +348,6 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'MES_DESLIG':''})
         self.assertEquals(-1, interpreter.time_at_employer)
         self.assertIn("Unable to calculate time_at_employer for:", interpreter.log_message)
-
-
 
 
 if __name__ == "__main__":

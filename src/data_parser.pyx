@@ -30,7 +30,7 @@ class Pis12DataParser():
                     if 0 < fetch_num <= paths_read:
                         break
 
-    def lines_reader(self, file_path, fetch_num = None):
+    def lines_reader(self, file_path, fetch_num = 0):
         """
         Reads and yields a line, but does not process it.
         :param file_path:
@@ -325,3 +325,4 @@ class Pis12DataInterpreter():
             else:
                 logging.info(self.log_message)
             return -1
+
