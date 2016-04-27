@@ -334,6 +334,31 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(manager.is_edge(400))
         self.assertTrue(manager.is_edge(500))
 
+    def test_get_edge_between(self):
+
+        manager = self.manager
+
+        # add some nodes
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(4)
+
+        manager.add_edge(1,2, 100)
+        manager.add_edge(1,3, 200)
+
+        self.assertEquals(100, manager.get_edge_between(1,2))
+        self.assertEquals(200, manager.get_edge_between(1,3))
+        self.assertEquals(100, manager.get_edge_between(2,1))
+        self.assertEquals(200, manager.get_edge_between(3,1))
+        self.assertIsNone(manager.get_edge_between(1,4))
+        self.assertIsNone(manager.get_edge_between(2,4))
+
+        manager.add_edge(2,4, 300)
+        manager.add_edge(1,4, 400)
+        self.assertEquals(300, manager.get_edge_between(2,4))
+        self.assertEquals(400, manager.get_edge_between(1,4))
+
     def test_is_edge_between(self):
         manager = graph_manager.SnapManager()
 

@@ -66,6 +66,21 @@ class SnapManager(object):
         dest_NId = self.NId_from_id[dest_id]
         return self.network.AddEdge(src_NId, dest_NId, EId)
 
+    def get_edge_between(self, node1, node2):
+        """This only returns the FIRST edge ever added between
+        node 1 and node 2"""
+        # TODO: consider raising error if there is more than 1 edge between?
+        NId1 = self.NId_from_id[node1]
+        NId2 = self.NId_from_id[node2]
+        try:
+            return self.network.GetEI(NId1, NId2).GetId()
+        except RuntimeError:
+            try:
+                return self.network.GetEI(NId2, NId1).GetId()
+            except RuntimeError:
+                return None
+
+
     def get_edges_between(self, node1, node2):
         # TODO: make this less aweful, maybe using GetInEdges or something.
         # Again, there are important methods missing from SNAP.py
