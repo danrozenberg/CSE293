@@ -79,8 +79,6 @@ def create_edges(interpreter, graph):
         edge_id = graph.add_edge(src_node_id, dest_node_id)
 
     year = interpreter.year
-
-    graph.add_edge_attr(edge_id, "year", year)
     graph.add_edge_attr(edge_id, str(year) + "_time_at_employer",
                         interpreter.time_at_employer)
 
