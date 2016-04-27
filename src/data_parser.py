@@ -190,13 +190,8 @@ class Pis12DataInterpreter():
         dia_desl = self.dict['DIADESL']
         mes_deslig = self.dict['MES_DESLIG']
 
-        # Sometimes, we have a message in DIADESL
-        if dia_desl == 'NAO DESL ANO':
-            self.__demission_date = 0
-            return self.__demission_date
-
         # if all empty, then not let go by company
-        elif dia_desl == '' and mes_deslig == '':
+        if dia_desl == '' and mes_deslig == '':
             self.__demission_date = 0
             return self.__demission_date
 
@@ -207,6 +202,11 @@ class Pis12DataInterpreter():
 
         # Another variation of 'not let go by company'
         elif dia_desl == '0' and mes_deslig == '0':
+            self.__demission_date = 0
+            return self.__demission_date
+
+        # Sometimes, we have a message in DIADESL
+        elif dia_desl == 'NAO DESL ANO':
             self.__demission_date = 0
             return self.__demission_date
 
@@ -246,6 +246,7 @@ class Pis12DataInterpreter():
             else:
                 self.__demission_date = datetime.datetime(dem_year, dem_month, dem_day)
                 return self.__demission_date
+
 
         except ValueError:
             self.log_message = "MES_DESLIG or DIADESL is invalid in: " + str(self.dict)
