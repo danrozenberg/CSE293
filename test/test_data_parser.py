@@ -1,6 +1,6 @@
 import unittest
 import logging
-import datetime
+from datetime import datetime
 import sys
 sys.path.insert(0, '../src/')
 from data_parser import Pis12DataParser
@@ -159,23 +159,33 @@ class TestPis12DataInterpreter(unittest.TestCase):
     def test_job_start_date(self):
         interpreter = Pis12DataInterpreter()
 
-        interpreter.feed_line({'DT_ADMISSAO':'10082015'})
+        interpreter.feed_line({'DT_ADMISSAO':'10082015',
+                               'MES_ADM':'',
+                               'ANO_ADM':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(2015,8,10), answer)
+        self.assertEquals(datetime(2015,8,10), answer)
 
-        interpreter.feed_line({'DT_ADMISSAO':'5041986'})
+        interpreter.feed_line({'DT_ADMISSAO':'5041986',
+                               'MES_ADM':'',
+                               'ANO_ADM':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(1986,4,5), answer)
+        self.assertEquals(datetime(1986,4,5), answer)
 
-        interpreter.feed_line({'DT_ADMISSAO':'05041986'})
+        interpreter.feed_line({'DT_ADMISSAO':'05041986',
+                               'MES_ADM':'',
+                               'ANO_ADM':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(1986,4,5), answer)
+        self.assertEquals(datetime(1986,4,5), answer)
 
-        interpreter.feed_line({'DT_ADMISSAO':'541986'})
+        interpreter.feed_line({'DT_ADMISSAO':'541986',
+                               'MES_ADM':'',
+                               'ANO_ADM':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(1986,4,5), answer)
+        self.assertEquals(datetime(1986,4,5), answer)
 
-        interpreter.feed_line({'DT_ADMISSAO':'5486'})
+        interpreter.feed_line({'DT_ADMISSAO':'5486',
+                               'MES_ADM':'',
+                               'ANO_ADM':''})
         answer = interpreter.admission_date
         self.assertEquals(-1, answer)
         self.assertIn("Could not parse DT_ADMISSAO for: ", interpreter.log_message)
@@ -184,7 +194,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'MES_ADM':'01',
                                 'ANO_ADM':'2001'})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(2007,9,28), answer)
+        self.assertEquals(datetime(2007,9,28), answer)
 
 
         # with 0 as MES_ADM and ANO_ADM = ''
@@ -193,7 +203,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'ANO_ADM':'',
                                 'ANO':'2002'})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(1990,1,1), answer)
+        self.assertEquals(datetime(1990,1,1), answer)
 
         # with a number in MES_ADM and ANO_ADM = ''
         interpreter.feed_line({'DT_ADMISSAO':'',
@@ -201,7 +211,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'ANO_ADM':'',
                                 'ANO':'2002'})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(2002,7,1), answer)
+        self.assertEquals(datetime(2002,7,1), answer)
 
 
         # with no dt_admissao
@@ -209,13 +219,13 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'ANO_ADM':'2001',
                                 'DT_ADMISSAO':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(2001,1,1), answer)
+        self.assertEquals(datetime(2001,1,1), answer)
 
         interpreter.feed_line({'MES_ADM':'5',
                                 'ANO_ADM':'1999',
                                 'DT_ADMISSAO':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(1999,5,1), answer)
+        self.assertEquals(datetime(1999,5,1), answer)
 
         interpreter.feed_line({'MES_ADM':'',
                                 'ANO_ADM':'',
@@ -230,39 +240,42 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'ANO_ADM':'',
                                 'ANO':''})
         answer = interpreter.admission_date
-        self.assertEquals(datetime.datetime(2005,12,3), answer)
+        self.assertEquals(datetime(2005,12,3), answer)
 
     def test_job_end_date(self):
         interpreter = Pis12DataInterpreter()
-
-        interpreter.feed_line({'DIADESL':'NAO DESL ANO'})
+        interpreter.feed_line({'DIADESL':'NAO DESL ANO',
+                               'MES_DESLIG':'',
+                               'ANO':'2007'})
         answer = interpreter.demission_date
-        self.assertEquals(0, answer)
+        self.assertEquals(datetime(2007,12,31), answer)
 
         interpreter.feed_line({'ANO':'1999',
                                 'DIADESL':'24',
                                 'MES_DESLIG':'12'})
         answer = interpreter.demission_date
-        self.assertEquals(datetime.datetime(1999,12,24), answer)
+        self.assertEquals(datetime(1999,12,24), answer)
 
 
         interpreter.feed_line({'ANO':'1999',
                                 'DIADESL':'',
                                 'MES_DESLIG':'0'})
-        self.assertEquals(0 , interpreter.demission_date)
+        self.assertEquals(datetime(1999,12,31),
+                          interpreter.demission_date)
 
         # got mes_deslig but no diadesl
         interpreter.feed_line({'ANO':'2000',
                                 'DIADESL':'',
                                 'MES_DESLIG':'3'})
-        self.assertEquals(datetime.datetime(2000,3,1)
+        self.assertEquals(datetime(2000,3,1)
                           ,interpreter.demission_date)
 
-        # mes_deslig and diadesl both equal to '0'
+        # "not fired"
         interpreter.feed_line({'ANO':'2001',
                                 'DIADESL':'0',
                                 'MES_DESLIG':'0'})
-        self.assertEquals(0 ,interpreter.demission_date)
+        self.assertEquals(datetime(2001,12,31),
+                          interpreter.demission_date)
 
 
         interpreter.feed_line({'ANO':'1999',
@@ -285,13 +298,14 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'DT_ADMISSAO':'',
                                 'DIADESL':'',
                                 'MES_DESLIG':''})
-        self.assertEquals(0, interpreter.demission_date)
+        self.assertEquals(datetime(2015,12,31),
+                          interpreter.demission_date)
 
         # a confusing date...put it as march 1st...
         interpreter.feed_line({'ANO':'2005',
                                 'DIADESL':'29',
                                 'MES_DESLIG':'2'})
-        self.assertEquals(datetime.datetime(2005,3,1)
+        self.assertEquals(datetime(2005,3,1)
                           , interpreter.demission_date)
         self.assertIn("Weird february date in: ", interpreter.log_message)
 

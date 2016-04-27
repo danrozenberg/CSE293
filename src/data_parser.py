@@ -1,6 +1,7 @@
+from datetime import datetime
 import os
 import csv
-import datetime
+from datetime import datetime
 
 # noinspection PyMethodMayBeStatic
 class Pis12DataParser():
@@ -144,7 +145,7 @@ class Pis12DataInterpreter():
                 # add missing zeroes to day of month
                 if len(date_string) == 7:
                     date_string = '0' + str(date_string)
-                self.__admission_date = datetime.datetime.strptime(date_string,'%d%m%Y')
+                self.__admission_date = datetime.strptime(date_string,'%d%m%Y')
                 return self.__admission_date
             except ValueError:
                 self.log_message = "Could not parse DT_ADMISSAO for: " + str(self.dict)
@@ -157,19 +158,19 @@ class Pis12DataInterpreter():
             if mes_adm == '0':
                 # This happens in older records...for our purposes, let's
                 # assume that they were hired long long ago, in 1900 or something.
-                self.__admission_date = datetime.datetime(1990, 1, 1)
+                self.__admission_date = datetime(1990, 1, 1)
                 return self.__admission_date
             else:
                 # I am assuming that in these cases, the worker was hired in the
                 # current year.
                 adm_month = int(mes_adm)
-                self.__admission_date = datetime.datetime(self.year, adm_month, 1)
+                self.__admission_date = datetime(self.year, adm_month, 1)
                 return self.__admission_date
 
         elif ano_adm == '' and mes_adm == '0':
             # This happens in older records...for our purposes, let's
             # assume worker was hired long ago.
-            self.__admission_date = datetime.datetime(1990, 1, 1)
+            self.__admission_date = datetime(1990, 1, 1)
             return self.__admission_date
 
         elif ano_adm <> '' and mes_adm <> '' :
@@ -177,7 +178,7 @@ class Pis12DataInterpreter():
             adm_day = 1
             adm_month = int(mes_adm)
             adm_year = int(ano_adm)
-            self.__admission_date = datetime.datetime(adm_year, adm_month, adm_day)
+            self.__admission_date = datetime(adm_year, adm_month, adm_day)
             return self.__admission_date
         else:
             self.log_message = "could not get admission date for: " + str(self.dict)
@@ -187,7 +188,7 @@ class Pis12DataInterpreter():
 
     @property
     def demission_date(self):
-        """ :return: demission date, or 0 if there was no demission.  """
+        # TODO: explain the whole unix timestamp idea
 
         if self.__demission_date is not None:
             return self.__demission_date
@@ -195,63 +196,52 @@ class Pis12DataInterpreter():
         dia_desl = self.dict['DIADESL']
         mes_deslig = self.dict['MES_DESLIG']
 
-        # if all empty, then not let go by company
-        if dia_desl == '' and mes_deslig == '':
-            self.__demission_date = 0
-            return self.__demission_date
-
-        # Another variation of 'not let go by company'
-        elif dia_desl == '' and mes_deslig == '0':
-            self.__demission_date = 0
-            return self.__demission_date
-
-        # Another variation of 'not let go by company'
-        elif dia_desl == '0' and mes_deslig == '0':
-            self.__demission_date = 0
-            return self.__demission_date
-
-        # Sometimes, we have a message in DIADESL
-        elif dia_desl == 'NAO DESL ANO':
-            self.__demission_date = 0
-            return self.__demission_date
-
-        # MES_DESLIG (different from 0), but no DIADESL, let's assume that
-        # the worker was let go at the first day of the month.
-        elif dia_desl == '' and mes_deslig.isdigit():
-            dem_month = int(mes_deslig)
-            dem_day = 1
-            dem_year = self.year
-            self.__demission_date = datetime.datetime(dem_year, dem_month, dem_day)
-            return self.__demission_date
-
         try:
-            dem_month = int(mes_deslig)
-            dem_day = int(dia_desl)
-            dem_year = self.year
+            # Many ways of saying "not let go by the company"
+            if (dia_desl == '' and mes_deslig == '') or \
+                (dia_desl == '' and mes_deslig == '0') or \
+                (dia_desl == '0' and mes_deslig == '0') or \
+                (dia_desl == 'NAO DESL ANO'):
+                    self.__demission_date =  datetime(self.year, 12, 31)
+                    return self.__demission_date
 
-            # We have weird instances where MES_DESLIG is 2 and
-            # the day is 29,30,31... This is pretty common
-            # Let us assume those demissions happened in march 1st
-            # We do this so that we don't have a gazzillion errors in the
-            # output...
-            if dem_month == 2 and dem_day > 28:
-                dem_month = 3
+            # MES_DESLIG (different from 0), but no DIADESL, let's assume that
+            # the worker was let go at the first day of the month.
+            elif dia_desl == '' and mes_deslig.isdigit():
+                dem_month = int(mes_deslig)
                 dem_day = 1
-                self.log_message = "Weird february date in: " + str(self.dict)
-                logging.info(self.log_message)
-
-            # TODO: inconsistency in EMP_EM_31_12??
-            # check inconsistent data:
-            if (dem_month > 0 >= dem_day) or \
-            (dem_month <= 0 < dem_day) :
-                self.log_message = "Inconsistent MES_DESLIG or DIADESL in: " + str(self.dict)
-                logging.warning(self.log_message)
-                self.__demission_date = -1
+                dem_year = self.year
+                self.__demission_date = datetime(dem_year, dem_month, dem_day)
                 return self.__demission_date
+
             else:
-                self.__demission_date = datetime.datetime(dem_year, dem_month, dem_day)
-                return self.__demission_date
+                dem_month = int(mes_deslig)
+                dem_day = int(dia_desl)
+                dem_year = self.year
 
+                # We have weird instances where MES_DESLIG is 2 and
+                # the day is 29,30,31... This is pretty common
+                # Let us assume those demissions happened in march 1st
+                # We do this so that we don't have a gazzillion errors in the
+                # output...
+                if dem_month == 2 and dem_day > 28:
+                    dem_month = 3
+                    dem_day = 1
+                    self.log_message = "Weird february date in: " + str(self.dict)
+                    logging.info(self.log_message)
+
+                # TODO: inconsistency in EMP_EM_31_12??
+                # check inconsistent data:
+                if (dem_month > 0 >= dem_day) or \
+                (dem_month <= 0 < dem_day) :
+                    self.log_message = "Inconsistent MES_DESLIG or DIADESL in: " + str(self.dict)
+                    logging.warning(self.log_message)
+                    self.__demission_date = -1
+                    return self.__demission_date
+                else:
+                    # FINALLY, we return for the normal case...
+                    self.__demission_date = datetime(dem_year, dem_month, dem_day)
+                    return self.__demission_date
 
         except ValueError:
             self.log_message = "MES_DESLIG or DIADESL is invalid in: " + str(self.dict)
@@ -282,17 +272,17 @@ class Pis12DataInterpreter():
         # pretend worker starts on Jan-1st if date is from a previous year
         #   or if it has no admission date ( Isuppose that means he/shw was not
         #   hired that year....)
-        if type(admission_date) == datetime.datetime and \
+        if type(admission_date) == datetime and \
            admission_date.year < year:
-            admission_date = datetime.datetime(year, 1, 1)
+            admission_date = datetime(year, 1, 1)
         if type(admission_date) == int and admission_date == 0:
-            admission_date = datetime.datetime(year, 1, 1)
+            admission_date = datetime(year, 1, 1)
 
 
         # if we get a 0 for demission date, we suppose the worker was not
         #   fired that year, give it a Dec-31 date...
         if type(demission_date) == int and demission_date == 0:
-            demission_date = datetime.datetime(year, 12, 31)
+            demission_date = datetime(year, 12, 31)
 
         # Finally, return...
         self.__time_at_employer = (demission_date - admission_date).days
@@ -334,3 +324,5 @@ class Pis12DataInterpreter():
             else:
                 logging.info(self.log_message)
             return -1
+
+#TODO: put logging inside a method to save lines!
