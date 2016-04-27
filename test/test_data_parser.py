@@ -203,7 +203,7 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'ANO_ADM':'',
                                 'ANO':'2002'})
         answer = interpreter.admission_date
-        self.assertEquals(datetime(1990,1,1), answer)
+        self.assertEquals(datetime(1800,1,1), answer)
 
         # with a number in MES_ADM and ANO_ADM = ''
         interpreter.feed_line({'DT_ADMISSAO':'',
