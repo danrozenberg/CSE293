@@ -72,13 +72,13 @@ class SnapManager(object):
         # TODO: consider raising error if there is more than 1 edge between?
         NId1 = self.NId_from_id[node1]
         NId2 = self.NId_from_id[node2]
-        try:
+
+        if self.network.IsEdge(NId1, NId2):
             return self.network.GetEI(NId1, NId2).GetId()
-        except RuntimeError:
-            try:
-                return self.network.GetEI(NId2, NId1).GetId()
-            except RuntimeError:
-                return None
+        elif self.network.IsEdge(NId2, NId1):
+            return self.network.GetEI(NId2, NId1).GetId()
+        else:
+            return None
 
 
     def get_edges_between(self, node1, node2):
