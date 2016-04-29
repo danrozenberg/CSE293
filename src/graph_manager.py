@@ -161,7 +161,7 @@ class SnapManager(object):
                 except RuntimeError:
                     break
 
-    def get_node_attributes(self, node_id):
+    def get_node_attrs(self, node_id):
         """
         :param NId: the node to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
@@ -181,9 +181,9 @@ class SnapManager(object):
 
         return dict(zip(names, converted_values))
 
-    def get_node_attribute(self, node_id, attr_name):
+    def get_node_attr(self, node_id, attr_name):
         # Probably not the most efficient way of doing this...
-        attributes = self.get_node_attributes(node_id)
+        attributes = self.get_node_attrs(node_id)
 
         try:
             return attributes[attr_name]
@@ -191,7 +191,7 @@ class SnapManager(object):
             raise RuntimeError("Node " + str(node_id) + " does not have attribute '" +
                                                attr_name + "'")
 
-    def get_edge_attributes(self, EId):
+    def get_edge_attrs(self, EId):
         """
         :param EId: the edge to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
@@ -209,9 +209,9 @@ class SnapManager(object):
 
         return dict(zip(names, converted_values))
 
-    def get_edge_attribute(self, EId, attr_name):
+    def get_edge_attr(self, EId, attr_name):
         # Probably not the most efficient way of doing this...
-        attributes = self.get_edge_attributes(EId)
+        attributes = self.get_edge_attrs(EId)
 
         try:
             return attributes[attr_name]
@@ -317,7 +317,7 @@ class SnapManager(object):
             return False
 
         dst_graph.add_node(node_id)
-        attr_dictionary = self.get_node_attributes(node_id)
+        attr_dictionary = self.get_node_attrs(node_id)
         for attr_name in attr_dictionary:
             attr_value = attr_dictionary[attr_name]
             dst_graph.add_node_attr(node_id, attr_name, attr_value)

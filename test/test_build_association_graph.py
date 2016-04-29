@@ -89,8 +89,8 @@ class TestBuildAssociationGraph(unittest.TestCase):
         expected_nodes = [19,888]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
-        self.assertEquals('worker', graph.get_node_attribute(19, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(888, 'type'))
+        self.assertEquals('worker', graph.get_node_attr(19, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(888, 'type'))
 
         # same graph, should add just another employer node
         interpreter.worker_id = 19
@@ -98,9 +98,9 @@ class TestBuildAssociationGraph(unittest.TestCase):
         expected_nodes = [19,888,999]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
-        self.assertEquals('worker', graph.get_node_attribute(19, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(888, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(999, 'type'))
+        self.assertEquals('worker', graph.get_node_attr(19, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(888, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(999, 'type'))
 
         # add an entry with same ids, don't change anything
         interpreter.worker_id = 19
@@ -108,9 +108,9 @@ class TestBuildAssociationGraph(unittest.TestCase):
         expected_nodes = [19,888,999]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
-        self.assertEquals('worker', graph.get_node_attribute(19, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(888, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(999, 'type'))
+        self.assertEquals('worker', graph.get_node_attr(19, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(888, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(999, 'type'))
 
         # add two more different node ids, just to check...
         interpreter.worker_id = 33
@@ -118,11 +118,11 @@ class TestBuildAssociationGraph(unittest.TestCase):
         expected_nodes = [19,888,999, 33, 3333]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
-        self.assertEquals('worker', graph.get_node_attribute(19, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(888, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(999, 'type'))
-        self.assertEquals('worker', graph.get_node_attribute(33, 'type'))
-        self.assertEquals('employer', graph.get_node_attribute(3333, 'type'))
+        self.assertEquals('worker', graph.get_node_attr(19, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(888, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(999, 'type'))
+        self.assertEquals('worker', graph.get_node_attr(33, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(3333, 'type'))
 
     def test_create_edges(self):
         interpreter = FakeInterpreter()
@@ -142,7 +142,7 @@ class TestBuildAssociationGraph(unittest.TestCase):
         interpreter.year = 2015
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
-        attributes = graph.get_edge_attributes(graph.get_edge_between(19,888))
+        attributes = graph.get_edge_attrs(graph.get_edge_between(19,888))
         self.assertTrue('2015_admission_date' in  attributes)
         self.assertFalse('2014_admission_date' in  attributes)
 
@@ -153,7 +153,7 @@ class TestBuildAssociationGraph(unittest.TestCase):
         interpreter.year = 2014
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
-        attributes = graph.get_edge_attributes(graph.get_edge_between(19,888))
+        attributes = graph.get_edge_attrs(graph.get_edge_between(19,888))
         self.assertTrue('2015_admission_date' in  attributes)
         self.assertTrue('2014_admission_date' in  attributes)
 

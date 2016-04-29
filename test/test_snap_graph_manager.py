@@ -97,24 +97,24 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node_attr(1, "a_third_one", "asd")
 
         # First node:
-        d = manager.get_node_attributes(1)
+        d = manager.get_node_attrs(1)
         self.assertEquals(13.5, d["one_attr"])
         self.assertEquals("asd", d["a_third_one"])
-        self.assertEquals("asd", manager.get_node_attribute(1, 'a_third_one'))
-        self.assertEquals(13.5, manager.get_node_attribute(1, 'one_attr'))
+        self.assertEquals("asd", manager.get_node_attr(1, 'a_third_one'))
+        self.assertEquals(13.5, manager.get_node_attr(1, 'one_attr'))
 
         # Second node:
-        d = manager.get_node_attributes(2)
+        d = manager.get_node_attrs(2)
         self.assertEquals(5, d["another_attr"])
-        self.assertEquals(5, manager.get_node_attribute(2, 'another_attr'))
+        self.assertEquals(5, manager.get_node_attr(2, 'another_attr'))
 
         # third, empty node
-        d = manager.get_node_attributes(3)
+        d = manager.get_node_attrs(3)
         self.assertEquals(len(d.keys()), 0)
 
         # Error
         with self.assertRaises(RuntimeError) as bad_call:
-            manager.get_node_attribute(3, "i dont exist")
+            manager.get_node_attr(3, "i dont exist")
         the_exception = bad_call.exception
         self.assertIn("does not have attribute", the_exception.message)
 
@@ -158,28 +158,28 @@ class TestSnapManager(unittest.TestCase):
         manager.add_edge_attr(1, "third", "asd")
 
         # First edge:
-        d = manager.get_edge_attributes(1)
+        d = manager.get_edge_attrs(1)
         self.assertEquals(33.33, d["first"])
         self.assertEquals("asd", d["third"])
-        self.assertEquals(33.33, manager.get_edge_attribute(1, 'first'))
-        self.assertEquals("asd", manager.get_edge_attribute(1, 'third'))
+        self.assertEquals(33.33, manager.get_edge_attr(1, 'first'))
+        self.assertEquals("asd", manager.get_edge_attr(1, 'third'))
 
         # Second node:
-        d = manager.get_edge_attributes(2)
+        d = manager.get_edge_attrs(2)
         self.assertEquals(100, d["second"])
-        self.assertEquals(100, manager.get_edge_attribute(2, 'second'))
+        self.assertEquals(100, manager.get_edge_attr(2, 'second'))
 
         # third, empty node
-        d = manager.get_edge_attributes(3)
+        d = manager.get_edge_attrs(3)
         self.assertEquals(len(d.keys()), 0)
         with self.assertRaises(RuntimeError) as bad_call:
-            manager.get_edge_attribute(3, "i dont exist")
+            manager.get_edge_attr(3, "i dont exist")
         the_exception = bad_call.exception
         self.assertIn("does not have attribute", the_exception.message)
 
         # what if we add the same attribute again?
         manager.add_edge_attr(1, "third", "basd")
-        d = manager.get_edge_attributes(1)
+        d = manager.get_edge_attrs(1)
         self.assertEquals("basd", d["third"])
 
     def test_get_nodes(self):
@@ -526,8 +526,8 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(2, src_graph.get_node_count())
         self.assertEquals(1, dst_graph.get_node_count())
 
-        original_attrs = src_graph.get_node_attributes(2)
-        copied_attrs = dst_graph.get_node_attributes(2)
+        original_attrs = src_graph.get_node_attrs(2)
+        copied_attrs = dst_graph.get_node_attrs(2)
         self.assertEquals(original_attrs, copied_attrs)
 
         # can't copy the same node id
@@ -535,8 +535,8 @@ class TestSnapManager(unittest.TestCase):
 
         # also, changes in one doesn't reflect changes in another
         src_graph.add_node_attr(2, "ThirdAttr", "Tubular!")
-        original_attrs = src_graph.get_node_attributes(2)
-        copied_attrs = dst_graph.get_node_attributes(2)
+        original_attrs = src_graph.get_node_attrs(2)
+        copied_attrs = dst_graph.get_node_attrs(2)
         self.assertEquals(3, len(original_attrs))
         self.assertEquals(2, len(copied_attrs))
 
