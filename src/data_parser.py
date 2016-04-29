@@ -1,7 +1,7 @@
-from datetime import datetime
 import os
 import csv
 from datetime import datetime
+from time import mktime
 
 # noinspection PyMethodMayBeStatic
 class Pis12DataParser():
@@ -100,6 +100,8 @@ class Pis12DataInterpreter():
         self._year = None
         self._admission_date = None
         self._demission_date = None
+        self._admission_timestamp = None
+        self._demission_timestamp = None
         self._time_at_employer = None
         self._worker_id = None
         self._employer_id = None
@@ -158,7 +160,7 @@ class Pis12DataInterpreter():
             if mes_adm == '0':
                 # This happens in older records...for our purposes, let's
                 # assume that they were hired long long ago, in 1900 or something.
-                self._admission_date = datetime(1800, 1, 1)
+                self._admission_date = datetime(1900, 1, 1)
                 return self._admission_date
             else:
                 # I am assuming that in these cases, the worker was hired in the
@@ -170,7 +172,7 @@ class Pis12DataInterpreter():
         elif ano_adm == '' and mes_adm == '0':
             # This happens in older records...for our purposes, let's
             # assume worker was hired long ago.
-            self._admission_date = datetime(1800, 1, 1)
+            self._admission_date = datetime(1900, 1, 1)
             return self._admission_date
 
         elif ano_adm <> '' and mes_adm <> '' :
@@ -248,6 +250,36 @@ class Pis12DataInterpreter():
             logging.warning(self.log_message)
             self._demission_date = -1
             return self._demission_date
+
+    @property
+    def admission_timestamp(self):
+        """
+        :return: admission date in unix timestamp,
+        That is, seconds from Jan 1st 1970.
+        """
+        if self._admission_timestamp is None:
+            admission_date = self.admission_date
+            if admission_date == -1 :
+                return -1
+            else:
+                self._admission_timestamp = mktime(admission_date.timetuple())
+
+        return self._admission_timestamp
+
+    @property
+    def demission_timestamp(self):
+        """
+        :return: demission date in unix timestamp,
+        That is, seconds from Jan 1st 1970.
+        """
+        if self._demission_timestamp is None:
+            demission_date = self.demission_date
+            if demission_date == -1:
+                return  -1
+            else:
+                self._demission_timestamp = mktime(demission_date.timetuple())
+
+        return self._demission_timestamp
 
     @property
     def time_at_employer(self):
