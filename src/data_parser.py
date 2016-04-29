@@ -94,9 +94,9 @@ class Pis12DataInterpreter():
      It SHOULD be responsability of a class that deals with PIS12.
      This is what this class is all about."""
     def __init__(self):
-        self.__reset_private_variables()
+        self._reset_private_variables()
 
-    def __reset_private_variables(self):
+    def _reset_private_variables(self):
         self._year = None
         self._admission_date = None
         self._demission_date = None
@@ -119,7 +119,7 @@ class Pis12DataInterpreter():
         # private variables save state so we only have to calculate
         # each property once, even if requested more than once
         # then again, we don't calculate it if we don't request it
-        self.__reset_private_variables()
+        self._reset_private_variables()
 
     @property
     def year(self):
