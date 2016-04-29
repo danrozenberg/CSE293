@@ -2,6 +2,7 @@ import unittest
 import sys
 import logging
 from datetime import datetime
+from time import mktime
 sys.path.insert(0, '../src/')
 import graph_manager
 import connect_workers
@@ -81,57 +82,57 @@ class ConnectWorkersTest(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(1,7))
         self.assertFalse(new_graph.is_edge_between(1,5))
 
-    def test_get_overlapping_time(self):
-        start_1 = datetime(2010,1,1)
-        end_1 = datetime(2015,1,1)
-        start_2 = datetime(2011,10,10)
-        end_2 = datetime(2011,10,20)
-        self.assertEquals(11, connect_workers.get_overlapping_time(start_1,
+    def test_get_overlapping_days(self):
+        start_1 =  mktime(datetime(2010,1,1).timetuple())
+        end_1 = mktime(datetime(2015,1,1).timetuple())
+        start_2 = mktime(datetime(2011,10,10).timetuple())
+        end_2 = mktime(datetime(2011,10,20).timetuple())
+        self.assertEquals(11, connect_workers.get_overlapping_days(start_1,
                                                                    end_1,
                                                                    start_2,
                                                                    end_2))
 
-        start_2 = datetime(2010,1,1)
-        end_2 = datetime(2015,1,1)
-        start_1 = datetime(2011,10,10)
-        end_1 = datetime(2011,10,20)
-        self.assertEquals(11, connect_workers.get_overlapping_time(start_1,
+        start_2 = mktime(datetime(2010,1,1).timetuple())
+        end_2 = mktime(datetime(2015,1,1).timetuple())
+        start_1 = mktime(datetime(2011,10,10).timetuple())
+        end_1 = mktime(datetime(2011,10,20).timetuple())
+        self.assertEquals(11, connect_workers.get_overlapping_days(start_1,
                                                                end_1,
                                                                start_2,
                                                                end_2))
 
-        start_2 = datetime(2010,1,1)
-        end_2 = datetime(2010,1,1)
-        start_1 = datetime(2010,1,1)
-        end_1 = datetime(2010,1,1)
-        self.assertEquals(1, connect_workers.get_overlapping_time(start_1,
+        start_2 = mktime(datetime(2010,1,1).timetuple())
+        end_2 = mktime(datetime(2010,1,1).timetuple())
+        start_1 = mktime(datetime(2010,1,1).timetuple())
+        end_1 = mktime(datetime(2010,1,1).timetuple())
+        self.assertEquals(1, connect_workers.get_overlapping_days(start_1,
                                                                end_1,
                                                                start_2,
                                                                end_2))
 
-        start_2 = datetime(2010,1,1)
-        end_2 = datetime(2010,1,2)
-        start_1 = datetime(2010,1,2)
-        end_1 = datetime(2010,1,2)
-        self.assertEquals(1,connect_workers.get_overlapping_time(start_1,
+        start_2 = mktime(datetime(2010,1,1).timetuple())
+        end_2 = mktime(datetime(2010,1,2).timetuple())
+        start_1 = mktime(datetime(2010,1,2).timetuple())
+        end_1 = mktime(datetime(2010,1,2).timetuple())
+        self.assertEquals(1,connect_workers.get_overlapping_days(start_1,
                                                                end_1,
                                                                start_2,
                                                                end_2))
 
-        start_1 = datetime(2010,1,1)
-        end_1 = datetime(2015,1,1)
-        start_2 = datetime(2066,10,10)
-        end_2 = datetime(2077,10,20)
-        self.assertEquals(0, connect_workers.get_overlapping_time(start_1,
+        start_1 = mktime(datetime(2010,1,1).timetuple())
+        end_1 = mktime(datetime(2015,1,1).timetuple())
+        start_2 = mktime(datetime(2066,10,10).timetuple())
+        end_2 = mktime(datetime(2077,10,20).timetuple())
+        self.assertEquals(0, connect_workers.get_overlapping_days(start_1,
                                                                end_1,
                                                                start_2,
                                                                end_2))
 
-        start_1 = datetime(2010,1,1)
-        end_1 = datetime(2015,1,1)
-        start_2 = datetime(2011,10,10)
-        end_2 = datetime(2012,10,20)
-        self.assertEquals(377, connect_workers.get_overlapping_time(start_1,
+        start_1 = mktime(datetime(2010,1,1).timetuple())
+        end_1 = mktime(datetime(2015,1,1).timetuple())
+        start_2 = mktime(datetime(2011,10,10).timetuple())
+        end_2 = mktime(datetime(2012,10,20).timetuple())
+        self.assertEquals(377, connect_workers.get_overlapping_days(start_1,
                                                                end_1,
                                                                start_2,
                                                                end_2))

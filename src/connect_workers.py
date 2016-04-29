@@ -52,11 +52,14 @@ def connect_workers(association_graph, new_graph, connector):
 
     return new_graph
 
-def get_overlapping_time(start_1, end_1, start_2, end_2):
+def get_overlapping_days(start_1, end_1, start_2, end_2):
     # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
+
+    fromtimestamp = datetime.fromtimestamp
+
     Range = namedtuple('Range', ['start', 'end'])
-    r1 = Range(start=start_1, end=end_1)
-    r2 = Range(start=start_2, end=end_2)
+    r1 = Range(start=fromtimestamp(start_1), end=fromtimestamp(end_1))
+    r2 = Range(start=fromtimestamp(start_2), end=fromtimestamp(end_2))
     latest_start = max(r1.start, r2.start)
     earliest_end = min(r1.end, r2.end)
     return max((earliest_end - latest_start).days + 1, 0)
@@ -80,6 +83,7 @@ class SimpleConnector(WorkerConnector):
         :return: wether we should add an edge between them.
         """
         pass
+
 
 
 
