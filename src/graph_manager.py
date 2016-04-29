@@ -66,6 +66,29 @@ class SnapManager(object):
         dest_NId = self.NId_from_id[dest_id]
         return self.network.AddEdge(src_NId, dest_NId, EId)
 
+    def get_edges(self, node_id):
+        """
+        Note that this only returns the first edge ever added between
+        node and its neighbors. So this fails if there is more than
+        1 edge between 2 nodes... This is a current SNAP limitation.
+        :param node_id: the node in question
+        :return: all ids of all edges connected to the node in question.
+        """
+        NId = self.NId_from_id[node_id]
+        nodeI = self.network.GetNI(NId)
+        edges = set()
+
+        for x in xrange(nodeI.GetOutDeg()):
+            neighbor = nodeI.GetOutNId(x)
+            edges.add(self.network.GetEI(NId, neighbor).GetId())
+
+        for x in xrange(nodeI.GetInDeg()):
+            neighbor = nodeI.GetInNId(x)
+            edges.add(self.network.GetEI(neighbor, NId).GetId())
+
+        return list(edges)
+
+
     def get_edge_between(self, node1, node2):
         """This only returns the FIRST edge ever added between
         node 1 and node 2"""

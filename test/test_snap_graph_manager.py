@@ -182,7 +182,6 @@ class TestSnapManager(unittest.TestCase):
         d = manager.get_edge_attributes(1)
         self.assertEquals("basd", d["third"])
 
-
     def test_get_nodes(self):
         manager = self.manager
 
@@ -340,6 +339,32 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(manager.is_edge(400))
         self.assertTrue(manager.is_edge(500))
 
+    def test_get_edges(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(4)
+        manager.add_node(5)
+
+        # should be empty
+        edge_ids = manager.get_edges(1)
+        self.assertEquals([], edge_ids)
+
+        # add some edges
+        manager.add_edge(1, 2, 100)
+        manager.add_edge(1, 2, 150) # is not considered in this implementation
+        manager.add_edge(1, 3, 200)
+        manager.add_edge(2, 3, 300)
+        manager.add_edge(4, 1, 400)
+        self.assertEquals([100, 200, 400], sorted(manager.get_edges(1)))
+        self.assertEquals([100, 300], manager.get_edges(2))
+        self.assertEquals([], manager.get_edges(5))
+
+        manager.add_edge(2, 5, 500)
+        self.assertEquals([100, 300, 500], sorted(manager.get_edges(2)))
+        self.assertEquals([500], manager.get_edges(5))
+
     def test_get_edge_between(self):
 
         manager = self.manager
@@ -407,7 +432,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertFalse(manager.is_edge_between(60, 20))
         self.assertFalse(manager.is_edge_between(30, 40))
 
-
     def test_get_neighboring_nodes(self):
         manager = graph_manager.SnapManager()
 
@@ -451,7 +475,6 @@ class TestSnapManager(unittest.TestCase):
         # check for node 30
         self.assertListEqual(sorted([10,20]),
                       sorted(manager.get_neighboring_nodes(30)))
-
 
     def test_deleting_nodes_also_deletes_edges(self):
 
