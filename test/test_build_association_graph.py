@@ -143,8 +143,8 @@ class TestBuildAssociationGraph(unittest.TestCase):
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
         attributes = graph.get_edge_attributes(graph.get_edge_between(19,888))
-        self.assertTrue('2015_time_at_employer' in  attributes)
-        self.assertFalse('2014_time_at_employer' in  attributes)
+        self.assertTrue('2015_admission_date' in  attributes)
+        self.assertFalse('2014_admission_date' in  attributes)
 
         # same ids, we DON'T add an edge!
         # but we do add another attribute!
@@ -154,8 +154,8 @@ class TestBuildAssociationGraph(unittest.TestCase):
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
         attributes = graph.get_edge_attributes(graph.get_edge_between(19,888))
-        self.assertTrue('2015_time_at_employer' in  attributes)
-        self.assertTrue('2014_time_at_employer' in  attributes)
+        self.assertTrue('2015_admission_date' in  attributes)
+        self.assertTrue('2014_admission_date' in  attributes)
 
         # different ids, add an edge...
         interpreter.worker_id = 123
@@ -204,6 +204,8 @@ class FakeInterpreter():
         self.year = 0
         self.admission_date = 0
         self.demission_date = 0
+        self.admission_timestamp = 0
+        self.demission_timestamp = 0
         self.worker_id = 0
         self.employer_id = 0
         self.time_at_employer = 0
