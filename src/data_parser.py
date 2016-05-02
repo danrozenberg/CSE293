@@ -1,7 +1,6 @@
 import os
 import csv
 from datetime import datetime
-import pytz
 from time import mktime
 
 # noinspection PyMethodMayBeStatic
