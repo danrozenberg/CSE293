@@ -1,6 +1,7 @@
 import os
 import csv
 from datetime import datetime
+import pytz
 from time import mktime
 
 # noinspection PyMethodMayBeStatic
@@ -262,7 +263,10 @@ class Pis12DataInterpreter():
             if admission_date == -1 :
                 return -1
             else:
-                self._admission_timestamp = mktime(admission_date.timetuple())
+                # Windows cant handle mktime for dates before 1970...
+                epoch = datetime(1970, 1, 1)
+                difference = admission_date - epoch
+                self._admission_timestamp = difference.total_seconds()
 
         return self._admission_timestamp
 
@@ -277,7 +281,10 @@ class Pis12DataInterpreter():
             if demission_date == -1:
                 return  -1
             else:
-                self._demission_timestamp = mktime(demission_date.timetuple())
+                # Windows cant handle mktime for dates before 1970...
+                epoch = datetime(1970, 1, 1)
+                difference = demission_date - epoch
+                self._demission_timestamp = difference.total_seconds()
 
         return self._demission_timestamp
 
