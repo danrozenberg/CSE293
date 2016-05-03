@@ -244,43 +244,6 @@ class TestSnapManager(unittest.TestCase):
         the_exception = bad_call.exception
         self.assertIn("Can not open file", the_exception.message)
 
-    def test_get_edges_between(self):
-        manager = self.manager
-        manager.add_node(10)
-        manager.add_node(20)
-        manager.add_node(30)
-
-        # no edges yet.
-        self.assertEquals(0, len(manager.get_edges_between(10, 20)))
-        self.assertEquals(0, len(manager.get_edges_between(10, 30)))
-        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
-
-        # add 3 edges between nodes 10 and 20
-        manager.add_edge(10, 20, 1)
-        manager.add_edge(10, 20, 2)
-        manager.add_edge(10, 20, 3)
-        self.assertEquals(3, len(manager.get_edges_between(10, 20)))
-        self.assertEquals(0, len(manager.get_edges_between(10, 30)))
-        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
-        self.assertListEqual([1,2,3], manager.get_edges_between(10, 20))
-
-        # Hmm, add some edges between 10 and 30
-        manager.add_edge(10, 30, 4)
-        manager.add_edge(10, 30, 5)
-        self.assertEquals(3, len(manager.get_edges_between(10, 20)))
-        self.assertEquals(2, len(manager.get_edges_between(10, 30)))
-        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
-        self.assertListEqual([1,2,3], manager.get_edges_between(10, 20))
-        self.assertListEqual([4,5], manager.get_edges_between(10, 30))
-
-        # Hmm, add more edges to first pair
-        manager.add_edge(10, 20, 6)
-        manager.add_edge(10, 20, 7)
-        self.assertEquals(5, len(manager.get_edges_between(10, 20)))
-        self.assertEquals(2, len(manager.get_edges_between(10, 30)))
-        self.assertEquals(0, len(manager.get_edges_between(20, 30)))
-        self.assertListEqual([1,2,3,6,7], manager.get_edges_between(10, 20))
-        self.assertListEqual([4,5], manager.get_edges_between(10, 30))
 
     def test_node_generator(self):
 
@@ -324,20 +287,24 @@ class TestSnapManager(unittest.TestCase):
         manager.add_edge(1,2, 200)
 
         self.assertTrue(manager.is_edge(100))
-        self.assertTrue(manager.is_edge(200))
         self.assertFalse(manager.is_edge(300))
         self.assertFalse(manager.is_edge(400))
         self.assertFalse(manager.is_edge(500))
+
+        # we only add 1 edge per pair...
+        self.assertFalse(manager.is_edge(200))
 
         manager.add_edge(1,3, 300)
         manager.add_edge(1,3, 400)
         manager.add_edge(2,3, 500)
 
         self.assertTrue(manager.is_edge(100))
-        self.assertTrue(manager.is_edge(200))
         self.assertTrue(manager.is_edge(300))
-        self.assertTrue(manager.is_edge(400))
         self.assertTrue(manager.is_edge(500))
+
+        # we only add 1 edge per pair...
+        self.assertFalse(manager.is_edge(400))
+        self.assertFalse(manager.is_edge(200))
 
     def test_get_edges(self):
         manager = self.manager
@@ -490,7 +457,6 @@ class TestSnapManager(unittest.TestCase):
         manager.add_edge(1,3, 300)
         manager.add_edge(1,3, 400)
         manager.add_edge(2,3, 500)
-        manager.add_edge(2,3, 600)
 
         # delete node 1, should remove all associated edges
         manager.delete_node(1)
@@ -501,7 +467,6 @@ class TestSnapManager(unittest.TestCase):
 
         # other edges should remain
         self.assertEquals(True, manager.is_edge(500))
-        self.assertEquals(True, manager.is_edge(600))
 
     def test_copy_node(self):
 

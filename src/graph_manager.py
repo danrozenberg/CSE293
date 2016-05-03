@@ -1,21 +1,20 @@
 import snap
 import logging
+from collections import defaultdict
 
 class SnapManager(object):
-    """
-    This implementation deals with SNAP networks.
-    """
+    """ This implementation deals with SNAP networks. """
 
     def __init__(self):
+        """The following dictionaries basically transform a CEI or CNJP into
+        values that fit a C++ integers. We want CEI and CNPJ to be
+        our IDs, but their values do not fit SNAP integers which are
+        used as node ids :(
+        This is the reason you can see the use of the following dictionaries:"""
         self.network = snap.TNEANet().New()
-
-        # The following dictionaries basically transform a CEI or CNJP into
-        #   values that fit a C++ integers. We want CEI and CNPJ to be
-        #   our IDs, but their values do not fit SNAP integers which are
-        #   used as node ids :(
-        # This is the reason you can see the use of the following dictionaries:
         self.NId_from_id = {}
         self.id_from_NId = {}
+        self.edge_from_tuple = defaultdict(lambda:None)
 
     def add_node(self, node_id):
         """
@@ -45,26 +44,33 @@ class SnapManager(object):
             logging.debug("Could not delete node with id = "
                             + str(NId) + " because it doesn't exist" )
 
-    def add_edge(self, src_id, dest_id, EId=-1):
+    def add_edge(self, id_1, id_2, EId=-1):
 
-        if EId <> -1 and self.network.IsEdge(EId):
-            logging.info("Couldn't add edge with EId = "
-                            + str(EId) + " because it already exist")
-            return EId
-
-        if not self.is_node(src_id):
+        if not self.is_node(id_1):
             logging.info("Couldn't add edge from node "
-                            + str(src_id) + " because such node doesn't exist")
+                            + str(id_1) + " because such node doesn't exist")
             return None
 
-        if not self.is_node(dest_id):
+        if not self.is_node(id_2):
             logging.info("Couldn't add edge to node "
-                            + str(dest_id) + " because such node doesn't exist")
+                            + str(id_2) + " because such node doesn't exist")
             return None
 
-        src_NId = self.NId_from_id[src_id]
-        dest_NId = self.NId_from_id[dest_id]
-        return self.network.AddEdge(src_NId, dest_NId, EId)
+        NId1 = self.NId_from_id[id_1]
+        NId2 = self.NId_from_id[id_2]
+        # we only add (x, y) edges where x <= y
+        if NId2 < NId1:
+            temp = NId1
+            NId1 = NId2
+            NId2 = temp
+
+        found_edge = self.edge_from_tuple[(NId1, NId2)]
+        if found_edge is not None:
+            return found_edge
+        else:
+            new_edge = self.network.AddEdge(NId1, NId2, EId)
+            self.edge_from_tuple[(NId1, NId2)] = new_edge
+            return new_edge
 
     def get_edges(self, node_id):
         """
@@ -88,49 +94,16 @@ class SnapManager(object):
 
         return list(edges)
 
-
     def get_edge_between(self, node1, node2):
         """This only returns the FIRST edge ever added between
         node 1 and node 2"""
-        # TODO: consider raising error if there is more than 1 edge between?
         NId1 = self.NId_from_id[node1]
         NId2 = self.NId_from_id[node2]
 
-        if self.network.IsEdge(NId1, NId2):
-            return self.network.GetEI(NId1, NId2).GetId()
-        elif self.network.IsEdge(NId2, NId1):
-            return self.network.GetEI(NId2, NId1).GetId()
+        if NId1 < NId2:
+            return self.edge_from_tuple[NId1, NId2]
         else:
-            return None
-
-
-    def get_edges_between(self, node1, node2):
-        # TODO: make this less aweful, maybe using GetInEdges or something.
-        # Again, there are important methods missing from SNAP.py
-        # The manual says its there, but LIES! ;(
-        # For this reason this method is super-funky!
-        NId1 = self.NId_from_id[node1]
-        NId2 = self.NId_from_id[node2]
-        edges = []
-        try:
-            edge_iterator = self.network.GetEI(NId1, NId2)
-            # iterator may 'overflow' to next set o nodes
-            if edge_iterator.GetSrcNId() == NId1 and \
-                edge_iterator.GetDstNId() == NId2:
-                    edges.append(edge_iterator.GetId())
-            while edge_iterator.Next():
-                # iterator may 'overflow' to next set o nodes
-                if edge_iterator.GetSrcNId() == NId1 and \
-                    edge_iterator.GetDstNId() == NId2:
-                    edges.append(edge_iterator.GetId())
-        except RuntimeError:
-            return edges
-
-        # in case we get this far...
-        return edges
-
-    def get_edge(self, EId):
-        return self.network.GetEI(EId)
+            return self.edge_from_tuple[NId2, NId1]
 
     def get_nodes(self):
         return list(self.get_node_iterator())
@@ -257,7 +230,7 @@ class SnapManager(object):
 
     def add_edge_attr(self, EId, name, value):
 
-        edge = self.get_edge(EId)
+        edge = self.network.GetEI(EId)
         if isinstance(value, int):
             self.network.AddIntAttrDatE(edge, value, name)
         elif isinstance(value, float):
@@ -285,10 +258,13 @@ class SnapManager(object):
         src_NId = self.NId_from_id[src_id]
         dest_NId = self.NId_from_id[dest_id]
 
-        answer =  self.network.IsEdge(src_NId, dest_NId) or \
-                  self.network.IsEdge(dest_NId, src_NId)
+        # direction 1
+        edge1 = self.edge_from_tuple[src_NId, dest_NId]
 
-        return answer
+        # direction 2
+        edge2 = self.edge_from_tuple[dest_NId, src_NId]
+
+        return (edge1 is not None) or (edge2 is not None)
 
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)
@@ -321,7 +297,6 @@ class SnapManager(object):
         for attr_name in attr_dictionary:
             attr_value = attr_dictionary[attr_name]
             dst_graph.add_node_attr(node_id, attr_name, attr_value)
-
         return True
 
     # noinspection PyMethodMayBeStatic
