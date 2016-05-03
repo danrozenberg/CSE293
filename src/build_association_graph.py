@@ -102,3 +102,5 @@ if __name__ == '__main__':
                   data_parser.Pis12DataInterpreter,
                   graph_manager.SnapManager,
                   output_file_path)
+
+    logging.warn("Finished!")
