@@ -46,11 +46,13 @@ def get_overlapping_days(start_1, end_1, start_2, end_2):
     earliest_end = min(r1.end, r2.end)
     return max((earliest_end - latest_start).days + 1, 0)
 
-
 class WorkerConnector(object):
     def __init__(self):
         # defaults allows workers with 0 days in common to be connected.
         self.min_days_together = -1
+
+        # TODO: min_firm_size  ?
+        # TODO: remove state owned firms?
 
     def connect_workers(self, association_graph, new_graph):
         # we get a special worker iterator
