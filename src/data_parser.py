@@ -203,6 +203,7 @@ class Pis12DataInterpreter():
             if (dia_desl == '' and mes_deslig == '') or \
                 (dia_desl == '' and mes_deslig == '0') or \
                 (dia_desl == '0' and mes_deslig == '0') or \
+                (dia_desl == 'LVA' and mes_deslig == '0') or \
                 (dia_desl == 'NAO DESL ANO'):
                     self._demission_date =  datetime(self.year, 12, 31)
                     return self._demission_date

@@ -308,6 +308,14 @@ class TestPis12DataInterpreter(unittest.TestCase):
         self.assertAlmostEqual(mktime(datetime(2001,12,31).timetuple()),
                           interpreter.demission_timestamp, delta = 43200)
 
+        interpreter.feed_line({'ANO':'2003',
+                                'DIADESL':'LVA',
+                                'MES_DESLIG':'0'})
+        self.assertEquals(datetime(2003,12,31),
+                          interpreter.demission_date)
+        self.assertAlmostEqual(mktime(datetime(2003,12,31).timetuple()),
+                          interpreter.demission_timestamp, delta = 43200)
+
 
         interpreter.feed_line({'ANO':'1999',
                                 'DIADESL':'0',
