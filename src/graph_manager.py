@@ -299,6 +299,15 @@ class SnapManager(object):
             dst_graph.add_node_attr(node_id, attr_name, attr_value)
         return True
 
+    def generate_random_graph(self, node_num, node_out_deg, rewire_prob):
+        # this substitutes the old graph, so beware
+        # from: https://snap.stanford.edu/snappy/doc/reference/GenSmallWorld.html?highlight=generate%20random%20network
+        self.network = snap.GenSmallWorld(node_num,
+                                          node_out_deg,
+                                          rewire_prob,
+                                          snap.TRnd(1,0))
+
+
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
         # TODO: use SNAP verifications instead because it is

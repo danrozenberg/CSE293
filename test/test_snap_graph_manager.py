@@ -244,7 +244,6 @@ class TestSnapManager(unittest.TestCase):
         the_exception = bad_call.exception
         self.assertIn("Can not open file", the_exception.message)
 
-
     def test_node_generator(self):
 
         manager = self.manager
@@ -504,6 +503,21 @@ class TestSnapManager(unittest.TestCase):
         copied_attrs = dst_graph.get_node_attrs(2)
         self.assertEquals(3, len(original_attrs))
         self.assertEquals(2, len(copied_attrs))
+
+    def test_get_random_graph(self):
+
+        manager = self.manager
+
+        # should have nothing
+        self.assertEquals(0, manager.get_node_count())
+        self.assertEquals(0, manager.get_edge_count())
+
+        # generate stuff
+        manager.generate_random_graph(20, 3, 0)
+        self.assertEquals(20, manager.get_node_count())
+        self.assertEquals(60, manager.get_edge_count())
+
+
 
 if __name__ == "__main__":
     unittest.main()
