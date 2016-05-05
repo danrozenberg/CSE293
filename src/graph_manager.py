@@ -299,6 +299,10 @@ class SnapManager(object):
             dst_graph.add_node_attr(node_id, attr_name, attr_value)
         return True
 
+    def get_random_node(self):
+        NId = self.network.GetRndNId()
+        return self.id_from_NId[NId]
+
     def generate_random_graph(self, node_num, node_out_deg, rewire_prob):
         # this substitutes the old graph, so beware
         # from: https://snap.stanford.edu/snappy/doc/reference/GenSmallWorld.html?highlight=generate%20random%20network
@@ -306,6 +310,18 @@ class SnapManager(object):
                                           node_out_deg,
                                           rewire_prob,
                                           snap.TRnd(1,0))
+
+    # Node centrality stuff
+    def get_degree_centrality(self, node_id):
+        NId = self.NId_from_id[node_id]
+        return snap.GetDegreeCentr(self.network, NId)
+
+    def get_betweeness_centrality(self):
+        """Computes (approximate) Node and Edge Betweenness Centrality based
+        on a sample of NodeFrac nodes."""
+        raise NotImplementedError
+
+
 
 
     # noinspection PyMethodMayBeStatic

@@ -505,7 +505,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(2, len(copied_attrs))
 
     def test_get_random_graph(self):
-
         manager = self.manager
 
         # should have nothing
@@ -516,6 +515,36 @@ class TestSnapManager(unittest.TestCase):
         manager.generate_random_graph(20, 3, 0)
         self.assertEquals(20, manager.get_node_count())
         self.assertEquals(60, manager.get_edge_count())
+
+    def test_get_degree_centrality(self):
+        manager = self.manager
+        manager.generate_random_graph(20, 3, 0)
+        self.jig_dictionary(manager)
+        self.assertGreater(manager.get_degree_centrality(0), 0)
+
+    def test_get_random_node(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(4)
+        manager.add_node(55)
+        manager.add_node(66)
+        manager.add_node(77)
+        manager.add_node(88)
+
+        possible_range = [1,2,3,4,55,66,77,88]
+        for i in range(50):
+            self.assertIn(manager.get_random_node()
+                          ,possible_range)
+
+
+    def jig_dictionary(self, manager, up_to = 100):
+        # good if we generate the graph randomly
+        # or in any way that doesn't really require a dictionary
+        # we just say node_id = NId
+        for x in xrange(up_to):
+            manager.NId_from_id[x] = x
 
 
 
