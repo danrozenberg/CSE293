@@ -9,7 +9,6 @@ class SnapStatisticsGatherer(object):
         pass
 
     def fill_results(self, node_list, graph_method):
-        print "asd"
         statistics = []
         for node in node_list:
             statistics.append(graph_method(node))
