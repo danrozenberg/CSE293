@@ -316,6 +316,17 @@ class SnapManager(object):
         NId = self.NId_from_id[node_id]
         return snap.GetDegreeCentr(self.network, NId)
 
+    def get_shortest_path_size(self, node_id):
+        """Returns the length of the shortest path from node SrcNId to
+         all other nodes in the network."""
+        NId = self.NId_from_id[node_id]
+
+        NIdToDistH = snap.TIntH()
+        return snap.GetShortPath(self.network,
+                                NId,
+                                NIdToDistH)
+
+
     def get_betweeness_centrality(self):
         """Computes (approximate) Node and Edge Betweenness Centrality based
         on a sample of NodeFrac nodes."""
