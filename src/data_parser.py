@@ -75,7 +75,7 @@ class Pis12DataParser():
                   'DIADESL': line[11], 'DT_ADMISSAO': line[18],
                   'EMP_EM_31_12': line[20], 'IDENTIFICAD': line[25],
                   'MES_ADM': line[35], 'MES_DESLIG': line[36],
-                  'PIS': line[45]}
+                  'PIS': line[45], 'MUNICIPIO': line[38]}
 
         return answer
 
@@ -98,6 +98,7 @@ class Pis12DataInterpreter():
 
     def _reset_private_variables(self):
         self._year = None
+        self._municipality = None
         self._admission_date = None
         self._demission_date = None
         self._admission_timestamp = None
@@ -127,6 +128,13 @@ class Pis12DataInterpreter():
         if self._year is None:
             self._year = self._simple_retrieval('ANO', 'info')
         return self._year
+
+    @property
+    def municipality(self):
+        """  :return: municipality as a string """
+        if self._municipality is None:
+            self._municipality = self.dict['MUNICIPIO']
+        return self._municipality
 
     @property
     def admission_date(self):

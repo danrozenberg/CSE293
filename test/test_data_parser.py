@@ -1,4 +1,3 @@
-import pytz
 import unittest
 import logging
 from datetime import datetime
@@ -377,6 +376,18 @@ class TestPis12DataInterpreter(unittest.TestCase):
         answer = interpreter.employer_id
         self.assertIn("IDENTIFICAD is invalid in", interpreter.log_message)
         self.assertEquals(-1, answer)
+
+    def test_municipality(self):
+        interpreter = Pis12DataInterpreter()
+        interpreter.feed_line({'MUNICIPIO':'553333'})
+        answer = interpreter.municipality
+        self.assertEquals('553333', answer)
+
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'MUNICIPIO':''})
+        answer = interpreter.municipality
+        self.assertEquals('', answer)
+
 
     def test_time_at_employer(self):
         interpreter = Pis12DataInterpreter()
