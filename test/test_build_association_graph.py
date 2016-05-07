@@ -196,6 +196,11 @@ class TestBuildAssociationGraph(unittest.TestCase):
         interpreter.year = 1999
         self.assertTrue(passes_filter(interpreter))
 
+        # single state rule
+        interpreter = FakeInterpreter()
+        interpreter.municipality = ''
+        self.assertFalse(passes_filter(interpreter))
+
 
 # todo, make interpreter an ABC
 class FakeInterpreter():
@@ -209,7 +214,7 @@ class FakeInterpreter():
         self.worker_id = 0
         self.employer_id = 0
         self.time_at_employer = 0
-
+        self.municipality = '432235' #some valid value
 
 
 if __name__ == "__main__":
