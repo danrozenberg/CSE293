@@ -310,6 +310,12 @@ class SnapManager(object):
                                           node_out_deg,
                                           rewire_prob,
                                           snap.TRnd(1,0))
+        # gotta jig the dictionary, unfortunatelly
+        self.NId_from_id = {}
+        self.id_from_NId = {}
+        for x in xrange(node_num):
+            self.NId_from_id[x] = x
+            self.id_from_NId[x] = x
 
     # Node centrality stuff
     def get_degree_centrality(self, node_id):

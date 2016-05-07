@@ -519,7 +519,6 @@ class TestSnapManager(unittest.TestCase):
     def test_get_degree_centrality(self):
         manager = self.manager
         manager.generate_random_graph(20, 3, 0)
-        self.jig_dictionary(manager)
         self.assertGreater(manager.get_degree_centrality(0), 0)
 
     def test_get_short_path_size(self):
@@ -554,14 +553,6 @@ class TestSnapManager(unittest.TestCase):
             self.assertIn(manager.get_random_node()
                           ,possible_range)
 
-
-
-    def jig_dictionary(self, manager, up_to = 100):
-        # good if we generate the graph randomly
-        # or in any way that doesn't really require a dictionary
-        # we just say node_id = NId
-        for x in xrange(up_to):
-            manager.NId_from_id[x] = x
 
 
 
