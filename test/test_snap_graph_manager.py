@@ -521,6 +521,7 @@ class TestSnapManager(unittest.TestCase):
         manager.generate_random_graph(20, 3, 0)
         self.assertGreater(manager.get_degree_centrality(0), 0)
 
+
     def test_get_short_path_size(self):
         manager = self.manager
         manager.add_node(1)
@@ -535,6 +536,21 @@ class TestSnapManager(unittest.TestCase):
 
         manager.add_edge(2,3)
         self.assertEquals(3, manager.get_shortest_path_size(1))
+
+    def test_get_connected_components(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(4)
+
+        self.assertEquals(4, len(manager.get_connected_components()))
+        manager.add_edge(1,2)
+        manager.add_edge(3,4)
+        self.assertEquals(2, len(manager.get_connected_components()))
+
+        manager.add_edge(2,3)
+        self.assertEquals(1, len(manager.get_connected_components()))
 
 
     def test_get_random_node(self):

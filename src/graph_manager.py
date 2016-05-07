@@ -332,14 +332,20 @@ class SnapManager(object):
                                 NId,
                                 NIdToDistH)
 
-
     def get_betweeness_centrality(self):
         """Computes (approximate) Node and Edge Betweenness Centrality based
         on a sample of NodeFrac nodes."""
         raise NotImplementedError
 
-
-
+    def get_connected_components(self):
+        """Returns all weakly connected components in Graph.
+        :returns list of component sizes [s1, s2, ... , sn]"""
+        components = snap.TCnComV()
+        snap.GetWccs(self.network, components)
+        sizes = []
+        for component in components:
+            sizes.append(component.Len())
+        return sizes
 
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
