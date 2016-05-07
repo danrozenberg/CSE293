@@ -1,4 +1,4 @@
-import math
+import numpy as np
 import matplotlib.pyplot as plt
 
 class StatisticsGatherer(object):
@@ -11,6 +11,20 @@ class StatisticsGatherer(object):
     @staticmethod
     def fill_results(node_list, graph_method):
         return map(graph_method, node_list)
+
+
+    @staticmethod
+    def print_statistics(result_list):
+        result_string = "average = " + str(np.average(result_list))
+        result_string += "\nstddev = " + str(np.std(result_list))
+        result_string += "\n10th percentile = " + str(np.percentile(result_list, 10))
+        result_string += "\n25th percentile = " + str(np.percentile(result_list, 25))
+        result_string += "\nmedian = " + str(np.median(result_list))
+        result_string += "\n75th percentile = " + str(np.percentile(result_list, 75))
+        result_string += "\n90th percentile = " + str(np.percentile(result_list, 90))
+        result_string += "\nmax = " + str(max(result_list))
+        result_string += "\nmin = " + str(min(result_list))
+        return result_string
 
 
     @staticmethod
@@ -31,4 +45,3 @@ class StatisticsGatherer(object):
     def save_report(self, output_path):
         # saves output in a csv, ready to be EXCELED!
         pass
-
