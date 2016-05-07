@@ -1,5 +1,5 @@
 
-class SnapStatisticsGatherer(object):
+class StatisticsGatherer(object):
 
     # generate a report on the graph.
     def report(self):
