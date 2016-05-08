@@ -117,21 +117,28 @@ class SnapManager(object):
         :return: A generator that traverses nodes, returning their ids.
         """
 
+        # There is yet another SNAP bug here to beware
+        # If we load a saved TNEATNet (from disk)
+        # it will mess up the itarator (goes out of bounds)
+        # we can control it with this variable
+        total_to_find = self.get_node_count()
+
         if self.get_node_count() == 0:
             # got nothing, return empty iterator
             return
         else:
             node_iterator = self.network.BegNI()
             found_id = self.id_from_NId[node_iterator.GetId()]
+            total_found = 1
             yield found_id
 
             # note, the Nodes() method does not work in SNAP, for some reason...
-            # actually, its missing a lot of useful stuff.
-            # gotta do it like this:  =(
-            while node_iterator.Next():
+            # so gotta do it like this:  =(
+            while node_iterator.Next() and total_found < total_to_find:
                 try:
                     found_id = self.id_from_NId[node_iterator.GetId()]
                     yield found_id
+                    total_found += 1
                 except RuntimeError:
                     break
 
