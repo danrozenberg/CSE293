@@ -317,15 +317,7 @@ class SnapManager(object):
             self.NId_from_id[x] = x
             self.id_from_NId[x] = x
 
-    # Node centrality stuff
-    def get_degree_centrality(self, node_id):
-        """Returns degree centrality of a given node NId in Graph.
-        Degree centrality of a node is defined as its degree/(N-1),
-        where N is the number of nodes in the network."""
-
-        NId = self.NId_from_id[node_id]
-        return snap.GetDegreeCentr(self.network, NId)
-
+    # GRAPH PATH LENGHTS
     def get_shortest_path_size(self, node_id):
         """Returns the length of the shortest path from node SrcNId to
          all other nodes in the network."""
@@ -335,6 +327,16 @@ class SnapManager(object):
         return snap.GetShortPath(self.network,
                                 NId,
                                 NIdToDistH)
+
+    # NODE CENTRALITY
+
+    def get_degree_centrality(self, node_id):
+        """Returns degree centrality of a given node NId in Graph.
+        Degree centrality of a node is defined as its degree/(N-1),
+        where N is the number of nodes in the network."""
+
+        NId = self.NId_from_id[node_id]
+        return snap.GetDegreeCentr(self.network, NId)
 
     def get_eccentricity(self, node_id):
         NId = self.NId_from_id[node_id]
@@ -355,6 +357,7 @@ class SnapManager(object):
         snap.GetEigenVectorCentr(self.network, NIdEigenH)
         return NIdEigenH
 
+    # CONNECTED COMPONENTS
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.
         :returns list of component sizes [s1, s2, ... , sn]"""
