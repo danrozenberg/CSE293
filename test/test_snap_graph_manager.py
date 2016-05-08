@@ -281,6 +281,9 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, manager2.get_edge_between(20,40))
         self.assertEquals(567, manager2.get_edge_between(10,20))
         self.assertEquals(4, manager2.get_node_count())
+        self.assertEquals(10, manager2.id_from_NId[0])
+        self.assertEquals(20, manager2.id_from_NId[1])
+        self.assertEquals(30, manager2.id_from_NId[2])
 
 
         # cleanup
