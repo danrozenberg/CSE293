@@ -1,3 +1,4 @@
+import cPickle as pickle
 import snap
 import logging
 from collections import defaultdict
@@ -14,7 +15,7 @@ class SnapManager(object):
         self.network = snap.TNEANet().New()
         self.NId_from_id = {}
         self.id_from_NId = {}
-        self.edge_from_tuple = defaultdict(lambda:None)
+        self.edge_from_tuple = defaultdict(_get_defaults_dict)
 
     def add_node(self, node_id):
         """
@@ -271,9 +272,28 @@ class SnapManager(object):
         self.network.Save(FOut)
         FOut.Flush()
 
+        # save dictionaries too!
+        pickle.dump(self.NId_from_id,
+                    open(file_path.replace(".graph", "_nid_from_id.p"), 'w'))
+        pickle.dump(self.id_from_NId,
+                    open(file_path.replace(".graph", "_id_from_nid.p"), 'w'))
+        pickle.dump(self.edge_from_tuple,
+                    open(file_path.replace(".graph", "_edge_from_tuple.p"), 'w'))
+
     def load_graph(self, file_path):
         FIn = snap.TFIn(file_path)
         self.network = snap.TNEANet.Load(FIn)
+
+        # grab dictionaries too!
+        self.NId_from_id =\
+            pickle.load(open(file_path.replace(".graph", "_nid_from_id.p"), 'rb'))
+
+        self.id_from_NId =\
+            pickle.load(open(file_path.replace(".graph", "_id_from_nid.p"), 'rb'))
+
+        self.edge_from_tuple = \
+            pickle.load(open(file_path.replace(".graph", "_edge_from_tuple.p"), 'rb'))
+
         return self
 
     def copy_node(self, node_id, dst_graph):
@@ -311,11 +331,8 @@ class SnapManager(object):
                                           rewire_prob,
                                           snap.TRnd(1,0))
         # gotta jig the dictionary, unfortunatelly
-        self.NId_from_id = {}
-        self.id_from_NId = {}
-        for x in xrange(node_num):
-            self.NId_from_id[x] = x
-            self.id_from_NId[x] = x
+        self.jig_dictionary()
+
 
     # GRAPH PATH LENGHTS
     def get_shortest_path_size(self, node_id):
@@ -375,6 +392,27 @@ class SnapManager(object):
         return snap.GetClustCf(self.network, -1)
 
 
+    def jig_dictionary(self, NId_from_id=None, id_from_NId=None ):
+        # TODO: apologize for having to do this.
+
+        node_num = self.get_node_count()
+        self.id_from_NId = {}
+        self.NId_from_id = {}
+
+        #=====NID from ID====
+        if NId_from_id is not None:
+            self.NId_from_id = NId_from_id
+        else:
+            for x in xrange(node_num):
+                self.NId_from_id[x] = x
+
+        #=====ID from NID====
+        if id_from_NId is not None:
+            self.id_from_NId = id_from_NId
+        else:
+            for x in xrange(node_num):
+                self.id_from_NId[x] = x
+
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):
         # TODO: use SNAP verifications instead because it is
@@ -384,3 +422,7 @@ class SnapManager(object):
             return float(value) if '.' in value else int(value)
         except ValueError:
             return value
+
+# so we can pickle default dict
+def _get_defaults_dict():
+    return None
