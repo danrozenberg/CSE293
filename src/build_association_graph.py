@@ -102,8 +102,8 @@ def enable_logging(log_level):
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    source_folder = "../test/parallel_graph_manip_test_1/"
-    output_file_path = "../output_graphs/test.graph"
+    source_folder = "c:/csv_data/"
+    output_file_path = "../output_graphs/rs_affiliation.graph"
 
 
     process_files(source_folder,
