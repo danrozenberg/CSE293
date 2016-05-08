@@ -319,6 +319,10 @@ class SnapManager(object):
 
     # Node centrality stuff
     def get_degree_centrality(self, node_id):
+        """Returns degree centrality of a given node NId in Graph.
+        Degree centrality of a node is defined as its degree/(N-1),
+        where N is the number of nodes in the network."""
+
         NId = self.NId_from_id[node_id]
         return snap.GetDegreeCentr(self.network, NId)
 
@@ -332,10 +336,14 @@ class SnapManager(object):
                                 NId,
                                 NIdToDistH)
 
-    def get_betweeness_centrality(self):
+    def get_betweeness_centrality(self, fraction=1.0):
         """Computes (approximate) Node and Edge Betweenness Centrality based
-        on a sample of NodeFrac nodes."""
-        raise NotImplementedError
+        on a sample of NodeFrac nodes.
+        It does so for all all nodes in the graph. Returns a HashMap"""
+        Nodes = snap.TIntFltH()
+        Edges = snap.TIntPrFltH()
+        snap.GetBetweennessCentr(self.network, Nodes, Edges, fraction)
+        return Nodes
 
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.

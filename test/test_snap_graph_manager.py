@@ -521,6 +521,15 @@ class TestSnapManager(unittest.TestCase):
         manager.generate_random_graph(20, 3, 0)
         self.assertGreater(manager.get_degree_centrality(0), 0)
 
+    def test_get_betweeness_centrality(self):
+        manager = self.manager
+        manager.generate_random_graph(20, 3, 0)
+
+        answer_hash = manager.get_betweeness_centrality()
+        self.assertGreater(answer_hash[0], 0)
+        self.assertGreater(answer_hash[2], 0)
+        self.assertGreater(answer_hash[10], 0)
+
 
     def test_get_short_path_size(self):
         manager = self.manager
