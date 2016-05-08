@@ -331,10 +331,15 @@ class SnapManager(object):
          all other nodes in the network."""
         NId = self.NId_from_id[node_id]
 
-        NIdToDistH = snap.TIntH()
+        NIdToDistH = snap.TIntH() #saves all distanecs FROM *NId*
         return snap.GetShortPath(self.network,
                                 NId,
                                 NIdToDistH)
+
+    def get_eccentricity(self, node_id):
+        NId = self.NId_from_id[node_id]
+        return snap.GetNodeEcc(self.network,NId)
+
 
     def get_betweeness_centrality(self, fraction=1.0):
         """Computes (approximate) Node and Edge Betweenness Centrality based

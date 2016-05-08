@@ -521,6 +521,11 @@ class TestSnapManager(unittest.TestCase):
         manager.generate_random_graph(20, 3, 0)
         self.assertGreater(manager.get_degree_centrality(0), 0)
 
+    def test_get_eccentricity(self):
+        manager = self.manager
+        manager.generate_random_graph(20, 3, 0)
+        self.assertGreater(manager.get_eccentricity(0), 0)
+
     def test_get_betweeness_centrality(self):
         manager = self.manager
         manager.generate_random_graph(20, 3, 0)
