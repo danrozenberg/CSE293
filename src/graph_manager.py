@@ -122,16 +122,16 @@ class SnapManager(object):
             return
         else:
             node_iterator = self.network.BegNI()
-            found_NId = self.id_from_NId[node_iterator.GetId()]
-            yield found_NId
+            found_id = self.id_from_NId[node_iterator.GetId()]
+            yield found_id
 
             # note, the Nodes() method does not work in SNAP, for some reason...
             # actually, its missing a lot of useful stuff.
             # gotta do it like this:  =(
             while node_iterator.Next():
                 try:
-                    found_NId = self.id_from_NId[node_iterator.GetId()]
-                    yield found_NId
+                    found_id = self.id_from_NId[node_iterator.GetId()]
+                    yield found_id
                 except RuntimeError:
                     break
 
