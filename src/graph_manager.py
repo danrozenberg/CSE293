@@ -345,6 +345,13 @@ class SnapManager(object):
         snap.GetBetweennessCentr(self.network, Nodes, Edges, fraction)
         return Nodes
 
+    def get_eigenvector_centrallity(self):
+        """  :return: hash from Id to centrality """
+        NIdEigenH = snap.TIntFltH()
+        snap.GetEigenVectorCentr(self.network, NIdEigenH)
+        return NIdEigenH
+
+
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.
         :returns list of component sizes [s1, s2, ... , sn]"""
