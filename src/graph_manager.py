@@ -329,7 +329,6 @@ class SnapManager(object):
                                 NIdToDistH)
 
     # NODE CENTRALITY
-
     def get_degree_centrality(self, node_id):
         """Returns degree centrality of a given node NId in Graph.
         Degree centrality of a node is defined as its degree/(N-1),
@@ -367,6 +366,14 @@ class SnapManager(object):
         for component in components:
             sizes.append(component.Len())
         return sizes
+
+    # TRIADS AND CLUSTERING
+    def get_clustering_coefficient(self):
+        """Computes the average clustering coefficient as
+        defined in  Watts and Strogatz, Collective dynamics of
+        small-world networks"""
+        return snap.GetClustCf(self.network, -1)
+
 
     # noinspection PyMethodMayBeStatic
     def __convert(self, value):

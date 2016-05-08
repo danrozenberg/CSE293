@@ -526,6 +526,11 @@ class TestSnapManager(unittest.TestCase):
         manager.generate_random_graph(20, 3, 0)
         self.assertGreater(manager.get_eccentricity(0), 0)
 
+    def test_get_clustering_coefficient(self):
+        manager = self.manager
+        manager.generate_random_graph(20, 3, 0)
+        self.assertGreater(manager.get_clustering_coefficient(), 0)
+
     def test_get_betweeness_centrality(self):
         manager = self.manager
         manager.generate_random_graph(20, 3, 0)
@@ -543,7 +548,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertGreater(answer_hash[0], 0)
         self.assertGreater(answer_hash[2], 0)
         self.assertGreater(answer_hash[10], 0)
-
 
     def test_get_short_path_size(self):
         manager = self.manager
@@ -574,7 +578,6 @@ class TestSnapManager(unittest.TestCase):
 
         manager.add_edge(2,3)
         self.assertEquals(1, len(manager.get_connected_components()))
-
 
     def test_get_random_node(self):
         manager = self.manager
