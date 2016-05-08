@@ -340,7 +340,6 @@ class SnapManager(object):
         NId = self.NId_from_id[node_id]
         return snap.GetNodeEcc(self.network,NId)
 
-
     def get_betweeness_centrality(self, fraction=1.0):
         """Computes (approximate) Node and Edge Betweenness Centrality based
         on a sample of NodeFrac nodes.
@@ -355,7 +354,6 @@ class SnapManager(object):
         NIdEigenH = snap.TIntFltH()
         snap.GetEigenVectorCentr(self.network, NIdEigenH)
         return NIdEigenH
-
 
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.
