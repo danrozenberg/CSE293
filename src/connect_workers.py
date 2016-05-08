@@ -1,5 +1,6 @@
 from datetime import datetime
 from collections import namedtuple
+from graph_manager import SnapManager
 
 def get_worker_iterator(association_graph):
     node_iterator = association_graph.get_node_iterator()
@@ -7,7 +8,6 @@ def get_worker_iterator(association_graph):
         node_type = association_graph.get_node_attr(node, "type")
         if node_type == "worker":
             yield node
-
 
 def get_time_together(worker_edge, coworker_edge, graph):
     time_together = 0
@@ -25,7 +25,6 @@ def get_time_together(worker_edge, coworker_edge, graph):
                 coworker_edge_attrs[admission_string],
                 coworker_edge_attrs[demission_string])
     return time_together
-
 
 def get_overlapping_days(start_1, end_1, start_2, end_2):
     # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
@@ -54,29 +53,28 @@ class WorkerConnector(object):
         # TODO: min_firm_size  ?
         # TODO: remove state owned firms?
 
-    def connect_workers(self, association_graph, new_graph):
+    def connect_workers(self, affiliation_graph, new_graph):
         # we get a special worker iterator
-        for worker in get_worker_iterator(association_graph):
-
+        for worker in get_worker_iterator(affiliation_graph):
             # add this worker to the new graph, if necessary
-            association_graph.copy_node(worker, new_graph)
+            affiliation_graph.copy_node(worker, new_graph)
 
             # In an association graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
-            employer_nodes = association_graph.get_neighboring_nodes(worker)
+            employer_nodes = affiliation_graph.get_neighboring_nodes(worker)
 
             for employer in employer_nodes:
-                worker_edge = association_graph.get_edge_between(worker, employer)
+                worker_edge = affiliation_graph.get_edge_between(worker, employer)
 
-                for coworker in association_graph.get_neighboring_nodes(employer):
+                for coworker in affiliation_graph.get_neighboring_nodes(employer):
 
                     # no need to connect someone with oneself...
                     if worker == coworker:
                         continue
 
-                    coworker_edge = association_graph.get_edge_between(coworker, employer)
+                    coworker_edge = affiliation_graph.get_edge_between(coworker, employer)
 
-                    if self.should_connect(worker_edge, coworker_edge, association_graph):
+                    if self.should_connect(worker_edge, coworker_edge, affiliation_graph):
                         new_graph.add_node(coworker)
 
                         if not new_graph.is_edge_between(worker, coworker):
@@ -101,8 +99,22 @@ class WorkerConnector(object):
         # add more checks here, as needed.
         return time_together >= self.min_days_together
 
+def run_script(load_path, save_path, min_days):
+    # load affiliation
+    affiliation_graph = SnapManager()
+    affiliation_graph.load_graph(load_path)
 
+    # connect workers
+    connected_graph = SnapManager()
+    connector = WorkerConnector()
+    connector.min_days_together = min_days
+    connector.connect_workers(affiliation_graph, connected_graph)
 
+    # save it
+    connected_graph.save_graph(save_path)
 
-
-
+if __name__ == '__main__':
+    load_path = "../output_graphs/rs_affiliation.graph"
+    save_path = "../output_graphs/rs_connected.graph"
+    min_days = 150
+    run_script(load_path, save_path, min_days)
