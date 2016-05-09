@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 from collections import namedtuple
 import logging
 from graph_manager import SnapManager
@@ -33,11 +33,11 @@ def get_overlapping_days(start_1, end_1, start_2, end_2):
     # convert to datetime if we received timestamp
     # also, assumes all parameters are in the same format
     if type(start_1) == float:
-        fromtimestamp = datetime.fromtimestamp
-        start_1 = fromtimestamp(start_1)
-        end_1 = fromtimestamp(end_1)
-        start_2 = fromtimestamp(start_2)
-        end_2 = fromtimestamp(end_2)
+        # windows cant handle negative timestamps..
+        start_1 = from_timestamp(start_1)
+        end_1 = from_timestamp(end_1)
+        start_2 = from_timestamp(start_2)
+        end_2 = from_timestamp(end_2)
 
     Range = namedtuple('Range', ['start', 'end'])
     r1 = Range(start=start_1, end=end_1)
@@ -45,6 +45,16 @@ def get_overlapping_days(start_1, end_1, start_2, end_2):
     latest_start = max(r1.start, r2.start)
     earliest_end = min(r1.end, r2.end)
     return max((earliest_end - latest_start).days + 1, 0)
+
+def from_timestamp(timestamp):
+    # windows cant handle negative timestamps
+    # we need to do this weird conversion here...
+    # there is some gmt weirdness python introduces...
+    # no big deal, though...
+    converted = datetime.datetime(1970,1,1) + \
+        datetime.timedelta(seconds=(timestamp))
+    return converted
+
 
 class WorkerConnector(object):
     def __init__(self):
