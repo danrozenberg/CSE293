@@ -1,5 +1,6 @@
 from datetime import datetime
 from collections import namedtuple
+import logging
 from graph_manager import SnapManager
 
 def get_worker_iterator(association_graph):
@@ -57,6 +58,7 @@ class WorkerConnector(object):
         # we get a special worker iterator
         for worker in get_worker_iterator(affiliation_graph):
             # add this worker to the new graph, if necessary
+            logging.warn("Processing worker " + str(worker))
             affiliation_graph.copy_node(worker, new_graph)
 
             # In an association graph, we can get the employers just by
@@ -99,6 +101,11 @@ class WorkerConnector(object):
         # add more checks here, as needed.
         return time_together >= self.min_days_together
 
+def enable_logging(log_level):
+    logging.basicConfig(format='%(asctime)s %(message)s',
+    datefmt='%d %b - %H:%M:%S -',
+    level=log_level)
+
 def run_script(load_path, save_path, min_days):
     # load affiliation
     affiliation_graph = SnapManager()
@@ -114,7 +121,10 @@ def run_script(load_path, save_path, min_days):
     connected_graph.save_graph(save_path)
 
 if __name__ == '__main__':
+    enable_logging(logging.WARNING)
     load_path = "../output_graphs/rs_affiliation.graph"
     save_path = "../output_graphs/rs_connected.graph"
     min_days = 182
+    logging.warn("Started!")
     run_script(load_path, save_path, min_days)
+    logging.warn("Finished!")
