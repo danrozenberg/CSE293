@@ -281,11 +281,11 @@ class SnapManager(object):
 
         # save dictionaries too!
         pickle.dump(self.NId_from_id,
-                    open(file_path.replace(".graph", "_nid_from_id.p"), 'w'))
+                    open(file_path.replace(".graph", "_nid_from_id.p"), 'wb'))
         pickle.dump(self.id_from_NId,
-                    open(file_path.replace(".graph", "_id_from_nid.p"), 'w'))
+                    open(file_path.replace(".graph", "_id_from_nid.p"), 'wb'))
         pickle.dump(self.edge_from_tuple,
-                    open(file_path.replace(".graph", "_edge_from_tuple.p"), 'w'))
+                    open(file_path.replace(".graph", "_edge_from_tuple.p"), 'wb'))
 
     def load_graph(self, file_path):
         FIn = snap.TFIn(file_path)
@@ -339,7 +339,6 @@ class SnapManager(object):
                                           snap.TRnd(1,0))
         # gotta jig the dictionary, unfortunatelly
         self.jig_dictionary()
-
 
     # GRAPH PATH LENGHTS
     def get_shortest_path_size(self, node_id):
