@@ -37,6 +37,17 @@ class TestSnapStatisticsGatherer(unittest.TestCase):
         # cleanup
         os.remove(file_path)
 
+    def test_get_node_sample(self):
+        gatherer = StatisticsGatherer
+        manager = graph_manager.SnapManager()
+        manager.generate_random_graph(20,2,0.5)
+
+        sample = gatherer.get_node_sample(manager, 5)
+        self.assertEquals(5, len(sample))
+
+        sample = gatherer.get_node_sample(manager, 999)
+        self.assertEquals(20, len(sample))
+
 
 if __name__ == "__main__":
     unittest.main()
