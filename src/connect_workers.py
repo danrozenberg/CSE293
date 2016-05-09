@@ -109,7 +109,9 @@ def enable_logging(log_level):
 def run_script(load_path, save_path, min_days):
     # load affiliation
     affiliation_graph = SnapManager()
+    logging.warn("Beggining to load graph...")
     affiliation_graph.load_graph(load_path)
+    logging.warn("Loaded!")
 
     # connect workers
     connected_graph = SnapManager()
