@@ -116,5 +116,5 @@ def run_script(load_path, save_path, min_days):
 if __name__ == '__main__':
     load_path = "../output_graphs/rs_affiliation.graph"
     save_path = "../output_graphs/rs_connected.graph"
-    min_days = 150
+    min_days = 182
     run_script(load_path, save_path, min_days)
