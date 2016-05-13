@@ -169,7 +169,6 @@ class SnapManager(object):
         names = snap.TStrV()
         values = snap.TStrV()
         self.network.AttrNameNI(NId, names)
-        self.network.AttrValueNI(NId, values)
 
         index = -1
         for i in xrange(len(names)):
@@ -181,6 +180,7 @@ class SnapManager(object):
         if index == -1:
             raise RuntimeError("Node does not have attribute" + attr_name )
         else:
+            self.network.AttrValueNI(NId, values)
             return self.__convert(values[index])
 
     def get_edge_attrs(self, EId):
@@ -206,7 +206,6 @@ class SnapManager(object):
         names = snap.TStrV()
         values = snap.TStrV()
         self.network.AttrNameEI(EId, names)
-        self.network.AttrValueEI(EId, values)
 
         index = -1
         for i in xrange(len(names)):
@@ -218,6 +217,7 @@ class SnapManager(object):
         if index == -1:
             raise RuntimeError("Edge does not have attribute" + attr_name )
         else:
+            self.network.AttrValueEI(EId, values)
             return self.__convert(values[index])
 
     def get_node_count(self):
