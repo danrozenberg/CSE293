@@ -53,6 +53,19 @@ def from_timestamp(timestamp):
     return converted
 
 
+def should_skip(worker, coworker, new_graph):
+    # no need to connect someone with oneself...
+    if worker == coworker:
+        return True
+
+    # no need to connect with someone already connected...
+    if new_graph.is_node(coworker) and \
+        new_graph.is_edge_between(worker, coworker):
+        return True
+
+    return  False
+
+
 class WorkerConnector(object):
     def __init__(self):
         # defaults allows workers with 0 days in common to be connected.
@@ -77,8 +90,8 @@ class WorkerConnector(object):
 
                 for coworker in affiliation_graph.get_neighboring_nodes(employer):
 
-                    # no need to connect someone with oneself...
-                    if worker == coworker:
+                    # sometimes, we can just skip a step in the algorithm...
+                    if should_skip(worker, coworker, new_graph):
                         continue
 
                     coworker_edge = affiliation_graph.get_edge_between(coworker, employer)

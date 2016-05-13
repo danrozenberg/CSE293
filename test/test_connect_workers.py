@@ -256,6 +256,33 @@ class WorkerConnector(unittest.TestCase):
         actual = connect_workers.from_timestamp(timestamp)
         self.assertAlmostEqual((expected - actual).seconds, 0, delta=61200)
 
+    def test_should_skip(self):
+        new_graph = graph_manager.SnapManager()
+        new_graph.add_node(1)
+        new_graph.add_node(2)
+        new_graph.add_node(3)
+        new_graph.add_node(4)
+
+        # # don't connect worker with himself
+        self.assertTrue(connect_workers.should_skip(1,1, new_graph))
+
+        # # don't skip unconnected workers
+        self.assertFalse(connect_workers.should_skip(1,2, new_graph))
+        self.assertFalse(connect_workers.should_skip(1,3, new_graph))
+
+        # do skip connected workers
+
+        new_graph.add_edge(1,3)
+        new_graph.add_edge(1,4)
+        self.assertTrue(connect_workers.should_skip(1,3, new_graph))
+        self.assertTrue(connect_workers.should_skip(4,1, new_graph))
+        self.assertFalse(connect_workers.should_skip(1,2, new_graph))
+
+
+
+
+
+
     def create_affiliation_graph(self, manager):
         # 9 workers
         manager.add_node(1)
