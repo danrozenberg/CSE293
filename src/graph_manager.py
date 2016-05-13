@@ -193,10 +193,9 @@ class SnapManager(object):
     def get_edge_attr(self, EId, attr_name):
         # Probably not the most efficient way of doing this...
         attributes = self.get_edge_attrs(EId)
-
-        try:
+        if attr_name in attributes:
             return attributes[attr_name]
-        except KeyError:
+        else:
             raise RuntimeError("Edge " + str(EId) + " does not have attribute '" +
                                                attr_name + "'")
 
