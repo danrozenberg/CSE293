@@ -3,10 +3,10 @@ from collections import namedtuple
 import logging
 from graph_manager import SnapManager
 
-def get_worker_iterator(association_graph):
-    node_iterator = association_graph.get_node_iterator()
+def get_worker_iterator(affiliation_graph):
+    node_iterator = affiliation_graph.get_node_iterator()
     for node in node_iterator:
-        node_type = association_graph.get_node_attr(node, "type")
+        node_type = affiliation_graph.get_node_attr(node, "type")
         if node_type == "worker":
             yield node
 
@@ -71,7 +71,7 @@ class WorkerConnector(object):
             logging.warn("Processing worker " + str(worker))
             affiliation_graph.copy_node(worker, new_graph)
 
-            # In an association graph, we can get the employers just by
+            # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
             employer_nodes = affiliation_graph.get_neighboring_nodes(worker)
 
@@ -134,9 +134,9 @@ def run_script(load_path, save_path, min_days):
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    load_path = "../output_graphs/rs_affiliation.graph"
-    save_path = "../output_graphs/rs_connected.graph"
     min_days = 182
+    load_path = "../output_graphs/rs_affiliation.graph"
+    save_path = "../output_graphs/rs_connected" + str(min_days) + "_days.graph"
     logging.warn("Started!")
     run_script(load_path, save_path, min_days)
     logging.warn("Finished!")

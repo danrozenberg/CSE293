@@ -171,7 +171,7 @@ class WorkerConnector(unittest.TestCase):
 
     def test_connect_workers_with_min_days(self):
         manager = graph_manager.SnapManager()
-        self.create_association_graph(manager)
+        self.create_affiliation_graph(manager)
 
         new_graph = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
@@ -207,7 +207,7 @@ class WorkerConnector(unittest.TestCase):
 
     def test_connect_workers_no_min_days(self):
         manager = graph_manager.SnapManager()
-        self.create_association_graph(manager)
+        self.create_affiliation_graph(manager)
 
         new_graph = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
@@ -256,7 +256,7 @@ class WorkerConnector(unittest.TestCase):
         actual = connect_workers.from_timestamp(timestamp)
         self.assertAlmostEqual((expected - actual).seconds, 0, delta=61200)
 
-    def create_association_graph(self, manager):
+    def create_affiliation_graph(self, manager):
         # 9 workers
         manager.add_node(1)
         manager.add_node(2)

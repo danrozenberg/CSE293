@@ -643,7 +643,7 @@ class TestSnapManager(unittest.TestCase):
             self.assertIn(manager.get_random_node()
                           ,possible_range)
 
-    def create_association_graph(self, manager):
+    def create_affiliation_graph(self, manager):
         # 9 workers
         manager.add_node(1)
         manager.add_node(2)

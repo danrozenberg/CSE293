@@ -7,9 +7,9 @@ import graph_manager
 class GraphPlotterTest(unittest.TestCase):
 
     def test_draw(self):
-        # Create an association graph
+        # Create an affiliation graph
         manager = graph_manager.SnapManager()
-        self.create_association_graph(manager)
+        self.create_affiliation_graph(manager)
         self.assertTrue(manager.get_node_count() > 0)
 
         # create plotter and change output folder
@@ -29,7 +29,7 @@ class GraphPlotterTest(unittest.TestCase):
         self.assertTrue(os.path.isfile(file_path))
 
 
-    def create_association_graph(self, manager):
+    def create_affiliation_graph(self, manager):
         manager.add_node(1)
         manager.add_node(2)
         manager.add_node(3)

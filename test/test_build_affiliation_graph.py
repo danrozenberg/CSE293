@@ -3,18 +3,18 @@ import sys, os
 import mock
 import logging
 sys.path.insert(0, '../src/')
-from build_association_graph import *
+from build_affiliation_graph import *
 import data_parser
 import graph_manager
 
 
-class TestBuildAssociationGraph(unittest.TestCase):
+class TestBuildAffiliationGraph(unittest.TestCase):
     # TODO: if there is enough time, decouple from other classes.
 
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
-    @mock.patch('build_association_graph.process_file')
+    @mock.patch('build_aaffiliation_graph.process_file')
     def test_process_files(self, process_file_mock):
 
         save_path = "./test.graph"
@@ -51,13 +51,13 @@ class TestBuildAssociationGraph(unittest.TestCase):
         graph = graph_manager.SnapManager()
         process_file(file_path, parser, interpreter_class, graph)
 
-        # from association_graph, we should see 5 worker nodes
+        # from affiliation_graph, we should see 5 worker nodes
         # we should also see 3 employer nodes.
         self.assertEquals(8, graph.get_node_count())
 
-    @mock.patch('build_association_graph.create_nodes')
-    @mock.patch('build_association_graph.create_edges')
-    @mock.patch('build_association_graph.passes_filter', return_value=True)
+    @mock.patch('build_affiliation_graph.create_nodes')
+    @mock.patch('build_affiliation_graph.create_edges')
+    @mock.patch('build_affiliation_graph.passes_filter', return_value=True)
     def test_process_line_if_filter_is_ok(self, mock_filter,
                            mock_edges, mock_nodes):
 
@@ -66,9 +66,9 @@ class TestBuildAssociationGraph(unittest.TestCase):
         self.assertEquals(1, mock_filter.call_count)
         self.assertEquals(1, mock_edges.call_count)
 
-    @mock.patch('build_association_graph.create_nodes')
-    @mock.patch('build_association_graph.create_edges')
-    @mock.patch('build_association_graph.passes_filter', return_value=False)
+    @mock.patch('build_affiliation_graph.create_nodes')
+    @mock.patch('build_affiliation_graph.create_edges')
+    @mock.patch('build_affiliation_graph.passes_filter', return_value=False)
     def test_process_line_if_filter_is_not_ok(self, mock_filter,
                            mock_edges, mock_nodes):
 
