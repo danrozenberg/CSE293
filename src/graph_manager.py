@@ -2,7 +2,6 @@ import cPickle as pickle
 import snap
 import logging
 from collections import defaultdict
-from itertools import izip
 
 class SnapManager(object):
     """ This implementation deals with SNAP networks. """
