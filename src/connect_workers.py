@@ -39,11 +39,8 @@ def get_overlapping_days(start_1, end_1, start_2, end_2):
         start_2 = from_timestamp(start_2)
         end_2 = from_timestamp(end_2)
 
-    Range = namedtuple('Range', ['start', 'end'])
-    r1 = Range(start=start_1, end=end_1)
-    r2 = Range(start=start_2, end=end_2)
-    latest_start = max(r1.start, r2.start)
-    earliest_end = min(r1.end, r2.end)
+    latest_start = max(start_1, start_2)
+    earliest_end = min(end_1, end_2)
     return max((earliest_end - latest_start).days + 1, 0)
 
 def from_timestamp(timestamp):
