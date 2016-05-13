@@ -2,6 +2,7 @@ import cPickle as pickle
 import snap
 import logging
 from collections import defaultdict
+from itertools import izip
 
 class SnapManager(object):
     """ This implementation deals with SNAP networks. """
@@ -163,14 +164,24 @@ class SnapManager(object):
         return dict(zip(names, converted_values))
 
     def get_node_attr(self, node_id, attr_name):
-        # Probably not the most efficient way of doing this...
-        attributes = self.get_node_attrs(node_id)
 
-        try:
-            return attributes[attr_name]
-        except KeyError:
-            raise RuntimeError("Node " + str(node_id) + " does not have attribute '" +
-                                               attr_name + "'")
+        NId = self.NId_from_id[node_id]
+        names = snap.TStrV()
+        values = snap.TStrV()
+        self.network.AttrNameNI(NId, names)
+        self.network.AttrValueNI(NId, values)
+
+        index = -1
+        for i in xrange(len(names)):
+            if names[i] == attr_name:
+                index = i
+                break
+
+        # if we found anything..
+        if index == -1:
+            raise RuntimeError("Node does not have attribute" + attr_name )
+        else:
+            return self.__convert(values[index])
 
     def get_edge_attrs(self, EId):
         """
@@ -191,13 +202,23 @@ class SnapManager(object):
         return dict(zip(names, converted_values))
 
     def get_edge_attr(self, EId, attr_name):
-        # Probably not the most efficient way of doing this...
-        attributes = self.get_edge_attrs(EId)
-        if attr_name in attributes:
-            return attributes[attr_name]
+
+        names = snap.TStrV()
+        values = snap.TStrV()
+        self.network.AttrNameEI(EId, names)
+        self.network.AttrValueEI(EId, values)
+
+        index = -1
+        for i in xrange(len(names)):
+            if names[i] == attr_name:
+                index = i
+                break
+
+        # if we found anything..
+        if index == -1:
+            raise RuntimeError("Edge does not have attribute" + attr_name )
         else:
-            raise RuntimeError("Edge " + str(EId) + " does not have attribute '" +
-                                               attr_name + "'")
+            return self.__convert(values[index])
 
     def get_node_count(self):
         return self.network.GetNodes()
