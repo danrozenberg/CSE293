@@ -14,7 +14,7 @@ class TestBuildAffiliationGraph(unittest.TestCase):
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
-    @mock.patch('build_aaffiliation_graph.process_file')
+    @mock.patch('build_affiliation_graph.process_file')
     def test_process_files(self, process_file_mock):
 
         save_path = "./test.graph"
