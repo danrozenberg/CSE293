@@ -52,7 +52,7 @@ def from_timestamp(timestamp):
     # there is some gmt weirdness python introduces...
     # no big deal, though...
     converted = datetime.datetime(1970,1,1) + \
-        datetime.timedelta(seconds=(timestamp))
+        datetime.timedelta(seconds=timestamp)
     return converted
 
 

@@ -152,7 +152,7 @@ class WorkerConnector(unittest.TestCase):
 
         self.assertEquals(19, time_together)
 
-        #worked more together in 2015
+        #worked more together again in 2015
         manager.add_edge_attr(worker_edge,
                               "2015_admission_date",
                               mktime(datetime(2015,1,1).timetuple()))
@@ -169,7 +169,7 @@ class WorkerConnector(unittest.TestCase):
         time_together = connect_workers.get_time_together(worker_edge,
                                                           coworker_edge,
                                                           manager)
-        self.assertEquals(78, time_together)
+        self.assertEquals(77, time_together)
 
     def test_connect_workers_with_min_days(self):
         manager = graph_manager.SnapManager()
