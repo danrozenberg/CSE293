@@ -9,9 +9,7 @@ import connect_workers
 
 class WorkerConnector(unittest.TestCase):
     def setUp(self):
-        logging.basicConfig(format='%(asctime)s %(message)s',
-        datefmt='%d %b - %H:%M:%S -',
-        level=logging.INFO)
+        logging.disable(logging.CRITICAL)
 
     def test_get_overlapping_days(self):
         start_1 =  mktime(datetime(2010,1,1).timetuple())
