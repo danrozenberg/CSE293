@@ -288,11 +288,8 @@ class SnapManager(object):
                     open(file_path.replace(".graph", "_edge_from_tuple.p"), 'wb'))
 
     def load_graph(self, file_path):
-        print "step 1"
         FIn = snap.TFIn(file_path)
-        print "step 2"
         self.network = snap.TNEANet.Load(FIn)
-        print "load now?"
 
         # grab dictionaries too!
         self.NId_from_id =\
