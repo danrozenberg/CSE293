@@ -185,6 +185,38 @@ class TestSnapManager(unittest.TestCase):
         d = manager.get_edge_attrs(1)
         self.assertEquals("basd", d["third"])
 
+    def test_edge_attr_dictionary(self):
+        manager = self.manager
+        self.assertEquals(0, manager.get_edge_count())
+
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_edge(1, 2, 10)
+        manager.add_edge(2, 3, 20)
+        manager.add_edge(1, 3, 30)
+        self.assertEquals(0,len(manager.get_edge_attrs(10)))
+        self.assertEquals(0,len(manager.get_edge_attrs(20)))
+        self.assertEquals(0,len(manager.get_edge_attrs(30)))
+
+        manager.add_edge_attr(10, "first", 33.33)
+        manager.add_edge_attr(10, "third", "asd")
+
+        # First edge:
+        d = manager.get_edge_attrs(10)
+        self.assertEquals(33.33, d["first"])
+        self.assertEquals("asd", d["third"])
+
+        #change some things, dict should reflect it.
+        manager.add_edge_attr(10, "first", 44.44)
+        manager.add_edge_attr(10, "third", "basd")
+        d = manager.get_edge_attrs(10)
+        self.assertEquals(44.44, d["first"])
+        self.assertEquals("basd", d["third"])
+
+
+
+
     def test_get_nodes(self):
         manager = self.manager
 

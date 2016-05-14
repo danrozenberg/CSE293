@@ -16,6 +16,7 @@ class SnapManager(object):
         self.NId_from_id = {}
         self.id_from_NId = {}
         self.edge_from_tuple = defaultdict(_get_defaults_dict)
+        self.attrs_from_edge = defaultdict(_get_defaults_dict)
 
     def add_node(self, node_id):
         """
@@ -187,18 +188,22 @@ class SnapManager(object):
         :param EId: the edge to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
         """
-        names = snap.TStrV()
-        values = snap.TStrV()
-        converted_values = []
-        self.network.AttrNameEI(EId, names)
-        self.network.AttrValueEI(EId, values)
+        if self.attrs_from_edge[EId] is None:
+            names = snap.TStrV()
+            values = snap.TStrV()
+            converted_values = []
+            self.network.AttrNameEI(EId, names)
+            self.network.AttrValueEI(EId, values)
 
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
+            for value in values:
+                # Due to a SNAP bug we are forced to convert attributes
+                #   back to their original type ourselves ;(
+                converted_values.append(self.__convert(value))
 
-        return dict(zip(names, converted_values))
+            self.attrs_from_edge[EId] = dict(zip(names, converted_values))
+
+        return self.attrs_from_edge[EId]
+
 
     def get_edge_attr(self, EId, attr_name):
 
@@ -257,6 +262,9 @@ class SnapManager(object):
 
     def add_edge_attr(self, EId, name, value):
 
+        # reset anything we knew about edge attrs
+        self.attrs_from_edge[EId] = None
+
         edge = self.network.GetEI(EId)
         if isinstance(value, int):
             self.network.AddIntAttrDatE(edge, value, name)
@@ -305,6 +313,8 @@ class SnapManager(object):
                     open(file_path.replace(".graph", "_id_from_nid.p"), 'wb'))
         pickle.dump(self.edge_from_tuple,
                     open(file_path.replace(".graph", "_edge_from_tuple.p"), 'wb'))
+        pickle.dump(self.attrs_from_edge,
+                    open(file_path.replace(".graph", "_attrs_from_edge.p"), 'wb'))
 
     def load_graph(self, file_path, graph_type=snap.TNEANet):
         FIn = snap.TFIn(file_path)
@@ -320,6 +330,9 @@ class SnapManager(object):
 
         self.edge_from_tuple = \
             pickle.load(open(file_path.replace(".graph", "_edge_from_tuple.p"), 'rb'))
+
+        self.attrs_from_edge = \
+            pickle.load(open(file_path.replace(".graph", "_attrs_from_edge.p"), 'rb'))
 
         return self
 
