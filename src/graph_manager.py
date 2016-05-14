@@ -306,9 +306,10 @@ class SnapManager(object):
         pickle.dump(self.edge_from_tuple,
                     open(file_path.replace(".graph", "_edge_from_tuple.p"), 'wb'))
 
-    def load_graph(self, file_path):
+    def load_graph(self, file_path, graph_type=snap.TNEANet):
         FIn = snap.TFIn(file_path)
-        self.network = snap.TNEANet.Load(FIn)
+
+        self.network = graph_type.Load(FIn)
 
         # grab dictionaries too!
         self.NId_from_id =\

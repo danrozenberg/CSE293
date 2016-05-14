@@ -1,5 +1,6 @@
 from datetime import datetime
 import sys
+import snap
 import os
 from time import mktime
 import unittest
@@ -135,7 +136,7 @@ class TestSnapManager(unittest.TestCase):
 
     # should add and retrieve attribute to/from an edge
     # also tests get edge attrs/attr
-    def test_add_edge_attribute(self):
+    def test_add_and_get_edge_attribute(self):
         manager = self.manager
         self.assertEquals(0, manager.get_edge_count())
 
@@ -245,6 +246,13 @@ class TestSnapManager(unittest.TestCase):
             manager.load_graph("i dont exist")
         the_exception = bad_call.exception
         self.assertIn("Can not open file", the_exception.message)
+
+    def test_load_undirected_graph(self):
+        graph_path = "./naive_bayes/random.graph"
+        manager = graph_manager.SnapManager()
+        graph_type = snap.TUNGraph
+        manager.load_graph(graph_path, graph_type)
+        self.assertEquals(1000, manager.get_node_count())
 
     def test_save_and_load_graph_with_dictionary_preservation(self):
         manager = self.manager
