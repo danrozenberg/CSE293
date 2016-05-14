@@ -119,7 +119,7 @@ class WorkerConnector(object):
         admission_strings = self.admission_strings
         demission_strings = self.demission_strings
 
-        for year in xrange(1980, 2030):
+        for year in xrange(1980, 2016):
 
             if (admission_strings[year] in worker_edge_attrs) and \
                (admission_strings[year] in coworker_edge_attrs):
