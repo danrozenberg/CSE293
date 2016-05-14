@@ -10,10 +10,10 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
-def get_time_together(worker_edge, coworker_edge, graph):
+def get_time_together(worker_edge_attrs, coworker_edge_attrs):
+    # although less general, receiving attributes as parameters
+    # allows us to call get_edge_attrs almost half the number of times...
     time_together = 0
-    worker_edge_attrs = graph.get_edge_attrs(worker_edge)
-    coworker_edge_attrs = graph.get_edge_attrs(coworker_edge)
     for year in xrange(1980, 2030):
         admission_string = str(year) + "_admission_date"
         demission_string = str(year) + "_demission_date"
@@ -87,6 +87,7 @@ class WorkerConnector(object):
 
             for employer in employer_nodes:
                 worker_edge = affiliation_graph.get_edge_between(worker, employer)
+                worker_edge_attrs = affiliation_graph.get_edge_attrs(worker_edge)
 
                 for coworker in affiliation_graph.get_neighboring_nodes(employer):
 
@@ -95,28 +96,22 @@ class WorkerConnector(object):
                         continue
 
                     coworker_edge = affiliation_graph.get_edge_between(coworker, employer)
+                    coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
 
-                    if self.should_connect(worker_edge, coworker_edge, affiliation_graph):
+                    if self.should_connect(worker_edge_attrs, coworker_edge_attrs):
                         new_graph.add_node(coworker)
-
-                        if not new_graph.is_edge_between(worker, coworker):
-                            new_graph.add_edge(worker, coworker)
-                            # TODO: maybe put time together in the attr?
-                            # TODO: maybe put in some other attrs?
+                        new_graph.add_edge(worker, coworker)
+                        # TODO: maybe put time together in the attr?
+                        # TODO: maybe put in some other attrs?
 
         return new_graph
 
-    def should_connect(self, worker_edge, coworker_edge, graph):
-        """
-        :param worker_edge: id edge connecting worker to employee
-        :param coworker_edge: id of edge connecting employee to a
-            different worker.
-        :return: wether we should add an edge between them.
-        """
+    def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
+        # although less general, receiving attributes as parameters
+        # allows us to call get_edge_attrs almost half the number of times...
+        # TODO, make worker_edge attrs a class property or something...
 
-        time_together = get_time_together(worker_edge,
-                                               coworker_edge,
-                                               graph)
+        time_together = get_time_together(worker_edge_attrs, coworker_edge_attrs)
 
         # add more checks here, as needed.
         return time_together >= self.min_days_together

@@ -115,9 +115,10 @@ class WorkerConnector(unittest.TestCase):
         manager.add_edge(2,888, coworker_edge)
 
         # Nothing so far
-        time_together = connect_workers.get_time_together(worker_edge,
-                                                          coworker_edge,
-                                                          manager)
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connect_workers.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs)
         self.assertEquals(0, time_together)
 
         #lets say they worked together for 19 days in 2013
@@ -134,9 +135,10 @@ class WorkerConnector(unittest.TestCase):
         manager.add_edge_attr(coworker_edge,
                               "2013_demission_date",
                               mktime(datetime(2013,4,20).timetuple()))
-        time_together = connect_workers.get_time_together(worker_edge,
-                                                          coworker_edge,
-                                                          manager)
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connect_workers.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs)
         self.assertEquals(19, time_together)
 
 
@@ -164,9 +166,10 @@ class WorkerConnector(unittest.TestCase):
         manager.add_edge_attr(coworker_edge,
                               "2015_demission_date",
                               mktime(datetime(2015,12,31).timetuple()))
-        time_together = connect_workers.get_time_together(worker_edge,
-                                                          coworker_edge,
-                                                          manager)
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connect_workers.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs)
         self.assertEquals(77, time_together)
 
     def test_connect_workers_with_min_days(self):
@@ -277,11 +280,6 @@ class WorkerConnector(unittest.TestCase):
         self.assertTrue(connect_workers.should_skip(1,3, new_graph))
         self.assertTrue(connect_workers.should_skip(4,1, new_graph))
         self.assertFalse(connect_workers.should_skip(1,2, new_graph))
-
-
-
-
-
 
     def create_affiliation_graph(self, manager):
         # 9 workers
