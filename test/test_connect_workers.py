@@ -102,6 +102,7 @@ class WorkerConnector(unittest.TestCase):
 
     def test_get_time_at_worker_attrs(self):
         manager = graph_manager.SnapManager()
+        connector = connect_workers.WorkerConnector()
 
         # create 2 workers, 1 employee node
         manager.add_node(1)
@@ -117,7 +118,7 @@ class WorkerConnector(unittest.TestCase):
         # Nothing so far
         worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
         coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
-        time_together = connect_workers.get_time_together(worker_edge_attrs,
+        time_together = connector.get_time_together(worker_edge_attrs,
                                                           coworker_edge_attrs)
         self.assertEquals(0, time_together)
 
@@ -137,7 +138,7 @@ class WorkerConnector(unittest.TestCase):
                               mktime(datetime(2013,4,20).timetuple()))
         worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
         coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
-        time_together = connect_workers.get_time_together(worker_edge_attrs,
+        time_together = connector.get_time_together(worker_edge_attrs,
                                                           coworker_edge_attrs)
         self.assertEquals(19, time_together)
 
@@ -168,7 +169,7 @@ class WorkerConnector(unittest.TestCase):
                               mktime(datetime(2015,12,31).timetuple()))
         worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
         coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
-        time_together = connect_workers.get_time_together(worker_edge_attrs,
+        time_together = connector.get_time_together(worker_edge_attrs,
                                                           coworker_edge_attrs)
         self.assertEquals(77, time_together)
 

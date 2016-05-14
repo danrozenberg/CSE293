@@ -10,22 +10,6 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
-def get_time_together(worker_edge_attrs, coworker_edge_attrs):
-    # although less general, receiving attributes as parameters
-    # allows us to call get_edge_attrs almost half the number of times...
-    time_together = 0
-    for year in xrange(1980, 2030):
-        admission_string = str(year) + "_admission_date"
-        demission_string = str(year) + "_demission_date"
-
-        if (admission_string in worker_edge_attrs) and \
-           (admission_string in coworker_edge_attrs):
-            time_together += get_overlapping_days(
-                worker_edge_attrs[admission_string],
-                worker_edge_attrs[demission_string],
-                coworker_edge_attrs[admission_string],
-                coworker_edge_attrs[demission_string])
-    return time_together
 
 def get_overlapping_days(start_1, end_1, start_2, end_2):
     # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
@@ -74,6 +58,15 @@ class WorkerConnector(object):
         # TODO: min_firm_size  ?
         # TODO: remove state owned firms?
 
+        # To avoid concatenating strings too many times, we take a shortcut here
+        # this will be used in the get_time_together method
+        # TODO: extract this sometime.
+        self.admission_strings = []
+        self.demission_strings = []
+        for year in xrange(0, 2030):
+            self.admission_strings.append(str(year) + "_admission_date")
+            self.demission_strings.append(str(year) + "_demission_date")
+
     def connect_workers(self, affiliation_graph, new_graph):
         # we get a special worker iterator
         for worker in get_worker_iterator(affiliation_graph):
@@ -111,10 +104,31 @@ class WorkerConnector(object):
         # allows us to call get_edge_attrs almost half the number of times...
         # TODO, make worker_edge attrs a class property or something...
 
-        time_together = get_time_together(worker_edge_attrs, coworker_edge_attrs)
+        time_together = self.get_time_together(worker_edge_attrs, coworker_edge_attrs)
 
         # add more checks here, as needed.
         return time_together >= self.min_days_together
+
+    def get_time_together(self, worker_edge_attrs, coworker_edge_attrs):
+        # although less general, receiving attributes as parameters
+        # allows us to call get_edge_attrs almost half the number of times...
+        time_together = 0
+
+        # we did some string concatenation in the class init method
+        # lets reference to it here.
+        admission_strings = self.admission_strings
+        demission_strings = self.demission_strings
+
+        for year in xrange(1980, 2030):
+
+            if (admission_strings[year] in worker_edge_attrs) and \
+               (admission_strings[year] in coworker_edge_attrs):
+                time_together += get_overlapping_days(
+                    worker_edge_attrs[admission_strings[year]],
+                    worker_edge_attrs[demission_strings[year]],
+                    coworker_edge_attrs[admission_strings[year]],
+                    coworker_edge_attrs[demission_strings[year]])
+        return time_together
 
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
