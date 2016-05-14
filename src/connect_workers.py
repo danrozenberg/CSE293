@@ -1,5 +1,4 @@
 import datetime
-from collections import namedtuple
 import logging
 from graph_manager import SnapManager
 
