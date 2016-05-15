@@ -107,7 +107,9 @@ class WorkerConnector(object):
         # allows us to call get_edge_attrs almost half the number of times...
         # TODO, make worker_edge attrs a class property or something...
 
-        time_together = self.get_time_together(worker_edge_attrs, coworker_edge_attrs)
+        time_together = self.get_time_together(worker_edge_attrs,
+                                               coworker_edge_attrs,
+                                               self.min_days_together)
 
         # add more checks here, as needed.
         return time_together >= self.min_days_together
