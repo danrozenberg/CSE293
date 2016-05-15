@@ -13,18 +13,16 @@ def get_worker_iterator(affiliation_graph):
 def get_overlapping_days(start_1, end_1, start_2, end_2):
     # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
 
-    # convert to datetime if we received timestamp
-    # also, assumes all parameters are in the same format
-    if type(start_1) == float:
-        # windows cant handle negative timestamps..
-        start_1 = from_timestamp(start_1)
-        end_1 = from_timestamp(end_1)
-        start_2 = from_timestamp(start_2)
-        end_2 = from_timestamp(end_2)
-
     latest_start = max(start_1, start_2)
     earliest_end = min(end_1, end_2)
-    return max((earliest_end - latest_start).days + 1, 0)
+
+    # timestamps
+    if type(start_1) == float:
+        return round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
+
+    # datetimes
+    if type(start_1) == datetime.datetime:
+        return max((earliest_end - latest_start).days + 1, 0)
 
 def from_timestamp(timestamp):
     # windows cant handle negative timestamps
