@@ -67,10 +67,16 @@ class WorkerConnector(object):
             self.demission_strings.append(str(year) + "_demission_date")
 
     def connect_workers(self, affiliation_graph, new_graph):
-        # we get a special worker iterator
+
+        progress_counter = -1
         for worker in get_worker_iterator(affiliation_graph):
+
+            # log every once in a while
+            progress_counter += 1
+            if progress_counter % 1000 == 0:
+                logging.warn("Processeced " + str(progress_counter) + " workers.")
+
             # add this worker to the new graph, if necessary
-            logging.warn("Processing worker " + str(worker))
             affiliation_graph.copy_node(worker, new_graph)
 
             # In an affiliation graph, we can get the employers just by
