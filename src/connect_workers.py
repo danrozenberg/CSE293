@@ -74,7 +74,7 @@ class WorkerConnector(object):
             # log every once in a while
             progress_counter += 1
             if progress_counter % 1000 == 0:
-                logging.warn("Processeced " + str(progress_counter) + " workers.")
+                logging.warn("Processed " + str(progress_counter) + " workers.")
 
             # add this worker to the new graph, if necessary
             affiliation_graph.copy_node(worker, new_graph)
