@@ -173,6 +173,12 @@ class WorkerConnector(unittest.TestCase):
                                                           coworker_edge_attrs)
         self.assertEquals(79, time_together)
 
+        # test with min_days param set
+        time_together = connector.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs,
+                                                          59)
+        self.assertEquals(79, time_together)
+
     def test_connect_workers_with_min_days(self):
         manager = graph_manager.SnapManager()
         self.create_affiliation_graph(manager)

@@ -112,7 +112,7 @@ class WorkerConnector(object):
         # add more checks here, as needed.
         return time_together >= self.min_days_together
 
-    def get_time_together(self, worker_edge_attrs, coworker_edge_attrs):
+    def get_time_together(self, worker_edge_attrs, coworker_edge_attrs, min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
         time_together = 0
@@ -122,15 +122,23 @@ class WorkerConnector(object):
         admission_strings = self.admission_strings
         demission_strings = self.demission_strings
 
-        for year in xrange(1980, 2016):
+        for year in xrange(2016, 1980, -1):
+            admission_string = admission_strings[year]
+            demission_string = demission_strings[year]
 
-            if (admission_strings[year] in worker_edge_attrs) and \
-               (admission_strings[year] in coworker_edge_attrs):
+            if (admission_string in worker_edge_attrs) and \
+               (admission_string in coworker_edge_attrs):
                 time_together += get_overlapping_days(
-                    worker_edge_attrs[admission_strings[year]],
-                    worker_edge_attrs[demission_strings[year]],
-                    coworker_edge_attrs[admission_strings[year]],
-                    coworker_edge_attrs[demission_strings[year]])
+                    worker_edge_attrs[admission_string],
+                    worker_edge_attrs[demission_string],
+                    coworker_edge_attrs[admission_string],
+                    coworker_edge_attrs[demission_string])
+
+                # we can stop if we were given a min_days, and
+                # if that min time has been reached
+                if min_days is not None and time_together > min_days:
+                    return time_together
+
         return time_together
 
 def enable_logging(log_level):
