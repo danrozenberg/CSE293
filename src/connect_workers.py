@@ -100,6 +100,11 @@ class WorkerConnector(object):
                         # TODO: maybe put time together in the attr?
                         # TODO: maybe put in some other attrs?
 
+                # this worker-employer edge will never be examined again
+                # and we are running out of memory, so we might as well
+                # nuke the worker_edge_attr from memory. We just set it to None..
+                affiliation_graph.attrs_from_edge[worker_edge] = None
+
         return new_graph
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
