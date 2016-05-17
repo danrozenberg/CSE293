@@ -133,13 +133,14 @@ class WorkerConnector(object):
             admission_string = admission_strings[year]
             demission_string = demission_strings[year]
 
-            if (admission_string in worker_edge_attrs) and \
-               (admission_string in coworker_edge_attrs):
+            try:
                 time_together += get_overlapping_days(
                     worker_edge_attrs[admission_string],
                     worker_edge_attrs[demission_string],
                     coworker_edge_attrs[admission_string],
                     coworker_edge_attrs[demission_string])
+            except:
+                pass
 
                 # we can stop if we were given a min_days, and
                 # if that min time has been reached
