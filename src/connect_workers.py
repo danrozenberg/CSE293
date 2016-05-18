@@ -136,6 +136,11 @@ class WorkerConnector(object):
 
         # now we interconnect all nodes in the ego.
         # remember that ego net does not include self.
+        self.connect_alters(ego, ego_net, affiliation_graph)
+        return ego_net
+
+    def connect_alters(self, ego, ego_net, affiliation_graph):
+
         alter_list = ego_net.get_nodes()
         for alter in alter_list:
             plant_nodes = affiliation_graph.get_neighboring_nodes(alter)
@@ -157,9 +162,6 @@ class WorkerConnector(object):
                     if self.should_connect(alter_edge_attrs, coworker_edge_attrs):
                         ego_net.add_node(coworker)
                         ego_net.add_edge(alter, coworker)
-
-
-            return ego_net
 
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
