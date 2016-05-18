@@ -131,8 +131,6 @@ class WorkerConnector(object):
             for coworker in affiliation_graph.get_neighboring_nodes(plant):
 
                 # sometimes, we can just skip a step in the algorithm...
-                if coworker == ego:
-                    continue
                 if should_skip(ego, coworker, ego_net):
                     continue
 
