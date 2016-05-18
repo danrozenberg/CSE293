@@ -131,7 +131,7 @@ class WorkerConnector(object):
             for coworker in affiliation_graph.get_neighboring_nodes(plant):
 
                 # sometimes, we can just skip a step in the algorithm...
-                if should_skip(ego, coworker, ego_net):
+                if coworker == ego or ego_net.is_node(coworker):
                     continue
 
                 coworker_edge = affiliation_graph.get_edge_between(coworker, plant)
@@ -139,7 +139,6 @@ class WorkerConnector(object):
 
                 if self.should_connect(ego_edge_attrs, coworker_edge_attrs):
                     ego_net.add_node(coworker)
-                    ego_net.add_edge(ego, coworker)
 
 
         # now we interconnect all nodes in the ego.
@@ -157,7 +156,6 @@ class WorkerConnector(object):
                 alter_edge_attrs = affiliation_graph.get_edge_attrs(alter_edge)
 
                 for coworker in affiliation_graph.get_neighboring_nodes(plant):
-
                     # we only connect alters. Also, ego should not be consider.
                     if (coworker not in alter_list) or (coworker == ego):
                         continue
@@ -168,7 +166,6 @@ class WorkerConnector(object):
                     coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
 
                     if self.should_connect(alter_edge_attrs, coworker_edge_attrs):
-                        ego_net.add_node(coworker)
                         ego_net.add_edge(alter, coworker)
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
