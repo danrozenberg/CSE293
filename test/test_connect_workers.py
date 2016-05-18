@@ -250,6 +250,88 @@ class WorkerConnector(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(1,7))
         self.assertFalse(new_graph.is_edge_between(1,5))
 
+    def test_build_ego_network(self):
+
+        manager = graph_manager.SnapManager()
+
+        # 4 workers
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(9)
+        manager.add_node_attr(1, "type", "worker")
+        manager.add_node_attr(2, "type", "worker")
+        manager.add_node_attr(3, "type", "worker")
+        manager.add_node_attr(9, "type", "worker")
+
+        # 2 plants
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node_attr(10, "type", "employer")
+        manager.add_node_attr(20, "type", "employer")
+
+        # connect them
+        manager.add_edge(1, 10, 100)
+        manager.add_edge(3, 10, 200)
+        manager.add_edge(9, 10, 300)
+        manager.add_edge(2, 10, 600)
+
+        manager.add_edge(9, 20, 400)
+        manager.add_edge(2, 20, 500)
+
+
+
+        # 1 worked with 9 and 3
+        manager.add_edge_attr(100, "1999_admission_date",
+                              mktime(datetime(1999,1,1).timetuple()))
+        manager.add_edge_attr(100, "1999_demission_date",
+                              mktime(datetime(1999,12,31).timetuple()))
+        manager.add_edge_attr(200, "1999_admission_date",
+                              mktime(datetime(1999,5,5).timetuple()))
+        manager.add_edge_attr(200, "1999_demission_date",
+                              mktime(datetime(1999,12,31).timetuple()))
+        manager.add_edge_attr(300, "1999_admission_date",
+                              mktime(datetime(1999,1,6).timetuple()))
+        manager.add_edge_attr(300, "1999_demission_date",
+                              mktime(datetime(1999,12,31).timetuple()))
+
+        # 9 worked with 2 somewhere else:
+        manager.add_edge_attr(400, "2000_admission_date",
+                              mktime(datetime(2000,1,1).timetuple()))
+        manager.add_edge_attr(400, "2000_demission_date",
+                              mktime(datetime(2000,12,31).timetuple()))
+        manager.add_edge_attr(500, "2000_admission_date",
+                              mktime(datetime(2000,1,1).timetuple()))
+        manager.add_edge_attr(500, "2000_demission_date",
+                              mktime(datetime(2000,12,31).timetuple()))
+
+
+        # later on, 1 worked with 2
+        manager.add_edge_attr(100, "2001_admission_date",
+                              mktime(datetime(2001,1,1).timetuple()))
+        manager.add_edge_attr(100, "2001_demission_date",
+                              mktime(datetime(2001,12,31).timetuple()))
+        manager.add_edge_attr(600, "2001_admission_date",
+                              mktime(datetime(2001,1,1).timetuple()))
+        manager.add_edge_attr(600, "2001_demission_date",
+                              mktime(datetime(2001,12,31).timetuple()))
+
+
+        connector = connect_workers.WorkerConnector()
+        connector.min_days_together = 1
+        ego_net = connector.build_ego_network(9, manager)
+
+        # Graph should have 3 nodes only
+        self.assertEqual(3, ego_net.get_node_count())
+
+        # All edges that should exist
+        self.assertTrue(ego_net.is_edge_between(1,2))
+        self.assertTrue(ego_net.is_edge_between(1,3))
+
+        # some edges that should not exist
+        self.assertFalse(ego_net.is_edge_between(3,2))
+
+
     def test_from_timestamp(self):
         expected = datetime(1980,10,15)
         timestamp = mktime(expected.timetuple())

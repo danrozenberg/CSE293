@@ -105,6 +105,63 @@ class WorkerConnector(object):
 
         return new_graph
 
+    def build_ego_network(self, ego, affiliation_graph):
+        '''
+        :param ego: the ego
+        :param affiliation_graph: the affiliation graph that lets us figure
+          out the ego network.
+        :return:a new graph_manager object (the ego network)
+        '''
+
+        # first add nodes present in the ego
+        ego_net = SnapManager()
+        plant_nodes = affiliation_graph.get_neighboring_nodes(ego)
+        for plant in plant_nodes:
+            ego_edge = affiliation_graph.get_edge_between(ego, plant)
+            ego_edge_attrs = affiliation_graph.get_edge_attrs(ego_edge)
+
+            for coworker in affiliation_graph.get_neighboring_nodes(plant):
+
+                # sometimes, we can just skip a step in the algorithm...
+                if should_skip(ego, coworker, ego_net):
+                    continue
+
+                coworker_edge = affiliation_graph.get_edge_between(coworker, plant)
+                coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
+
+                if self.should_connect(ego_edge_attrs, coworker_edge_attrs):
+                    ego_net.add_node(coworker)
+                    ego_net.add_edge(ego, coworker)
+
+
+        # now we interconnect all nodes in the ego.
+        # remember that ego net does not include self.
+        alter_list = ego_net.get_nodes()
+        for alter in alter_list:
+            plant_nodes = affiliation_graph.get_neighboring_nodes(alter)
+            for plant in plant_nodes:
+                alter_edge = affiliation_graph.get_edge_between(alter, plant)
+                alter_edge_attrs = affiliation_graph.get_edge_attrs(alter_edge)
+
+                for coworker in affiliation_graph.get_neighboring_nodes(plant):
+
+                    # we only connect alters. Also, ego should not be consider.
+                    if (coworker not in alter_list) or (coworker == ego):
+                        continue
+                    if should_skip(alter, coworker, ego_net):
+                        continue
+
+                    coworker_edge = affiliation_graph.get_edge_between(coworker, plant)
+                    coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
+
+                    if self.should_connect(alter_edge_attrs, coworker_edge_attrs):
+                        ego_net.add_node(coworker)
+                        ego_net.add_edge(alter, coworker)
+
+
+            return ego_net
+
+
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
