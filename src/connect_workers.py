@@ -105,6 +105,12 @@ class WorkerConnector(object):
 
         return new_graph
 
+    def build_ego_networks(self, ego_list, affiliation_graph):
+        network_from_ego = {}
+        for ego in ego_list:
+            network_from_ego[ego] = self.build_ego_network(ego, affiliation_graph)
+        return network_from_ego
+
     def build_ego_network(self, ego, affiliation_graph):
         '''
         :param ego: the ego
@@ -162,7 +168,6 @@ class WorkerConnector(object):
                     if self.should_connect(alter_edge_attrs, coworker_edge_attrs):
                         ego_net.add_node(coworker)
                         ego_net.add_edge(alter, coworker)
-
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
         # although less general, receiving attributes as parameters
