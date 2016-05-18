@@ -186,7 +186,7 @@ class WorkerConnector(unittest.TestCase):
         new_graph = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
         connector.min_days_together = 1
-        connector.connect_workers(manager, new_graph)
+        connector.connect_all_workers(manager, new_graph)
 
         # Graph should have 9 nodes only
         self.assertEqual(9, new_graph.get_node_count())
@@ -221,7 +221,7 @@ class WorkerConnector(unittest.TestCase):
 
         new_graph = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
-        connector.connect_workers(manager,new_graph)
+        connector.connect_all_workers(manager,new_graph)
 
         # Graph should have 9 nodes only
         self.assertEqual(9, new_graph.get_node_count())

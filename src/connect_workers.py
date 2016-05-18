@@ -9,7 +9,6 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
-
 def get_overlapping_days(start_1, end_1, start_2, end_2):
     # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
 
@@ -32,7 +31,6 @@ def from_timestamp(timestamp):
     converted = datetime.datetime(1970,1,1) + \
         datetime.timedelta(seconds=timestamp)
     return converted
-
 
 def should_skip(worker, coworker, new_graph):
     # no need to connect someone with oneself...
@@ -64,7 +62,7 @@ class WorkerConnector(object):
             self.admission_strings.append(str(year) + "_admission_date")
             self.demission_strings.append(str(year) + "_demission_date")
 
-    def connect_workers(self, affiliation_graph, new_graph):
+    def connect_all_workers(self, affiliation_graph, new_graph):
 
         progress_counter = -1
         for worker in get_worker_iterator(affiliation_graph):
@@ -165,7 +163,7 @@ def run_script(load_path, save_path, min_days):
     connected_graph = SnapManager()
     connector = WorkerConnector()
     connector.min_days_together = min_days
-    connector.connect_workers(affiliation_graph, connected_graph)
+    connector.connect_all_workers(affiliation_graph, connected_graph)
 
     # save it
     connected_graph.save_graph(save_path)
