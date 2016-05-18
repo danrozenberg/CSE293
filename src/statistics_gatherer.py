@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from graph_manager import SnapManager
 
 
@@ -30,19 +30,19 @@ class StatisticsGatherer(object):
         return metric_name + ":" + value + "\n"
 
     @staticmethod
-    def build_histogram(result_list, save_path, x_label="Value", y_label="Frequency", title=""):
-        bin_num = len(set(result_list))
-        plt.hist(result_list, bin_num, normed=1, facecolor='g', alpha=0.75)
-        plt.xlabel(x_label)
-        plt.ylabel(y_label)
-        plt.title(title)
-        plt.axis([min(result_list), max(result_list), 0, 1])
-
-        # for degugging how it looks
-        # plt.show()
-
-        # save
-        plt.savefig(save_path)
+    # def build_histogram(result_list, save_path, x_label="Value", y_label="Frequency", title=""):
+    #     bin_num = len(set(result_list))
+    #     plt.hist(result_list, bin_num, normed=1, facecolor='g', alpha=0.75)
+    #     plt.xlabel(x_label)
+    #     plt.ylabel(y_label)
+    #     plt.title(title)
+    #     plt.axis([min(result_list), max(result_list), 0, 1])
+    #
+    #     # for degugging how it looks
+    #     # plt.show()
+    #
+    #     # save
+    #     plt.savefig(save_path)
 
     def save_report(self, output_path):
         # saves output in a csv, ready to be EXCELED!

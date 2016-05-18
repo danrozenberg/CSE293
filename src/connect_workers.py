@@ -131,6 +131,8 @@ class WorkerConnector(object):
             for coworker in affiliation_graph.get_neighboring_nodes(plant):
 
                 # sometimes, we can just skip a step in the algorithm...
+                if coworker == ego:
+                    continue
                 if should_skip(ego, coworker, ego_net):
                     continue
 
@@ -226,7 +228,6 @@ def run_script(load_path, save_path, min_days):
     logging.warn("Loaded!")
 
     # connect workers
-    connected_graph = SnapManager()
     connector = WorkerConnector()
     connector.min_days_together = min_days
 
@@ -234,10 +235,10 @@ def run_script(load_path, save_path, min_days):
     ego_list = StatisticsGatherer.get_node_sample(affiliation_graph,
                                                   500,
                                                   "worker")
+    logging.warn("Sample drawn... will now start building networks:")
     network_from_ego = connector.build_ego_networks(ego_list,affiliation_graph)
-
-
     logging.warn("Done!")
+
     # save it
     # connected_graph.save_graph(save_path)
 
