@@ -1,6 +1,7 @@
 import datetime
 import logging
 from graph_manager import SnapManager
+from statistics_gatherer import StatisticsGatherer
 
 def get_worker_iterator(affiliation_graph):
     node_iterator = affiliation_graph.get_node_iterator()
@@ -108,6 +109,7 @@ class WorkerConnector(object):
     def build_ego_networks(self, ego_list, affiliation_graph):
         network_from_ego = {}
         for ego in ego_list:
+            logging.warn("Started building network for ego: " +str(ego))
             network_from_ego[ego] = self.build_ego_network(ego, affiliation_graph)
         return network_from_ego
 
@@ -227,10 +229,17 @@ def run_script(load_path, save_path, min_days):
     connected_graph = SnapManager()
     connector = WorkerConnector()
     connector.min_days_together = min_days
-    connector.connect_all_workers(affiliation_graph, connected_graph)
 
+    logging.warn("Drawing random sample!")
+    ego_list = StatisticsGatherer.get_node_sample(affiliation_graph,
+                                                  500,
+                                                  "worker")
+    network_from_ego = connector.build_ego_networks(ego_list,affiliation_graph)
+
+
+    logging.warn("Done!")
     # save it
-    connected_graph.save_graph(save_path)
+    # connected_graph.save_graph(save_path)
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
