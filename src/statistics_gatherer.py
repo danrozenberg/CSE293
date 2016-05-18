@@ -49,7 +49,7 @@ class StatisticsGatherer(object):
         pass
 
     @staticmethod
-    def get_node_sample(graph_manager, sample_size):
+    def get_node_sample(graph_manager, sample_size, node_type_filter = None):
         # get a a sample of nodes for calculating statistics
 
         # don't "overdraw" the graph
@@ -58,7 +58,14 @@ class StatisticsGatherer(object):
 
         node_set = set()
         while len(node_set) < sample_size:
-            node_set.add(graph_manager.get_random_node())
+            node = graph_manager.get_random_node()
+            if node_type_filter is not None:
+                node_type = graph_manager.get_node_attr(node, "type")
+                if node_type <> node_type_filter:
+                    # TODO: deal with overdrawing when using filter
+                    # It shouldn't happen in this project anyway :( ...
+                    continue
+            node_set.add(node)
         return list(node_set)
 
     @staticmethod
