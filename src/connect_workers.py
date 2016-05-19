@@ -185,7 +185,6 @@ def run_script(load_path, min_days):
     node_slice = node_list[start:end]
     results = connector.connect_workers(affiliation_graph, node_slice)
     logging.warn("proc " + proc_num + " Finished!")
-    print results
 
 
     # save it
