@@ -148,24 +148,31 @@ class WorkerConnector(object):
 
     def connect_alters(self, ego, ego_net, affiliation_graph):
 
+        # get method addresses for performance reasonts
+        get_neighboring_nodes = affiliation_graph.get_neighboring_nodes
+        get_edge_between = affiliation_graph.get_edge_between
+        get_edge_attrs = affiliation_graph.get_edge_attrs
+        should_connect = self.should_connect
+
+
         alter_list = ego_net.get_nodes()
         for alter in alter_list:
-            plant_nodes = affiliation_graph.get_neighboring_nodes(alter)
+            plant_nodes = get_neighboring_nodes(alter)
             for plant in plant_nodes:
-                alter_edge = affiliation_graph.get_edge_between(alter, plant)
-                alter_edge_attrs = affiliation_graph.get_edge_attrs(alter_edge)
+                alter_edge = get_edge_between(alter, plant)
+                alter_edge_attrs = get_edge_attrs(alter_edge)
 
-                for coworker in affiliation_graph.get_neighboring_nodes(plant):
+                for coworker in get_neighboring_nodes(plant):
                     # we only connect alters. Also, ego should not be consider.
                     if (coworker not in alter_list) or (coworker == ego):
                         continue
                     if should_skip(alter, coworker, ego_net):
                         continue
 
-                    coworker_edge = affiliation_graph.get_edge_between(coworker, plant)
-                    coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
+                    coworker_edge = get_edge_between(coworker, plant)
+                    coworker_edge_attrs = get_edge_attrs(coworker_edge)
 
-                    if self.should_connect(alter_edge_attrs, coworker_edge_attrs):
+                    if should_connect(alter_edge_attrs, coworker_edge_attrs):
                         ego_net.add_edge(alter, coworker)
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
