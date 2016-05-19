@@ -1,6 +1,7 @@
 import cPickle as pickle
 import snap
 import logging
+import random
 from collections import defaultdict
 
 class SnapManager(object):
@@ -361,8 +362,8 @@ class SnapManager(object):
         return True
 
     def get_random_node(self):
-        NId = self.network.GetRndNId()
-        return self.id_from_NId[NId]
+        ids = self.NId_from_id.keys()
+        return random.choice(ids)
 
     def generate_random_graph(self, node_num, node_out_deg, rewire_prob):
         # this substitutes the old graph, so beware
