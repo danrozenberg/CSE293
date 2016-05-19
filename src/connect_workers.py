@@ -45,7 +45,6 @@ def should_skip(worker, coworker, new_graph):
 
     return  False
 
-
 class WorkerConnector(object):
     def __init__(self):
         # defaults allows workers with 0 days in common to be connected.
@@ -156,6 +155,9 @@ class WorkerConnector(object):
 
         alter_list = set(ego_net.get_nodes())
         logging.warn("This ego has " + str(len(alter_list)) + " alters..")
+        if len(alter_list) > 2000:
+            logging.warn("Oh boy, let's skip it")
+            return
 
         for alter in alter_list:
             plant_nodes = get_neighboring_nodes(alter)
