@@ -143,10 +143,10 @@ class WorkerConnector(object):
 
         # now we interconnect all nodes in the ego.
         # remember that ego net does not include self.
-        self.connect_alters(ego, ego_net, affiliation_graph)
+        self.connect_alters(ego_net, affiliation_graph)
         return ego_net
 
-    def connect_alters(self, ego, ego_net, affiliation_graph):
+    def connect_alters(self, ego_net, affiliation_graph):
 
         # get method addresses for performance reasonts
         get_neighboring_nodes = affiliation_graph.get_neighboring_nodes
@@ -154,18 +154,18 @@ class WorkerConnector(object):
         get_edge_attrs = affiliation_graph.get_edge_attrs
         should_connect = self.should_connect
 
+        alter_list = set(ego_net.get_nodes())
+        logging.warn("This ego has " + str(len(alter_list)) + " alters..")
 
-        alter_list = ego_net.get_nodes()
         for alter in alter_list:
             plant_nodes = get_neighboring_nodes(alter)
             for plant in plant_nodes:
                 alter_edge = get_edge_between(alter, plant)
                 alter_edge_attrs = get_edge_attrs(alter_edge)
+                valid_coworkers = set(get_neighboring_nodes(plant)) & \
+                                   alter_list
 
-                for coworker in get_neighboring_nodes(plant):
-                    # we only connect alters. Also, ego should not be consider.
-                    if (coworker not in alter_list) or (coworker == ego):
-                        continue
+                for coworker in valid_coworkers:
                     if should_skip(alter, coworker, ego_net):
                         continue
 
