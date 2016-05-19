@@ -1,5 +1,7 @@
 import datetime
 import logging
+import sys
+import subprocess
 from graph_manager import SnapManager
 
 def get_worker_iterator(affiliation_graph):
@@ -64,18 +66,22 @@ class WorkerConnector(object):
             self.admission_strings.append(str(year) + "_admission_date")
             self.demission_strings.append(str(year) + "_demission_date")
 
-    def connect_workers(self, affiliation_graph, new_graph):
+        self.proc_num = sys.argv[1]
+
+    def connect_workers(self, affiliation_graph, node_slice):
+
+        # my answer will be a set of tuples
+        edges_to_add = set()
 
         progress_counter = -1
-        for worker in get_worker_iterator(affiliation_graph):
+        for worker in node_slice:
 
             # log every once in a while
             progress_counter += 1
             if progress_counter % 1000 == 0:
-                logging.warn("Processed " + str(progress_counter) + " workers.")
-
-            # add this worker to the new graph, if necessary
-            affiliation_graph.copy_node(worker, new_graph)
+                logging.warn("proc " + self.proc_num +
+                             ": processed " + str(progress_counter) +
+                             " workers.")
 
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
@@ -88,15 +94,15 @@ class WorkerConnector(object):
                 for coworker in affiliation_graph.get_neighboring_nodes(employer):
 
                     # sometimes, we can just skip a step in the algorithm...
-                    if should_skip(worker, coworker, new_graph):
+                    if worker == coworker:
                         continue
 
                     coworker_edge = affiliation_graph.get_edge_between(coworker, employer)
                     coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
 
                     if self.should_connect(worker_edge_attrs, coworker_edge_attrs):
-                        new_graph.add_node(coworker)
-                        new_graph.add_edge(worker, coworker)
+                        edges_to_add.add((min(coworker, worker), max(worker, coworker)))
+
                         # TODO: maybe put time together in the attr?
                         # TODO: maybe put in some other attrs?
 
@@ -105,7 +111,7 @@ class WorkerConnector(object):
                 # nuke the worker_edge_attr from memory. We just set it to None..
                 affiliation_graph.attrs_from_edge[worker_edge] = None
 
-        return new_graph
+        return edges_to_add
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
         # although less general, receiving attributes as parameters
@@ -149,32 +155,47 @@ class WorkerConnector(object):
 
         return time_together
 
+    def get_edges_to_add(self, node_list):
+        return node_list
+
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
     datefmt='%d %b - %H:%M:%S -',
     level=log_level)
 
-def run_script(load_path, save_path, min_days):
+def run_script(load_path, min_days):
     # load affiliation
     affiliation_graph = SnapManager()
-    logging.warn("Beggining to load graph...")
+    proc_num = sys.argv[1]
+    logging.warn("proc " + proc_num + " Beggining to load graph...")
     affiliation_graph.load_graph(load_path)
-    logging.warn("Loaded!")
+    logging.warn("proc " + proc_num + " Loaded!")
 
-    # connect workers
-    connected_graph = SnapManager()
+    # create connect objects
     connector = WorkerConnector()
     connector.min_days_together = min_days
-    connector.connect_workers(affiliation_graph, connected_graph)
+
+    # how many shares
+    N = 4
+    n = int(sys.argv[1])
+
+    node_list = list(get_worker_iterator(affiliation_graph))
+    start = (n-1) * len(node_list) / N
+    end = n * len(node_list) / N
+    node_slice = node_list[start:end]
+    results = connector.connect_workers(affiliation_graph, node_slice)
+    logging.warn("proc " + proc_num + " Finished!")
+    print results
+
 
     # save it
-    connected_graph.save_graph(save_path)
+    # connected_graph.save_graph(save_path)
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    min_days = 182
+    min_days = 1
     load_path = "../output_graphs/rs_affiliation.graph"
     save_path = "../output_graphs/rs_connected" + str(min_days) + "_days.graph"
     logging.warn("Started!")
-    run_script(load_path, save_path, min_days)
+    run_script(load_path, min_days)
     logging.warn("Finished!")
