@@ -1,7 +1,8 @@
 import datetime
 import logging
 import sys
-import subprocess
+import pickle
+import os
 from graph_manager import SnapManager
 
 def get_worker_iterator(affiliation_graph):
@@ -35,7 +36,6 @@ def from_timestamp(timestamp):
         datetime.timedelta(seconds=timestamp)
     return converted
 
-
 def should_skip(worker, coworker, new_graph):
     # no need to connect someone with oneself...
     if worker == coworker:
@@ -48,6 +48,12 @@ def should_skip(worker, coworker, new_graph):
 
     return  False
 
+def delete_files(folder_path):
+    found_files = os.listdir(folder_path)
+    for subfile in found_files:
+        if os.path.isfile(folder_path + "/" +  subfile):
+            file_path = folder_path + subfile
+            os.remove(file_path)
 
 class WorkerConnector(object):
     def __init__(self):
@@ -68,7 +74,34 @@ class WorkerConnector(object):
 
         self.proc_num = sys.argv[1]
 
-    def connect_workers(self, affiliation_graph, node_slice):
+
+    def start_get_edges_worker(self, graph_load_path):
+        """ This is what gets called by Popen, so it is the
+         entry point of processing, if called by the script start.py
+        """
+        # load affiliation
+        affiliation_graph = SnapManager()
+        proc_num = sys.argv[1]
+        logging.warn("proc " + proc_num + ": Beggining to load graph...")
+        affiliation_graph.load_graph(graph_load_path)
+        logging.warn("proc " + proc_num + ": Affiliations graph loaded!")
+
+        # Get this process' work load
+        node_slice = get_node_slice(affiliation_graph)
+        results = self.get_edges(affiliation_graph, node_slice)
+        logging.warn("proc " + proc_num + ": Finished!")
+
+        # save edge output
+        output_folder = "../output_edges/"
+        self.save_edge_list(output_folder, proc_num, results)
+
+    def get_edges(self, affiliation_graph, node_slice):
+        """
+        :param affiliation_graph: The source affiliation graph
+        :param node_slice: a list of nodes for which we will calculate
+            which edges should be attached to them.
+        :return: a set of tuples.
+        """
 
         # my answer will be a set of tuples
         edges_to_add = set()
@@ -155,46 +188,50 @@ class WorkerConnector(object):
 
         return time_together
 
-    def get_edges_to_add(self, node_list):
-        return node_list
+
+def add_edges_to_graph(edge_list, new_graph):
+    for pair in edge_list:
+        new_graph.add_node(pair[0])
+        new_graph.add_node(pair[1])
+        new_graph.add_edge(pair[0], pair[1])
+
+def add_edges_from_disk(target_folder):
+    #returns a new graph
+    new_graph = SnapManager()
+
+    found_files = os.listdir(target_folder)
+    for subfile in found_files:
+        edge_list = pickle.load(open(target_folder + subfile, 'rb'))
+        add_edges_to_graph(edge_list, new_graph)
+
+    return new_graph
+
+def save_edges_to_disk(output_folder, edges, proc_num = ""):
+    file_name = output_folder + "edge_list_" + proc_num + ".p"
+    pickle.dump(edges, open(file_name, 'wb'))
 
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
     datefmt='%d %b - %H:%M:%S -',
     level=log_level)
 
-def run_script(load_path, min_days):
-    # load affiliation
-    affiliation_graph = SnapManager()
-    proc_num = sys.argv[1]
-    logging.warn("proc " + proc_num + " Beggining to load graph...")
-    affiliation_graph.load_graph(load_path)
-    logging.warn("proc " + proc_num + " Loaded!")
+def get_node_slice(affiliation_graph):
+        # how many pieces are we dividing amonstg
+        total_procs = int(sys.argv[2])
+        proc_number = int(sys.argv[1])
 
-    # create connect objects
-    connector = WorkerConnector()
-    connector.min_days_together = min_days
+        node_list = list(get_worker_iterator(affiliation_graph))
+        start = (proc_number-1) * len(node_list) / total_procs
+        end = proc_number * len(node_list) / total_procs
+        return node_list[start:end]
 
-    # how many shares
-    N = 4
-    n = int(sys.argv[1])
-
-    node_list = list(get_worker_iterator(affiliation_graph))
-    start = (n-1) * len(node_list) / N
-    end = n * len(node_list) / N
-    node_slice = node_list[start:end]
-    results = connector.connect_workers(affiliation_graph, node_slice)
-    logging.warn("proc " + proc_num + " Finished!")
-
-
-    # save it
-    # connected_graph.save_graph(save_path)
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    min_days = 1
+    min_days = 90
     load_path = "../output_graphs/rs_affiliation.graph"
     save_path = "../output_graphs/rs_connected" + str(min_days) + "_days.graph"
-    logging.warn("Started!")
-    run_script(load_path, min_days)
-    logging.warn("Finished!")
+    connector = WorkerConnector()
+    connector.min_days_together = min_days
+    connector.start_get_edges_worker(load_path)
+
