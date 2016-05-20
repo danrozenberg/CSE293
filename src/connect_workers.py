@@ -93,7 +93,7 @@ class WorkerConnector(object):
 
         # save edge output
         output_folder = "../output_edges/"
-        self.save_edge_list(output_folder, proc_num, results)
+        save_edges_to_disk(output_folder, results, proc_num)
 
     def get_edges(self, affiliation_graph, node_slice):
         """
