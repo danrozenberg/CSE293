@@ -370,4 +370,119 @@ class Pis12DataInterpreter():
                 logging.info(self.log_message)
             return -1
 
+class ClassificationLoader():
+
+    def __init__(self):
+        self.dictionary = None
+
+    def find_files(self, folder_path, fetch_num = 0, file_type="csv"):
+        """
+        A generator...
+        Given a folder, returns names of files inside it.
+        It returns as many as fetch_num names, which makes it useful in
+        small scale tests
+        :param folder: the folder to generate file names from. Does not process
+            sub-folders
+        :param fetch_num: if 0, we will generate names until they run out,
+            otherwise, return at most fetch_num names
+        :return: the names of the files inside folder.
+        """
+        found_files = os.listdir(folder_path)
+        paths_read = 0
+
+        #TODO: rename subfile variable
+        for subfile in found_files:
+            if os.path.isfile(folder_path + "/" +  subfile):
+                if subfile.endswith(file_type):
+                    yield folder_path + subfile
+                    paths_read += 1
+                    if 0 < fetch_num <= paths_read:
+                        break
+
+    def lines_reader(self, file_path, fetch_num = None):
+        """
+        Reads and yields a line, but does not process it.
+        :param file_path:
+        :param fetch_num:
+        :return: an iterator. The iterator yields lists of values.
+        """
+
+        # also accepts 0 as being "all the file"
+        if fetch_num == 0:
+            fetch_num = None
+
+        with open(file_path, "rb") as src:
+            reader = csv.reader(src)
+            _ = reader.next()  # throws header away
+
+            lines_read = 0
+            while True:
+                yield reader.next()
+                lines_read += 1
+                if 0 < fetch_num <= lines_read:
+                    break
+
+    def parse_line(self, line):
+        if len(line) < 9:
+            raise ValueError("Unexpected format. Line is too short: \n" +
+            str(line))
+
+        # also, here is where we parse fields. Add as needed.
+        answer = {'FIRM_ID': line[0], 'PLANT_ID': line[1],
+        'FIRST_YEAR': line[2], 'EMPLOYEE_SPINOFF': line[5],
+        'DIVESTITURE': line[6], 'UNRELATED': line[7],
+        'DIVERSIFY': line[8]}
+
+        self.dictionary = answer
+        return answer
+
+    @property
+    def plant_id(self):
+        if self.dictionary is None:
+            return None
+        else:
+            plant_id = self.dictionary['FIRM_ID'] + self.dictionary['PLANT_ID']
+            return int(plant_id)
+
+    @property
+    def first_year(self):
+        if self.dictionary is None:
+            return None
+        else:
+            return int(self.dictionary['FIRST_YEAR'])
+
+    @property
+    def firm_type(self):
+        if self.dictionary is None:
+            return None
+        if self.dictionary['EMPLOYEE_SPINOFF'] == '1' and \
+            self.dictionary['DIVESTITURE'] == '0' and \
+            self.dictionary['UNRELATED'] == '0' and \
+            self.dictionary['DIVERSIFY'] == '0':
+            return "EMPLOYEE_SPINOFF"
+
+        elif self.dictionary['EMPLOYEE_SPINOFF'] == '0' and \
+            self.dictionary['DIVESTITURE'] == '1' and \
+            self.dictionary['UNRELATED'] == '0' and \
+            self.dictionary['DIVERSIFY'] == '0':
+            return 'DIVESTITURE'
+
+        elif self.dictionary['EMPLOYEE_SPINOFF'] == '0' and \
+            self.dictionary['DIVESTITURE'] == '0' and \
+            self.dictionary['UNRELATED'] == '1' and \
+            self.dictionary['DIVERSIFY'] == '0':
+            return 'UNRELATED'
+
+        elif self.dictionary['EMPLOYEE_SPINOFF'] == '0' and \
+            self.dictionary['DIVESTITURE'] == '0' and \
+            self.dictionary['UNRELATED'] == '0' and \
+            self.dictionary['DIVERSIFY'] == '1':
+            return 'DIVERSIFY'
+
+        else:
+            return 'UNKNOWN'
+
+
+
+
 #TODO: put logging inside a method to save lines!

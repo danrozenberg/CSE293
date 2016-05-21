@@ -6,6 +6,7 @@ import sys
 sys.path.insert(0, '../src/')
 from data_parser import Pis12DataParser
 from data_parser import Pis12DataInterpreter
+from data_parser import ClassificationLoader
 
 class TestPis12DataParser(unittest.TestCase):
 
@@ -388,7 +389,6 @@ class TestPis12DataInterpreter(unittest.TestCase):
         answer = interpreter.municipality
         self.assertEquals('', answer)
 
-
     def test_time_at_employer(self):
         interpreter = Pis12DataInterpreter()
 
@@ -419,6 +419,111 @@ class TestPis12DataInterpreter(unittest.TestCase):
                                 'MES_DESLIG':''})
         self.assertEquals(-1, interpreter.time_at_employer)
         self.assertIn("Unable to calculate time_at_employer for:", interpreter.log_message)
+
+class TestClassificationLoader(unittest.TestCase):
+    def setUp(self):
+        logging.disable(logging.CRITICAL)
+
+
+    def test_find_files(self):
+        loader = ClassificationLoader()
+
+        # should return no files for empty folder
+        files = loader.find_files("./empty_folder/")
+        found_files = []
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(0, len(found_files))
+
+        # should return 3 csv files in test folder
+        files = loader.find_files("./test_file_path_folder/")
+        found_files = []
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(3, len(found_files))
+
+        # should return 3 csv files in test folder
+        files = loader.find_files("./test_file_path_folder/", "csv")
+        found_files = []
+        expected_files = ["./test_file_path_folder/asd.csv",
+                          "./test_file_path_folder/basd.csv",
+                          "./test_file_path_folder/alpha.csv"]
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(3, len(found_files))
+        self.assertItemsEqual(expected_files, found_files)
+
+
+        # should return 1 txt files in test folder
+        files = loader.find_files("./test_file_path_folder/", file_type="txt")
+        found_files = []
+        expected_files = ["./test_file_path_folder/nope.txt"]
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(1, len(found_files))
+        self.assertItemsEqual(expected_files, found_files)
+
+
+        # should return 2 csv files in test folder if requested for only 2
+        files = loader.find_files("./test_file_path_folder/", 2)
+        found_files = []
+        for f in files :
+            found_files.append(f)
+        self.assertEquals(2, len(found_files))
+
+    def test_lines_reader(self):
+        parser = ClassificationLoader()
+
+        # read
+        lines_reader = parser.lines_reader("./test_data/raw_graph.csv")
+        lines_read = 0
+        for line in lines_reader:
+            # this data source has 66 fields
+            self.assertEquals(67, len(line))
+
+            lines_read += 1
+        self.assertEquals(30, lines_read)
+
+    def test_parse_line(self):
+        parser = ClassificationLoader()
+
+        with self.assertRaises(ValueError) as bad_call:
+            parser.parse_line([1,2,3])
+        the_exception = bad_call.exception
+        self.assertIn("Unexpected format", the_exception.message)
+
+        valid_line = ['7','56750184','1999','777','1995','0','0','1','0']
+        answer = parser.parse_line(valid_line)
+
+        # test only a few of the entries in the dictionary
+        self.assertEquals('7', answer['FIRM_ID'])
+        self.assertEquals('56750184', answer['PLANT_ID'])
+        self.assertEquals('1', answer['UNRELATED'])
+        self.assertEquals('0', answer['DIVERSIFY'])
+
+    def test_properties(self):
+        parser = ClassificationLoader()
+
+        # should return none with no line fed...
+        self.assertIsNone(parser.plant_id)
+
+        valid_line = ['73','56750184','1999','777','1995','0','0','1','0']
+        parser.parse_line(valid_line)
+        self.assertEquals(7356750184, parser.plant_id)
+        self.assertEquals(1999, parser.first_year)
+        self.assertEquals('UNRELATED', parser.firm_type)
+
+        valid_line = ['73','56750184','1999','777','1995','0','0','0','1']
+        parser.parse_line(valid_line)
+        self.assertEquals('DIVERSIFY', parser.firm_type)
+
+        valid_line = ['73','56750184','1999','777','1995','0','0','0','0']
+        parser.parse_line(valid_line)
+        self.assertEquals('UNKNOWN', parser.firm_type)
+
+        valid_line = ['73','56750184','1999','777','1995','1','0','1','1']
+        parser.parse_line(valid_line)
+        self.assertEquals('UNKNOWN', parser.firm_type)
 
 
 
