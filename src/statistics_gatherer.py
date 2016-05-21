@@ -1,33 +1,30 @@
+"""This file helps us compiling results for our project
+as such, so save coding / plannign time, it will be super specific"""
+
+import random
+import cPickle as pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from graph_manager import SnapManager
+from data_parser import ClassificationLoader
 
 
 class StatisticsGatherer(object):
 
-    # generate a report on the graph.
-    def report(self):
-        pass
-
     @staticmethod
-    def print_statistics(result_list, results_name):
-
-        result_string = "======" + results_name + "======"
-        result_string += "\naverage = " + str(np.average(result_list))
-        result_string += "\nstddev = " + str(np.std(result_list))
-        result_string += "\n10th percentile = " + str(np.percentile(result_list, 10))
-        result_string += "\n25th percentile = " + str(np.percentile(result_list, 25))
-        result_string += "\nmedian = " + str(np.median(result_list))
-        result_string += "\n75th percentile = " + str(np.percentile(result_list, 75))
-        result_string += "\n90th percentile = " + str(np.percentile(result_list, 90))
-        result_string += "\nmax = " + str(max(result_list))
-        result_string += "\nmin = " + str(min(result_list))
-        result_string += "\n"
-        return result_string
-
-    @staticmethod
-    def print_metric(self, metric_name, value):
-        return metric_name + ":" + value + "\n"
+    def get_statistics(result_list, name=""):
+        results = dict
+        results["name"] = name
+        results["naverage"] = np.average(result_list)
+        results["nstddev"] = np.std(result_list)
+        results["n10th percentile"] = np.percentile(result_list, 10)
+        results["n25th percentile"] = np.percentile(result_list, 25)
+        results["nmedian"] = np.median(result_list)
+        results["n75th percentile"] = np.percentile(result_list, 75)
+        results["n90th percentile"] = np.percentile(result_list, 90)
+        results["nmax"] = max(result_list)
+        results["nmin"] = min(result_list)
+        return results
 
     @staticmethod
     def build_histogram(result_list, save_path, x_label="Value", y_label="Frequency", title=""):
@@ -44,14 +41,10 @@ class StatisticsGatherer(object):
         # save
         plt.savefig(save_path)
 
-    def save_report(self, output_path):
-        # saves output in a csv, ready to be EXCELED!
-        pass
-
     @staticmethod
     def get_node_sample(graph_manager, sample_size):
-        # get a a sample of nodes for calculating statistics
-
+        '''From a graph (at this point the connected worker graph)
+        we get a list of nodes at random'''
         # don't "overdraw" the graph
         if graph_manager.get_node_count() < sample_size:
             return graph_manager.get_nodes()
@@ -103,9 +96,20 @@ class StatisticsGatherer(object):
         gatherer.print_metric(graph.get_clustering_coefficient(),
                               "get_clustering_coefficient")
 
+    @staticmethod
+    def build_ground_truth(load_folder, output_file_path):
+        """ Builds ground truth from csv files,
+            it also pickles everything so we can load it later"""
+        loader = ClassificationLoader()
+        for file_path in loader.find_files(load_folder, 0):
+            for line in loader.lines_reader(file_path, 0):
+                loader.parse_line(line)
+        pickle.dump(loader, open(output_file_path, 'wb'))
+        return loader
 
-
-
+    @staticmethod
+    def load_ground_truth(target_file):
+        return pickle.load(open(target_file, 'rb'))
 
 def run_script(load_path):
     gatherer = StatisticsGatherer
