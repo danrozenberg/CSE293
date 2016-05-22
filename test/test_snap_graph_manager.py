@@ -215,8 +215,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals("basd", d["third"])
 
 
-
-
     def test_get_nodes(self):
         manager = self.manager
 
@@ -269,6 +267,28 @@ class TestSnapManager(unittest.TestCase):
         manager = graph_manager.SnapManager()
         manager.load_graph(file_path)
         self.assertEquals(3, manager.get_node_count())
+
+        # cleanup
+        os.remove(file_path)
+
+        # except if not found
+        with self.assertRaises(RuntimeError) as bad_call:
+            manager.load_graph("i dont exist")
+        the_exception = bad_call.exception
+        self.assertIn("Can not open file", the_exception.message)
+
+    def test_print_info(self):
+        manager = self.manager
+        manager.add_node(10)
+        manager.add_node(20)
+        manager.add_node(30)
+        manager.add_edge(10,30)
+        manager.add_edge(20,30)
+        file_path = "../output_stats/test_info.txt"
+        manager.print_info(file_path, "my_graph")
+
+        # file is saved
+        self.assertTrue(os.path.isfile(file_path))
 
         # cleanup
         os.remove(file_path)
