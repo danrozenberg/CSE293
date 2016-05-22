@@ -3,6 +3,7 @@ import unittest
 import sys
 sys.path.insert(0, '../src/')
 from statistics_gatherer import StatisticsGatherer
+from data_parser import ClassificationLoader
 import graph_manager
 
 
@@ -27,20 +28,27 @@ class TestSnapStatisticsGatherer(unittest.TestCase):
         output_path = "./classification_files/ground_truth.p"
 
         # file gets built
-        loader = gatherer.build_ground_truth(load_folder, output_path)
+        truth_data = gatherer.build_ground_truth(load_folder, output_path)
 
         # file is saved
         self.assertTrue(os.path.isfile(output_path))
 
         # file gets loaded
-        loader2 = gatherer.load_ground_truth(output_path)
+        truth_data2 = gatherer.load_ground_truth(output_path)
 
         # matchin a few things is enough, I trust python...
-        self.assertEqual(loader.plant_id, loader2.plant_id)
-        self.assertEqual(loader.firm_type, loader2.firm_type)
+        self.assertTrue(len(truth_data) > 2)
+        self.assertEqual(len(truth_data), len(truth_data2))
 
         # cleanup
         os.remove(output_path)
+
+    def test_get_plant_sample(self):
+        loader = ClassificationLoader()
+        loader.parse_line()
+
+        valid_line = ['7','56750184','1999','777','1995','0','0','1','0']
+        answer = parser.parse_line(valid_line)
 
 
 

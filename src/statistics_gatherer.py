@@ -55,6 +55,12 @@ class StatisticsGatherer(object):
         return list(node_set)
 
     @staticmethod
+    def get_plant_sample(ground_truth):
+        """from ground truth, give me a sample dictionary with
+        plant_id -> type"""
+
+
+    @staticmethod
     def calculate_node_specific_stats(sample, graph):
         # calculate node-specific metrics
         # it receives a sample of nodes, and will calculate
@@ -100,12 +106,15 @@ class StatisticsGatherer(object):
     def build_ground_truth(load_folder, output_file_path):
         """ Builds ground truth from csv files,
             it also pickles everything so we can load it later"""
+        truth_data = dict()
         loader = ClassificationLoader()
         for file_path in loader.find_files(load_folder, 0):
             for line in loader.lines_reader(file_path, 0):
                 loader.parse_line(line)
-        pickle.dump(loader, open(output_file_path, 'wb'))
-        return loader
+                truth_data[loader.plant_id] = (loader.first_year,
+                                               loader.entrant_type)
+        pickle.dump(truth_data, open(output_file_path, 'wb'))
+        return truth_data
 
     @staticmethod
     def load_ground_truth(target_file):
@@ -113,7 +122,20 @@ class StatisticsGatherer(object):
 
 def run_script(load_path):
     gatherer = StatisticsGatherer
+
+    # load our connected worker graph
     graph = SnapManager().load_graph(load_path)
+
+    # build (or load) our ground truth from disk
+    ground_truth = gatherer.build_ground_truth("X:/")
+
+    # find X compainies that are of type 1
+
+    # find X compainies that are of type 2
+
+    # for each worker in that company, calculate statistics.
+
+
     sample = gatherer.get_node_sample(graph, 100)
 
     gatherer.calculate_node_specific_stats(sample, graph)
