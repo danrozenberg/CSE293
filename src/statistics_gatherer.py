@@ -59,7 +59,6 @@ class StatisticsGatherer(object):
         """from ground truth, give me a sample dictionary with
         plant_id -> type"""
 
-
     @staticmethod
     def calculate_node_specific_stats(sample, graph):
         # calculate node-specific metrics
@@ -120,6 +119,12 @@ class StatisticsGatherer(object):
     def load_ground_truth(target_file):
         return pickle.load(open(target_file, 'rb'))
 
+def affiliation_graph_script(graph, output_folder):
+    ''' saves several properties of the affiliation graph'''
+    graph.print_info(output_folder + "affiliation_statistics.txt",
+                     "Affiliation Graph POA")
+
+
 def run_script(load_path):
     gatherer = StatisticsGatherer
 
@@ -129,9 +134,9 @@ def run_script(load_path):
     # build (or load) our ground truth from disk
     ground_truth = gatherer.build_ground_truth("X:/")
 
-    # find X compainies that are of type 1
+    # find X plants that are of type 1
 
-    # find X compainies that are of type 2
+    # find X plants that are of type 2
 
     # for each worker in that company, calculate statistics.
 
@@ -150,4 +155,6 @@ def run_script(load_path):
 
 if __name__ == '__main__':
     load_path = "../output_graphs/rs_affiliation.graph"
-    run_script(load_path)
+    manager = SnapManager().load_graph(load_path)
+    affiliation_graph_script(manager, "../output_stats/")
+
