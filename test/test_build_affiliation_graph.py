@@ -201,6 +201,33 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         interpreter.municipality = ''
         self.assertFalse(passes_filter(interpreter))
 
+    def process_line(self):
+        graph = graph_manager.SnapManager()
+
+        interpreter = FakeInterpreter()
+        interpreter.worker_id = 111
+        interpreter.employer_id = 456
+        interpreter.year = 2002
+        interpreter.municipality = '231324'
+        process_line(interpreter)
+        self.assertTrue(0, graph.get_node_count())
+
+        interpreter = FakeInterpreter()
+        interpreter.worker_id = 111
+        interpreter.employer_id = 456
+        interpreter.year = 2002
+        interpreter.municipality = '431490'
+        process_line(interpreter)
+        self.assertTrue(1, graph.get_node_count())
+
+        interpreter = FakeInterpreter()
+        interpreter.worker_id = 111
+        interpreter.employer_id = 456
+        interpreter.year = 2002
+        interpreter.municipality = '431490'
+        process_line(interpreter)
+        self.assertTrue(1, graph.get_node_count())
+
 
 # todo, make interpreter an ABC
 class FakeInterpreter():
