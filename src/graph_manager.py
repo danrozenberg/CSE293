@@ -432,6 +432,13 @@ class SnapManager(object):
         return snap.GetClustCf(self.network, -1)
 
 
+    # Print general graph information
+    def print_info(self, file_path, description):
+        snap.PrintInfo(self.network,
+                       description,
+                       file_path,
+                       False)
+
     def jig_dictionary(self, NId_from_id=None, id_from_NId=None ):
         # TODO: apologize for having to do this.
 
