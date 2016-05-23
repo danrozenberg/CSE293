@@ -227,8 +227,8 @@ def get_node_slice(affiliation_graph):
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     min_days = 90
-    load_path = "../output_graphs/rs_affiliation.graph"
-    save_path = "../output_graphs/rs_connected" + str(min_days) + "_days.graph"
+    load_path = "../output_graphs/cds_affiliation.graph"
+    save_path = "../output_graphs/cds_connected" + str(min_days) + "_days.graph"
     connector = WorkerConnector()
     connector.min_days_together = min_days
     connector.start_get_edges_worker(load_path)

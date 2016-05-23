@@ -29,6 +29,6 @@ logging.warn("Will connect edges now")
 graph = connect_workers.add_edges_from_disk(output_folder)
 
 logging.warn("Will save the graph now")
-graph.save_graph("../output_graphs/rs_connected" + str(90) + "_days.graph")
+graph.save_graph("../output_graphs/cds_connected" + str(90) + "_days.graph")
 
 logging.warn("All done!")
