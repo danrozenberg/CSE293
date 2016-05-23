@@ -159,14 +159,7 @@ class WorkerConnector(object):
                                        coworker_edge_attrs[demission_string])
 
                     # timestamps
-                    if type(latest_start) == float and type(earliest_end) == float:
-                        time_together += round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
-                    else:
-                        logging.warn("Weird type in one of the types: worker_admission: " +
-                                     str(worker_edge_attrs[admission_string]) + " | worker_demission: " +
-                                     str(worker_edge_attrs[demission_string]) + " | coworker_admission: " +
-                                     str(coworker_edge_attrs[admission_string]) + " | coworker_demission: " +
-                                     str(coworker_edge_attrs[demission_string]))
+                    time_together += round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
 
             # we can stop if we were given a min_days, and
             # if that min time has been reached
