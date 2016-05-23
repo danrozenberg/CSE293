@@ -91,10 +91,10 @@ class WorkerConnector(unittest.TestCase):
         #lets say they didn't work together in 2014
         manager.add_edge_attr(worker_edge,
                               "2014_admission_date",
-                              mktime(datetime(2013,1,1).timetuple()))
+                              mktime(datetime(2014,1,1).timetuple()))
         manager.add_edge_attr(worker_edge,
                               "2014_demission_date",
-                              mktime(datetime(2013,12,31).timetuple()))
+                              mktime(datetime(2014,12,31).timetuple()))
 
         self.assertEquals(20, time_together)
 
@@ -123,6 +123,87 @@ class WorkerConnector(unittest.TestCase):
                                                           coworker_edge_attrs,
                                                           59)
         self.assertEquals(79, time_together)
+
+    def test_get_time_together_with_max_year(self):
+        manager = graph_manager.SnapManager()
+        connector = connect_workers.WorkerConnector()
+        connector.max_year = 2013
+
+        # create 2 workers, 1 employee node
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(888) # the employer
+
+        # edge with no info
+        worker_edge = 10
+        coworker_edge = 20
+        manager.add_edge(1,888, worker_edge)
+        manager.add_edge(2,888, coworker_edge)
+
+        # Nothing so far
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connector.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs)
+        self.assertEquals(0, time_together)
+
+        #lets say they worked together for 20 days in 2013
+        manager.add_edge_attr(worker_edge,
+                              "2013_admission_date",
+                              mktime(datetime(2013,1,1).timetuple()))
+        manager.add_edge_attr(worker_edge,
+                              "2013_demission_date",
+                              mktime(datetime(2013,12,31).timetuple()))
+
+        manager.add_edge_attr(coworker_edge,
+                              "2013_admission_date",
+                              mktime(datetime(2013,4,1).timetuple()))
+        manager.add_edge_attr(coworker_edge,
+                              "2013_demission_date",
+                              mktime(datetime(2013,4,20).timetuple()))
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connector.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs)
+        self.assertEquals(20, time_together)
+
+
+        # 2014 doesnt count
+        manager.add_edge_attr(worker_edge,
+                              "2014_admission_date",
+                              mktime(datetime(2014,1,1).timetuple()))
+        manager.add_edge_attr(worker_edge,
+                              "2014_demission_date",
+                              mktime(datetime(2014,12,31).timetuple()))
+        manager.add_edge_attr(coworker_edge,
+                              "2014_admission_date",
+                              mktime(datetime(2014,1,1).timetuple()))
+        manager.add_edge_attr(coworker_edge,
+                              "2014_demission_date",
+                              mktime(datetime(2014,12,31).timetuple()))
+
+        self.assertEquals(20, time_together)
+
+        # 2015 also doesnt count
+        manager.add_edge_attr(worker_edge,
+                              "2015_admission_date",
+                              mktime(datetime(2015,1,1).timetuple()))
+        manager.add_edge_attr(worker_edge,
+                              "2015_demission_date",
+                              mktime(datetime(2015,3,31).timetuple()))
+
+        manager.add_edge_attr(coworker_edge,
+                              "2015_admission_date",
+                              mktime(datetime(2015,2,1).timetuple()))
+        manager.add_edge_attr(coworker_edge,
+                              "2015_demission_date",
+                              mktime(datetime(2015,12,31).timetuple()))
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connector.get_time_together(worker_edge_attrs,
+                                                          coworker_edge_attrs)
+        self.assertEquals(20, time_together)
+
 
     def test_connect_workers_with_min_days(self):
         manager = graph_manager.SnapManager()

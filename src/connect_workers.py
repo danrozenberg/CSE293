@@ -37,7 +37,13 @@ class WorkerConnector(object):
         # TODO: extract this sometime.
         self.admission_strings = []
         self.demission_strings = []
-        for year in xrange(0, 2030):
+
+        # final year: this represents the year (including it up to Dec-31st)...
+        # We will ignore any edges that represents date after that
+        # as such, we can create a snapshot at the end of that year.
+        self.max_year = 2016
+
+        for year in xrange(0, self.max_year+1):
             self.admission_strings.append(str(year) + "_admission_date")
             self.demission_strings.append(str(year) + "_demission_date")
 
@@ -50,6 +56,7 @@ class WorkerConnector(object):
         """
         # year from argvs
         year = sys.argv[2]
+        self.max_year = year
         graph_load_path = "../output_graphs/cds_affiliation.graph"
 
         # load affiliation
@@ -139,7 +146,7 @@ class WorkerConnector(object):
         admission_strings = self.admission_strings
         demission_strings = self.demission_strings
 
-        for year in xrange(2016, 1980, -1):
+        for year in xrange(self.max_year, 1980, -1):
             admission_string = admission_strings[year]
             demission_string = demission_strings[year]
             if (admission_string in worker_edge_attrs) and \
