@@ -123,6 +123,10 @@ class Pis12DataInterpreter():
         self._reset_private_variables()
 
     @property
+    def truth_dictionary(self):
+        return self.truth_dictionary
+
+    @property
     def year(self):
         """ :return: the year the entry relates to """
         if self._year is None:
@@ -373,7 +377,8 @@ class Pis12DataInterpreter():
 class ClassificationLoader():
 
     def __init__(self):
-        self.dictionary = None
+        self.line_dictionary = None
+        self.truth_data = dict()
 
     def find_files(self, folder_path, fetch_num = 0, file_type="csv"):
         """
@@ -433,50 +438,51 @@ class ClassificationLoader():
         'DIVESTITURE': line[6], 'UNRELATED': line[7],
         'DIVERSIFY': line[8]}
 
-        self.dictionary = answer
+        self.line_dictionary = answer
+        self.truth_data[self.plant_id] = (self.first_year, self.entrant_type)
         return answer
 
     @property
     def plant_id(self):
-        if self.dictionary is None:
+        if self.line_dictionary is None:
             return None
         else:
-            plant_id = int(self.dictionary['CNPJ'].zfill(14))
+            plant_id = int(self.line_dictionary['CNPJ'].zfill(14))
             return plant_id
 
     @property
     def first_year(self):
-        if self.dictionary is None:
+        if self.line_dictionary is None:
             return None
         else:
-            return int(self.dictionary['FIRST_YEAR'])
+            return int(self.line_dictionary['FIRST_YEAR'])
 
     @property
     def entrant_type(self):
-        if self.dictionary is None:
+        if self.line_dictionary is None:
             return None
-        if self.dictionary['EMPLOYEE_SPINOFF'] == '1' and \
-            self.dictionary['DIVESTITURE'] == '0' and \
-            self.dictionary['UNRELATED'] == '0' and \
-            self.dictionary['DIVERSIFY'] == '0':
+        if self.line_dictionary['EMPLOYEE_SPINOFF'] == '1' and \
+            self.line_dictionary['DIVESTITURE'] == '0' and \
+            self.line_dictionary['UNRELATED'] == '0' and \
+            self.line_dictionary['DIVERSIFY'] == '0':
             return "EMPLOYEE_SPINOFF"
 
-        elif self.dictionary['EMPLOYEE_SPINOFF'] == '0' and \
-            self.dictionary['DIVESTITURE'] == '1' and \
-            self.dictionary['UNRELATED'] == '0' and \
-            self.dictionary['DIVERSIFY'] == '0':
+        elif self.line_dictionary['EMPLOYEE_SPINOFF'] == '0' and \
+            self.line_dictionary['DIVESTITURE'] == '1' and \
+            self.line_dictionary['UNRELATED'] == '0' and \
+            self.line_dictionary['DIVERSIFY'] == '0':
             return 'DIVESTITURE'
 
-        elif self.dictionary['EMPLOYEE_SPINOFF'] == '0' and \
-            self.dictionary['DIVESTITURE'] == '0' and \
-            self.dictionary['UNRELATED'] == '1' and \
-            self.dictionary['DIVERSIFY'] == '0':
+        elif self.line_dictionary['EMPLOYEE_SPINOFF'] == '0' and \
+            self.line_dictionary['DIVESTITURE'] == '0' and \
+            self.line_dictionary['UNRELATED'] == '1' and \
+            self.line_dictionary['DIVERSIFY'] == '0':
             return 'UNRELATED'
 
-        elif self.dictionary['EMPLOYEE_SPINOFF'] == '0' and \
-            self.dictionary['DIVESTITURE'] == '0' and \
-            self.dictionary['UNRELATED'] == '0' and \
-            self.dictionary['DIVERSIFY'] == '1':
+        elif self.line_dictionary['EMPLOYEE_SPINOFF'] == '0' and \
+            self.line_dictionary['DIVESTITURE'] == '0' and \
+            self.line_dictionary['UNRELATED'] == '0' and \
+            self.line_dictionary['DIVERSIFY'] == '1':
             return 'DIVERSIFY'
 
         else:

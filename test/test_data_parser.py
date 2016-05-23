@@ -499,6 +499,21 @@ class TestClassificationLoader(unittest.TestCase):
         self.assertEquals('1', answer['UNRELATED'])
         self.assertEquals('0', answer['DIVERSIFY'])
 
+    def test_truth_dictionary(self):
+        parser = ClassificationLoader()
+
+        valid_line = ['73','245245','1999','777','1995','0','0','1','0']
+        parser.parse_line(valid_line)
+        valid_line = ['73','879879','1999','777','1995','0','0','0','1']
+        parser.parse_line(valid_line)
+        valid_line = ['73','213123','1999','777','1995','0','0','0','0']
+        parser.parse_line(valid_line)
+        valid_line = ['73','98776','1999','777','1995','1','0','1','1']
+        parser.parse_line(valid_line)
+
+        truth_data = parser.truth_data
+        self.assertEqual(4, len(truth_data))
+
     def test_properties(self):
         parser = ClassificationLoader()
 
