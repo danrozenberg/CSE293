@@ -193,24 +193,6 @@ class WorkerConnector(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(1,7))
         self.assertFalse(new_graph.is_edge_between(1,5))
 
-
-    def test_from_timestamp(self):
-        expected = datetime(1980,10,15)
-        timestamp = mktime(expected.timetuple())
-        actual = connect_workers.from_timestamp(timestamp)
-        self.assertAlmostEqual((expected - actual).seconds, 0, delta=61200)
-
-        expected = datetime(1920,1,15)
-        timestamp = mktime(expected.timetuple())
-        actual = connect_workers.from_timestamp(timestamp)
-        self.assertAlmostEqual((expected - actual).seconds, 0, delta=61200)
-
-        expected = datetime(2040,2,22)
-        timestamp = mktime(expected.timetuple())
-        actual = connect_workers.from_timestamp(timestamp)
-        self.assertAlmostEqual((expected - actual).seconds, 0, delta=61200)
-
-
     def test_overlapping_should_not_return_none(self):
         manager = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()

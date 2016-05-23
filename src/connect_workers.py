@@ -12,15 +12,6 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
-def from_timestamp(timestamp):
-    # windows cant handle negative timestamps
-    # we need to do this weird conversion here...
-    # there is some gmt weirdness python introduces...
-    # no big deal, though...
-    converted = datetime.datetime(1970,1,1) + \
-        datetime.timedelta(seconds=timestamp)
-    return converted
-
 def should_skip(worker, coworker, new_graph):
     # no need to connect someone with oneself...
     if worker == coworker:
