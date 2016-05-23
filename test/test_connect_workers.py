@@ -265,7 +265,41 @@ class WorkerConnector(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(1,3))
 
     def test_overlapping_should_not_return_none(self):
-        pass
+        manager = graph_manager.SnapManager()
+        connector = connect_workers.WorkerConnector()
+
+        # create 2 workers, 1 employee node
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(888) # the employer
+
+        # edge with no info
+        worker_edge = 10
+        coworker_edge = 20
+        manager.add_edge(1,888, worker_edge)
+        manager.add_edge(2,888, coworker_edge)
+
+        #they have weird values...
+        manager.add_edge_attr(worker_edge,
+                              "2013_admission_date",
+                              11)
+        manager.add_edge_attr(worker_edge,
+                              "2013_demission_date",
+                              "asd")
+        manager.add_edge_attr(coworker_edge,
+                              "2013_admission_date",
+                              11)
+        manager.add_edge_attr(coworker_edge,
+                              "2013_demission_date",
+                              "asd")
+        worker_edge_attrs =  manager.get_edge_attrs(worker_edge)
+        coworker_edge_attrs =  manager.get_edge_attrs(coworker_edge)
+        time_together = connector.get_time_together(worker_edge_attrs,
+                                                   coworker_edge_attrs)
+
+        # only logs data, returns 0.
+        self.assertEquals(0, time_together)
+
 
     def test_should_skip(self):
         new_graph = graph_manager.SnapManager()
