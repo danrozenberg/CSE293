@@ -13,62 +13,6 @@ class WorkerConnector(unittest.TestCase):
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
-    def test_get_overlapping_days(self):
-        start_1 =  mktime(datetime(2010,1,1).timetuple())
-        end_1 = mktime(datetime(2015,1,1).timetuple())
-        start_2 = mktime(datetime(2011,10,10).timetuple())
-        end_2 = mktime(datetime(2011,10,20).timetuple())
-        self.assertEquals(11, connect_workers.get_overlapping_days(start_1,
-                                                                   end_1,
-                                                                   start_2,
-                                                                   end_2))
-
-        # we can pass datetimes or timestamps :)
-        start_2 = datetime(2010,1,1)
-        end_2 = datetime(2015,1,1)
-        start_1 = datetime(2011,10,10)
-        end_1 = datetime(2011,10,20)
-        self.assertEquals(11, connect_workers.get_overlapping_days(start_1,
-                                                               end_1,
-                                                               start_2,
-                                                               end_2))
-
-        start_2 = mktime(datetime(2010,1,1).timetuple())
-        end_2 = mktime(datetime(2010,1,1).timetuple())
-        start_1 = mktime(datetime(2010,1,1).timetuple())
-        end_1 = mktime(datetime(2010,1,1).timetuple())
-        self.assertEquals(1, connect_workers.get_overlapping_days(start_1,
-                                                               end_1,
-                                                               start_2,
-                                                               end_2))
-
-        start_2 = mktime(datetime(2010,1,1).timetuple())
-        end_2 = mktime(datetime(2010,1,2).timetuple())
-        start_1 = mktime(datetime(2010,1,2).timetuple())
-        end_1 = mktime(datetime(2010,1,2).timetuple())
-        self.assertEquals(1,connect_workers.get_overlapping_days(start_1,
-                                                               end_1,
-                                                               start_2,
-                                                               end_2))
-
-        start_1 = mktime(datetime(2010,1,1).timetuple())
-        end_1 = mktime(datetime(2015,1,1).timetuple())
-        start_2 = mktime(datetime(2066,10,10).timetuple())
-        end_2 = mktime(datetime(2077,10,20).timetuple())
-        self.assertEquals(0, connect_workers.get_overlapping_days(start_1,
-                                                               end_1,
-                                                               start_2,
-                                                               end_2))
-
-        start_1 = mktime(datetime(2010,1,1).timetuple())
-        end_1 = mktime(datetime(2015,1,1).timetuple())
-        start_2 = mktime(datetime(2011,10,10).timetuple())
-        end_2 = mktime(datetime(2012,10,20).timetuple())
-        self.assertEquals(377, connect_workers.get_overlapping_days(start_1,
-                                                               end_1,
-                                                               start_2,
-                                                               end_2))
-
     def test_get_worker_iterator(self):
         manager = graph_manager.SnapManager()
 
@@ -102,7 +46,7 @@ class WorkerConnector(unittest.TestCase):
 
         self.assertListEqual([10,30,50,70], found_ids)
 
-    def test_get_time_at_worker_attrs(self):
+    def test_get_time_together(self):
         manager = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
 
@@ -320,6 +264,8 @@ class WorkerConnector(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(2,4))
         self.assertFalse(new_graph.is_edge_between(1,3))
 
+    def test_overlapping_should_not_return_none(self):
+        pass
 
     def test_should_skip(self):
         new_graph = graph_manager.SnapManager()

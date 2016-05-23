@@ -12,21 +12,6 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
-
-def get_overlapping_days(start_1, end_1, start_2, end_2):
-    # from https://stackoverflow.com/questions/9044084/efficient-date-range-overlap-calculation-in-python
-
-    latest_start = max(start_1, start_2)
-    earliest_end = min(end_1, end_2)
-
-    # timestamps
-    if type(start_1) == float:
-        return round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
-
-    # datetimes
-    if type(start_1) == datetime.datetime:
-        return max((earliest_end - latest_start).days + 1, 0)
-
 def from_timestamp(timestamp):
     # windows cant handle negative timestamps
     # we need to do this weird conversion here...
@@ -180,16 +165,20 @@ class WorkerConnector(object):
 
             if (admission_string in worker_edge_attrs) and \
                (admission_string in coworker_edge_attrs):
-                time_together += get_overlapping_days(
-                    worker_edge_attrs[admission_string],
-                    worker_edge_attrs[demission_string],
-                    coworker_edge_attrs[admission_string],
-                    coworker_edge_attrs[demission_string])
 
-                # we can stop if we were given a min_days, and
-                # if that min time has been reached
-                if min_days is not None and time_together > min_days:
-                    return time_together
+                    latest_start = max(worker_edge_attrs[admission_string],
+                                       coworker_edge_attrs[admission_string])
+                    earliest_end = min(worker_edge_attrs[demission_string],
+                                       coworker_edge_attrs[demission_string])
+
+                    # timestamps
+                    if type(latest_start) == float:
+                        time_together += round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
+
+            # we can stop if we were given a min_days, and
+            # if that min time has been reached
+            if min_days is not None and time_together > min_days:
+                return time_together
 
         return time_together
 
