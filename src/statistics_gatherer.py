@@ -9,7 +9,24 @@ from graph_manager import SnapManager
 from data_parser import ClassificationLoader
 
 
+#TODO : we don't really need a class here...
 class StatisticsGatherer(object):
+
+    @staticmethod
+    def get_valid_plants(ground_truth, affiliation_graph):
+        """ depending on how we built affiliations graph
+        it will contain only a subset of plants found in ground truth
+        thus, we create a new ground trugh, containing only plants
+        that actually exist in our affiliation graph.
+        """
+        valid_ground_data = {}
+        for key in ground_truth.keys():
+            if affiliation_graph.is_node(key):
+                type = affiliation_graph.get_node_attr(key, "type")
+                if type == "employer":
+                    valid_ground_data[key] = ground_truth[key]
+
+        return  valid_ground_data
 
     @staticmethod
     def get_statistics(result_list, name=""):
@@ -102,28 +119,26 @@ class StatisticsGatherer(object):
                               "get_clustering_coefficient")
 
     @staticmethod
-    def build_ground_truth(load_folder, output_file_path):
+    def build_ground_truth(load_folder, output_file_path, save=True):
         """ Builds ground truth from csv files,
             it also pickles everything so we can load it later"""
-        truth_data = dict()
         loader = ClassificationLoader()
         for file_path in loader.find_files(load_folder, 0):
             for line in loader.lines_reader(file_path, 0):
                 loader.parse_line(line)
-                truth_data[loader.plant_id] = (loader.first_year,
-                                               loader.entrant_type)
-        pickle.dump(truth_data, open(output_file_path, 'wb'))
-        return truth_data
+        if save:
+            pickle.dump(loader.truth_data, open(output_file_path, 'wb'))
+        return loader.truth_data
 
     @staticmethod
     def load_ground_truth(target_file):
         return pickle.load(open(target_file, 'rb'))
 
-def affiliation_graph_script(graph, output_folder):
+def affiliation_stats_script(load_path, output_file_path):
     ''' saves several properties of the affiliation graph'''
-    graph.print_info(output_folder + "affiliation_statistics.txt",
+    graph = SnapManager().load_graph(load_path)
+    graph.print_info(output_file_path,
                      "Affiliation Graph POA")
-
 
 def run_script(load_path):
     gatherer = StatisticsGatherer
@@ -132,9 +147,10 @@ def run_script(load_path):
     graph = SnapManager().load_graph(load_path)
 
     # build (or load) our ground truth from disk
-    ground_truth = gatherer.build_ground_truth("X:/")
+    ground_truth = gatherer.build_ground_truth("X:/state-csv/")
 
     # find X plants that are of type 1
+
 
     # find X plants that are of type 2
 
@@ -154,7 +170,5 @@ def run_script(load_path):
 
 
 if __name__ == '__main__':
-    load_path = "../output_graphs/rs_affiliation.graph"
-    manager = SnapManager().load_graph(load_path)
-    affiliation_graph_script(manager, "../output_stats/")
+    run_script()
 

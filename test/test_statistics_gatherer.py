@@ -43,12 +43,44 @@ class TestSnapStatisticsGatherer(unittest.TestCase):
         # cleanup
         os.remove(output_path)
 
-    def test_get_plant_sample(self):
-        loader = ClassificationLoader()
-        loader.parse_line()
+    def test_et_valid_plants(self):
+        affiliation_graph = graph_manager.SnapManager()
 
-        valid_line = ['7','56750184','1999','777','1995','0','0','1','0']
-        answer = parser.parse_line(valid_line)
+        # some workers
+        affiliation_graph.add_node(10)
+        affiliation_graph.add_node(20)
+        affiliation_graph.add_node(30)
+        affiliation_graph.add_node_attr(10, "type", "worker")
+        affiliation_graph.add_node_attr(20, "type", "worker")
+        affiliation_graph.add_node_attr(30, "type", "worker")
+
+        affiliation_graph.add_node(100)
+        affiliation_graph.add_node(200)
+        affiliation_graph.add_node(300)
+        affiliation_graph.add_node_attr(100, "type", "employer")
+        affiliation_graph.add_node_attr(200, "type", "employer")
+        affiliation_graph.add_node_attr(300, "type", "employer")
+
+
+        # create truth_data
+        parser = ClassificationLoader()
+        valid_line = ['999','10','1999','777','1995','0','0','1','0']
+        parser.parse_line(valid_line)
+        valid_line = ['999','200','1999','777','1995','0','0','0','1']
+        parser.parse_line(valid_line)
+        valid_line = ['999','300','1999','777','1995','0','0','0','0']
+        parser.parse_line(valid_line)
+
+        truth_data = parser.truth_data
+        valid_truth_data = StatisticsGatherer.get_valid_plants(truth_data,
+                                                               affiliation_graph)
+        self.assertEqual(2, len(valid_truth_data))
+        self.assertTrue(200 in valid_truth_data.keys())
+        self.assertTrue(300 in valid_truth_data.keys())
+
+
+
+
 
 
 
