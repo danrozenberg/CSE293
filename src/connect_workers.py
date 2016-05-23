@@ -67,9 +67,14 @@ class WorkerConnector(object):
         graph_save_path = "../output_graphs/cds_connected_" + str(year) + ".graph"
         connected_graph.save_graph(graph_save_path)
 
-
-
     def connect_workers(self, affiliation_graph, new_graph):
+
+        # get method addresses for performance reasonts
+        get_neighboring_nodes = affiliation_graph.get_neighboring_nodes
+        get_edge_between = affiliation_graph.get_edge_between
+        get_edge_attrs = affiliation_graph.get_edge_attrs
+        attrs_from_edge = affiliation_graph.attrs_from_edge
+        should_connect = self.should_connect
 
         progress_counter = -1
         for worker in get_worker_iterator(affiliation_graph):
@@ -84,22 +89,22 @@ class WorkerConnector(object):
 
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
-            employer_nodes = affiliation_graph.get_neighboring_nodes(worker)
+            employer_nodes = get_neighboring_nodes(worker)
 
             for employer in employer_nodes:
-                worker_edge = affiliation_graph.get_edge_between(worker, employer)
-                worker_edge_attrs = affiliation_graph.get_edge_attrs(worker_edge)
+                worker_edge = get_edge_between(worker, employer)
+                worker_edge_attrs = get_edge_attrs(worker_edge)
 
-                for coworker in affiliation_graph.get_neighboring_nodes(employer):
+                for coworker in get_neighboring_nodes(employer):
 
                     # sometimes, we can just skip a step in the algorithm...
                     if should_skip(worker, coworker, new_graph):
                         continue
 
-                    coworker_edge = affiliation_graph.get_edge_between(coworker, employer)
-                    coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
+                    coworker_edge = get_edge_between(coworker, employer)
+                    coworker_edge_attrs = get_edge_attrs(coworker_edge)
 
-                    if self.should_connect(worker_edge_attrs, coworker_edge_attrs):
+                    if should_connect(worker_edge_attrs, coworker_edge_attrs):
                         new_graph.add_node(coworker)
                         new_graph.add_edge(worker, coworker)
                         # TODO: maybe put time together in the attr?
@@ -108,7 +113,7 @@ class WorkerConnector(object):
                 # this worker-employer edge will never be examined again
                 # and we are running out of memory, so we might as well
                 # nuke the worker_edge_attr from memory. We just set it to None..
-                affiliation_graph.attrs_from_edge[worker_edge] = None
+                attrs_from_edge[worker_edge] = None
 
         return new_graph
 
