@@ -130,7 +130,6 @@ class TestPis12DataParser(unittest.TestCase):
         self.assertEquals('1', answer['PIS'])
         self.assertEquals('100', answer['IDENTIFICAD'])
 
-
 class TestPis12DataInterpreter(unittest.TestCase):
 
     """Note, KeyError should not happen in RL,
@@ -496,7 +495,7 @@ class TestClassificationLoader(unittest.TestCase):
 
         # test only a few of the entries in the dictionary
         self.assertEquals('7', answer['FIRM_ID'])
-        self.assertEquals('56750184', answer['PLANT_ID'])
+        self.assertEquals('56750184', answer['CNPJ'])
         self.assertEquals('1', answer['UNRELATED'])
         self.assertEquals('0', answer['DIVERSIFY'])
 
@@ -508,7 +507,7 @@ class TestClassificationLoader(unittest.TestCase):
 
         valid_line = ['73','56750184','1999','777','1995','0','0','1','0']
         parser.parse_line(valid_line)
-        self.assertEquals(7356750184, parser.plant_id)
+        self.assertEquals(56750184, parser.plant_id)
         self.assertEquals(1999, parser.first_year)
         self.assertEquals('UNRELATED', parser.entrant_type)
 

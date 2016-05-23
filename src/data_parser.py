@@ -428,7 +428,7 @@ class ClassificationLoader():
             str(line))
 
         # also, here is where we parse fields. Add as needed.
-        answer = {'FIRM_ID': line[0], 'PLANT_ID': line[1],
+        answer = {'FIRM_ID': line[0], 'CNPJ': line[1],
         'FIRST_YEAR': line[2], 'EMPLOYEE_SPINOFF': line[5],
         'DIVESTITURE': line[6], 'UNRELATED': line[7],
         'DIVERSIFY': line[8]}
@@ -441,8 +441,8 @@ class ClassificationLoader():
         if self.dictionary is None:
             return None
         else:
-            plant_id = self.dictionary['FIRM_ID'] + self.dictionary['PLANT_ID']
-            return int(plant_id)
+            plant_id = int(self.dictionary['CNPJ'].zfill(14))
+            return plant_id
 
     @property
     def first_year(self):
