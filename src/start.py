@@ -13,22 +13,16 @@ output_folder = "../output_edges/"
 connect_workers.delete_files(output_folder)
 
 procs = []
-total_procs = 3
-for i in range(1,total_procs+1):
+first_year = 1994
+last_year = 2004
+for year in range(first_year,last_year + 1):
     proc = subprocess.Popen([sys.executable,
                              "connect_workers.py",
-                             str(i),
-                             str(total_procs)])
+                             str(year),
+                             str(year)])
     procs.append(proc)
 
 for proc in procs:
     proc.wait()
-
-
-logging.warn("Will connect edges now")
-graph = connect_workers.add_edges_from_disk(output_folder)
-
-logging.warn("Will save the graph now")
-graph.save_graph("../output_graphs/cds_connected" + str(90) + "_days.graph")
 
 logging.warn("All done!")
