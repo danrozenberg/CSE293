@@ -102,7 +102,7 @@ def enable_logging(log_level):
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     source_folder = "c:/csv_data/"
-    output_file_path = "../output_graphs/rs_affiliation.graph"
+    output_file_path = "../output_graphs/csd_affiliation.graph"
 
 
     process_files(source_folder,
