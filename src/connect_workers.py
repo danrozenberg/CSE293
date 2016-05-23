@@ -177,15 +177,14 @@ class WorkerConnector(object):
         for year in xrange(2016, 1980, -1):
             admission_string = admission_strings[year]
             demission_string = demission_strings[year]
-            worker_start = worker_edge_attrs[admission_string]
-            coworker_start = coworker_edge_attrs[admission_string]
 
-            if (worker_start is not None) \
-                and (coworker_start is not None):
-                time_together += get_overlapping_days(worker_start ,
-                                                      worker_edge_attrs[demission_string],
-                                                      coworker_start,
-                                                      coworker_edge_attrs[demission_string])
+            if (admission_string in worker_edge_attrs) and \
+               (admission_string in coworker_edge_attrs):
+                time_together += get_overlapping_days(
+                    worker_edge_attrs[admission_string],
+                    worker_edge_attrs[demission_string],
+                    coworker_edge_attrs[admission_string],
+                    coworker_edge_attrs[demission_string])
 
                 # we can stop if we were given a min_days, and
                 # if that min time has been reached

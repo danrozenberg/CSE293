@@ -200,8 +200,7 @@ class SnapManager(object):
                 #   back to their original type ourselves ;(
                 converted_values.append(self.__convert(value))
 
-            self.attrs_from_edge[EId] = defaultdict(_get_defaults_dict,
-                                                    (zip(names, converted_values)))
+            self.attrs_from_edge[EId] = dict(zip(names, converted_values))
 
         return self.attrs_from_edge[EId]
 
