@@ -55,7 +55,7 @@ class WorkerConnector(object):
          entry point of processing, if called by the script start.py
         """
         # year from argvs
-        year = sys.argv[2]
+        year = int(sys.argv[2])
         self.max_year = year
         graph_load_path = "../output_graphs/cds_affiliation.graph"
 
