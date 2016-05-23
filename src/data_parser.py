@@ -452,7 +452,7 @@ class ClassificationLoader():
             return int(self.dictionary['FIRST_YEAR'])
 
     @property
-    def firm_type(self):
+    def entrant_type(self):
         if self.dictionary is None:
             return None
         if self.dictionary['EMPLOYEE_SPINOFF'] == '1' and \
