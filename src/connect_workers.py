@@ -33,13 +33,6 @@ def should_skip(worker, coworker, new_graph):
 
     return  False
 
-def delete_files(folder_path):
-    found_files = os.listdir(folder_path)
-    for subfile in found_files:
-        if os.path.isfile(folder_path + "/" +  subfile):
-            file_path = folder_path + subfile
-            os.remove(file_path)
-
 class WorkerConnector(object):
     def __init__(self):
         # defaults allows workers with 0 days in common to be connected.
@@ -60,73 +53,64 @@ class WorkerConnector(object):
         self.proc_num = sys.argv[1]
 
 
-    def start_get_edges_worker(self, graph_load_path):
+    def start_connect_worker_proc(self):
         """ This is what gets called by Popen, so it is the
          entry point of processing, if called by the script start.py
         """
+        # year from argvs
+        year = sys.argv[2]
+        graph_load_path = "../output_graphs/cds_affiliation.graph"
+
         # load affiliation
         affiliation_graph = SnapManager()
-        proc_num = sys.argv[1]
-        logging.warn("proc " + proc_num + ": Beggining to load graph...")
+        logging.warn("proc " + self.proc_num + ": Beggining to load graph...")
         affiliation_graph.load_graph(graph_load_path)
-        logging.warn("proc " + proc_num + ": Affiliations graph loaded!")
+        logging.warn("proc " + self.proc_num + ": Affiliations graph loaded!")
 
         # Get this process' work load
-        node_slice = get_node_slice(affiliation_graph)
-        results = self.get_edges(affiliation_graph, node_slice)
-        logging.warn("proc " + proc_num + ": Finished!")
+        connected_graph = SnapManager()
+        self.connect_workers(affiliation_graph, connected_graph)
+        logging.warn("proc " + self.proc_num + ": Finished!")
 
-        # save edge output
-        output_folder = "../output_edges/"
-        save_edges_to_disk(output_folder, results, proc_num)
+        # save connected graph
+        graph_save_path = "../output_graphs/cds_connected_" + str(year) + ".graph"
+        connected_graph.save_graph(graph_save_path)
 
-    def get_edges(self, affiliation_graph, node_slice):
-        """
-        :param affiliation_graph: The source affiliation graph
-        :param node_slice: a list of nodes for which we will calculate
-            which edges should be attached to them.
-        :return: a set of tuples.
-        """
 
-        # my answer will be a set of tuples
-        edges_to_add = set()
 
-         # get method addresses for performance reasonts
-        get_neighboring_nodes = affiliation_graph.get_neighboring_nodes
-        get_edge_between = affiliation_graph.get_edge_between
-        get_edge_attrs = affiliation_graph.get_edge_attrs
-        should_connect = self.should_connect
+    def connect_workers(self, affiliation_graph, new_graph):
 
         progress_counter = -1
-        for worker in node_slice:
+        for worker in get_worker_iterator(affiliation_graph):
 
             # log every once in a while
             progress_counter += 1
             if progress_counter % 1000 == 0:
-                logging.warn("proc " + self.proc_num +
-                             ": processed " + str(progress_counter) +
-                             " workers.")
+                logging.warn("Processed " + str(progress_counter) + " workers.")
+
+            # add this worker to the new graph, if necessary
+            affiliation_graph.copy_node(worker, new_graph)
 
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
-            employer_nodes = get_neighboring_nodes(worker)
+            employer_nodes = affiliation_graph.get_neighboring_nodes(worker)
 
             for employer in employer_nodes:
-                worker_edge = get_edge_between(worker, employer)
-                worker_edge_attrs = get_edge_attrs(worker_edge)
+                worker_edge = affiliation_graph.get_edge_between(worker, employer)
+                worker_edge_attrs = affiliation_graph.get_edge_attrs(worker_edge)
 
-                for coworker in get_neighboring_nodes(employer):
+                for coworker in affiliation_graph.get_neighboring_nodes(employer):
 
                     # sometimes, we can just skip a step in the algorithm...
-                    if worker == coworker:
+                    if should_skip(worker, coworker, new_graph):
                         continue
 
-                    coworker_edge = get_edge_between(coworker, employer)
-                    coworker_edge_attrs = get_edge_attrs(coworker_edge)
+                    coworker_edge = affiliation_graph.get_edge_between(coworker, employer)
+                    coworker_edge_attrs = affiliation_graph.get_edge_attrs(coworker_edge)
 
-                    if should_connect(worker_edge_attrs, coworker_edge_attrs):
-                        edges_to_add.add((min(coworker, worker), max(worker, coworker)))
-
+                    if self.should_connect(worker_edge_attrs, coworker_edge_attrs):
+                        new_graph.add_node(coworker)
+                        new_graph.add_edge(worker, coworker)
                         # TODO: maybe put time together in the attr?
                         # TODO: maybe put in some other attrs?
 
@@ -135,7 +119,7 @@ class WorkerConnector(object):
                 # nuke the worker_edge_attr from memory. We just set it to None..
                 affiliation_graph.attrs_from_edge[worker_edge] = None
 
-        return edges_to_add
+        return new_graph
 
     def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
         # although less general, receiving attributes as parameters
@@ -186,50 +170,14 @@ class WorkerConnector(object):
 
         return time_together
 
-
-def add_edges_to_graph(edge_list, new_graph):
-    for pair in edge_list:
-        new_graph.add_node(pair[0])
-        new_graph.add_node(pair[1])
-        new_graph.add_edge(pair[0], pair[1])
-
-def add_edges_from_disk(target_folder):
-    #returns a new graph
-    new_graph = SnapManager()
-
-    found_files = os.listdir(target_folder)
-    for subfile in found_files:
-        edge_list = pickle.load(open(target_folder + subfile, 'rb'))
-        add_edges_to_graph(edge_list, new_graph)
-
-    return new_graph
-
-def save_edges_to_disk(output_folder, edges, proc_num = ""):
-    file_name = output_folder + "edge_list_" + proc_num + ".p"
-    pickle.dump(edges, open(file_name, 'wb'))
-
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
     datefmt='%d %b - %H:%M:%S -',
     level=log_level)
 
-def get_node_slice(affiliation_graph):
-        # how many pieces are we dividing amonstg
-        total_procs = int(sys.argv[2])
-        proc_number = int(sys.argv[1])
-
-        node_list = list(get_worker_iterator(affiliation_graph))
-        start = (proc_number-1) * len(node_list) / total_procs
-        end = proc_number * len(node_list) / total_procs
-        return node_list[start:end]
-
-
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    min_days = 90
-    load_path = "../output_graphs/cds_affiliation.graph"
-    save_path = "../output_graphs/cds_connected" + str(min_days) + "_days.graph"
     connector = WorkerConnector()
-    connector.min_days_together = min_days
-    connector.start_get_edges_worker(load_path)
+    connector.min_days_together = 90
+    connector.start_connect_worker_proc()
 

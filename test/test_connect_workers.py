@@ -7,7 +7,6 @@ from time import mktime
 sys.path.insert(0, '../src/')
 import graph_manager
 import connect_workers
-import pickle
 
 class WorkerConnector(unittest.TestCase):
     def setUp(self):
@@ -129,22 +128,13 @@ class WorkerConnector(unittest.TestCase):
         manager = graph_manager.SnapManager()
         self.create_affiliation_graph(manager)
 
+        new_graph = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
         connector.min_days_together = 1
+        connector.connect_workers(manager, new_graph)
 
-        # node slices is all nodes in the graph
-        edges_to_add = connector.get_edges(manager,
-                                           connect_workers.get_worker_iterator(manager))
-
-        # do it like the workers would, saving to disk then reading from disk
-        edge_output_folder = "../output_edges/"
-        connect_workers.delete_files(edge_output_folder)
-        connect_workers.save_edges_to_disk(edge_output_folder, edges_to_add)
-        new_graph = connect_workers.add_edges_from_disk(edge_output_folder)
-
-        # Graph should have 8 nodes only
-        # node number 8 never gets added because it has no edges
-        self.assertEqual(8, new_graph.get_node_count())
+        # Graph should have 9 nodes only
+        self.assertEqual(9, new_graph.get_node_count())
 
         # All edges that should exist
         self.assertTrue(new_graph.is_edge_between(1,2))
@@ -169,28 +159,16 @@ class WorkerConnector(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(1,9))
         self.assertFalse(new_graph.is_edge_between(9,1))
 
-        # Node 8 does not exist
-        self.assertFalse(new_graph.is_node(8))
-
     def test_connect_workers_no_min_days(self):
         manager = graph_manager.SnapManager()
         self.create_affiliation_graph(manager)
 
-        # node slices is all nodes in the graph
+        new_graph = graph_manager.SnapManager()
         connector = connect_workers.WorkerConnector()
-        connector.min_days = 0
-        edges_to_add = connector.get_edges(manager,
-                                           connect_workers.get_worker_iterator(manager))
+        connector.connect_workers(manager,new_graph)
 
-        # do it like the workers would, saving to disk then reading from disk
-        edge_output_folder = "../output_edges/"
-        connect_workers.delete_files(edge_output_folder)
-        connect_workers.save_edges_to_disk(edge_output_folder, edges_to_add)
-        new_graph = connect_workers.add_edges_from_disk(edge_output_folder)
-
-        # Graph should have 8 nodes only
-        # node number 8 never gets added because it has no edges
-        self.assertEqual(8, new_graph.get_node_count())
+        # Graph should have 9 nodes only
+        self.assertEqual(9, new_graph.get_node_count())
 
         # All edges that should exist
         self.assertTrue(new_graph.is_edge_between(1,2))
@@ -215,8 +193,6 @@ class WorkerConnector(unittest.TestCase):
         self.assertFalse(new_graph.is_edge_between(1,7))
         self.assertFalse(new_graph.is_edge_between(1,5))
 
-        # Node 8 does not exist
-        self.assertFalse(new_graph.is_node(8))
 
     def test_from_timestamp(self):
         expected = datetime(1980,10,15)
@@ -234,35 +210,6 @@ class WorkerConnector(unittest.TestCase):
         actual = connect_workers.from_timestamp(timestamp)
         self.assertAlmostEqual((expected - actual).seconds, 0, delta=61200)
 
-    def test_delete_files(self):
-        folder_path = "../output_edges/"
-        connect_workers.delete_files(folder_path)
-        found_files = os.listdir(folder_path)
-        self.assertEquals(0, len(found_files))
-
-    def test_add_edges(self):
-        set1 = set()
-        set1.add((1,2))
-        set1.add((3,4))
-        set2 = set()
-        set2.add((1,2))
-        set2.add((1,4))
-
-        #gotta pickle them, now.
-        output_folder = "../output_edges/"
-        connect_workers.delete_files(output_folder)
-        pickle.dump(set1,open(output_folder + "edge_list_1.p", 'wb'))
-        pickle.dump(set2,open(output_folder + "edge_list_2.p", 'wb'))
-        new_graph = connect_workers.add_edges_from_disk(output_folder)
-
-        self.assertEquals(4, new_graph.get_node_count())
-        self.assertEquals(3, new_graph.get_edge_count())
-        self.assertTrue(new_graph.is_edge_between(1,2))
-        self.assertTrue(new_graph.is_edge_between(3,4))
-        self.assertTrue(new_graph.is_edge_between(1,4))
-
-        self.assertFalse(new_graph.is_edge_between(2,4))
-        self.assertFalse(new_graph.is_edge_between(1,3))
 
     def test_overlapping_should_not_return_none(self):
         manager = graph_manager.SnapManager()
