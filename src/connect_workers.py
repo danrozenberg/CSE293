@@ -1,8 +1,5 @@
-import datetime
 import logging
 import sys
-import pickle
-import os
 from graph_manager import SnapManager
 
 def get_worker_iterator(affiliation_graph):
