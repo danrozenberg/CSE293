@@ -424,7 +424,6 @@ class TestClassificationLoader(unittest.TestCase):
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
-
     def test_find_files(self):
         loader = ClassificationLoader()
 
@@ -511,19 +510,19 @@ class TestClassificationLoader(unittest.TestCase):
         parser.parse_line(valid_line)
         self.assertEquals(7356750184, parser.plant_id)
         self.assertEquals(1999, parser.first_year)
-        self.assertEquals('UNRELATED', parser.firm_type)
+        self.assertEquals('UNRELATED', parser.entrant_type)
 
         valid_line = ['73','56750184','1999','777','1995','0','0','0','1']
         parser.parse_line(valid_line)
-        self.assertEquals('DIVERSIFY', parser.firm_type)
+        self.assertEquals('DIVERSIFY', parser.entrant_type)
 
         valid_line = ['73','56750184','1999','777','1995','0','0','0','0']
         parser.parse_line(valid_line)
-        self.assertEquals('UNKNOWN', parser.firm_type)
+        self.assertEquals('UNKNOWN', parser.entrant_type)
 
         valid_line = ['73','56750184','1999','777','1995','1','0','1','1']
         parser.parse_line(valid_line)
-        self.assertEquals('UNKNOWN', parser.firm_type)
+        self.assertEquals('UNKNOWN', parser.entrant_type)
 
 
 
