@@ -61,7 +61,7 @@ class WorkerConnector(object):
 
         # load affiliation
         affiliation_graph = SnapManager()
-        logging.warn("proc " + self.proc_num + ": Beggining to load graph...")
+        logging.warn("proc " + self.proc_num + ": Beginning to load graph...")
         affiliation_graph.load_graph(graph_load_path)
         logging.warn("proc " + self.proc_num + ": Affiliations graph loaded!")
 
