@@ -75,6 +75,7 @@ def create_nodes(interpreter, graph):
     # add employer node and a 'employer' property
     node_id = graph.add_node(interpreter.employer_id)
     graph.add_node_attr(node_id, "type", "employer")
+    graph.add_node_attr(node_id, "municipality", interpreter.municipality)
 
 def create_edges(interpreter, graph):
     # add values as edge attributes

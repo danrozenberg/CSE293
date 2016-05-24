@@ -91,6 +91,7 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertLessEqual(expected_nodes, graph.get_nodes())
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
         self.assertEquals('employer', graph.get_node_attr(888, 'type'))
+        self.assertEquals(430510, graph.get_node_attr(888, 'municipality'))
 
         # same graph, should add just another employer node
         interpreter.worker_id = 19
@@ -241,7 +242,7 @@ class FakeInterpreter():
         self.worker_id = 0
         self.employer_id = 0
         self.time_at_employer = 0
-        self.municipality = '431490' #some valid value
+        self.municipality = '430510' #some valid value
 
 
 if __name__ == "__main__":
