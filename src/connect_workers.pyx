@@ -134,10 +134,15 @@ class WorkerConnector(object):
         # add more checks here, as needed.
         return time_together >= self.min_days_together
 
-    def get_time_together(self, worker_edge_attrs, coworker_edge_attrs, min_days = None):
+    def get_time_together(self, worker_edge_attrs, coworker_edge_attrs,min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
-        time_together = 0
+        cdef int time_together = 0
+        cdef int year = 0
+        cdef float latest_start = 0
+        cdef float earliest_end = 0
+        cdef char* admission_string = ''
+        cdef char* demission_string = ''
 
         # we did some string concatenation in the class init method
         # lets reference to it here.
