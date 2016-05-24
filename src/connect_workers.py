@@ -45,6 +45,7 @@ class WorkerConnector(object):
             self.demission_strings.append(str(year) + "_demission_date")
 
         self.proc_num = sys.argv[1]
+        self.progress_counter = -1
 
     def start_connect_worker_proc(self):
         """ This is what gets called by Popen, so it is the
@@ -97,13 +98,13 @@ class WorkerConnector(object):
         del attrs_from_edge[worker_edge]
 
     def for_each_worker(self, affiliation_graph, get_neighboring_nodes,
-                        new_graph, progress_counter, worker, attrs_from_edge,
+                        new_graph, worker, attrs_from_edge,
                         get_edge_attrs, get_edge_between, should_connect):
         # log every once in a while
-        progress_counter += 1
-        if progress_counter % 1000 == 0:
+        self.progress_counter += 1
+        if self.progress_counter % 1000 == 0:
             logging.warn("proc " + self.proc_num +
-                         ": processed " + str(progress_counter) +
+                         ": processed " + str(self.progress_counter) +
                          " workers.")
 
         # add this worker to the new graph, if necessary
@@ -126,10 +127,8 @@ class WorkerConnector(object):
         attrs_from_edge = affiliation_graph.attrs_from_edge
         should_connect = self.should_connect
 
-        progress_counter = -1
-
         map(lambda x: self.for_each_worker(affiliation_graph, get_neighboring_nodes,
-                                 new_graph, progress_counter, x, attrs_from_edge,
+                                 new_graph, x, attrs_from_edge,
                                  get_edge_attrs, get_edge_between, should_connect),
             get_worker_iterator(affiliation_graph))
 
