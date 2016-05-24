@@ -9,6 +9,15 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
+def get_worker_list(affiliation_graph):
+    list = []
+    node_iterator = affiliation_graph.get_node_iterator()
+    for node in node_iterator:
+        node_type = affiliation_graph.get_node_attr(node, "type")
+        if node_type == "worker":
+            list.append(node)
+    return list
+
 def should_skip(worker, coworker, new_graph):
     # no need to connect someone with oneself...
     if worker == coworker:
@@ -146,34 +155,42 @@ class WorkerConnector(object):
         # add more checks here, as needed.
         return time_together >= self.min_days_together
 
+    def time_together_for_year(self, admission_strings, coworker_edge_attrs,
+                               demission_strings, time_together,
+                               worker_edge_attrs, year):
+        admission_string = admission_strings[year]
+        demission_string = demission_strings[year]
+        if (admission_string in worker_edge_attrs) and \
+            (admission_string in coworker_edge_attrs):
+            latest_start = max(worker_edge_attrs[admission_string],
+                               coworker_edge_attrs[admission_string])
+            earliest_end = min(worker_edge_attrs[demission_string],
+                               coworker_edge_attrs[demission_string])
+
+            # timestamps
+            time_together += round(
+                max(((earliest_end - latest_start) / 60 / 60 / 24) + 1, 0))
+
+        return time_together
+
     def get_time_together(self, worker_edge_attrs, coworker_edge_attrs, min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
-        time_together = 0
 
         # we did some string concatenation in the class init method
         # lets reference to it here.
         admission_strings = self.admission_strings
         demission_strings = self.demission_strings
 
-        for year in xrange(self.max_year, 1980, -1):
-            admission_string = admission_strings[year]
-            demission_string = demission_strings[year]
-            if (admission_string in worker_edge_attrs) and \
-               (admission_string in coworker_edge_attrs):
-                    latest_start = max(worker_edge_attrs[admission_string],
-                                       coworker_edge_attrs[admission_string])
-                    earliest_end = min(worker_edge_attrs[demission_string],
-                                       coworker_edge_attrs[demission_string])
+        list_of_time_together = map(lambda x :self.time_together_for_year(admission_strings,
+                                                        coworker_edge_attrs,
+                                                        demission_strings,
+                                                        time_together,
+                                                        worker_edge_attrs, x),
+            xrange(self.max_year, 1980, -1))
 
-                    # timestamps
-                    time_together += round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
 
-            # we can stop if we were given a min_days, and
-            # if that min time has been reached
-            if min_days is not None and time_together > min_days:
-                return time_together
-
+        time_together = sum(list_of_time_together)
         return time_together
 
 def enable_logging(log_level):
