@@ -204,7 +204,6 @@ class SnapManager(object):
 
         return self.attrs_from_edge[EId]
 
-
     def get_edge_attr(self, EId, attr_name):
 
         names = snap.TStrV()
