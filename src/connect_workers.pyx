@@ -137,12 +137,15 @@ class WorkerConnector(object):
     def get_time_together(self, worker_edge_attrs, coworker_edge_attrs,min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
-        cdef int time_together = 0
-        cdef int year = 0
-        cdef float latest_start = 0
-        cdef float earliest_end = 0
-        cdef char* admission_string = ''
-        cdef char* demission_string = ''
+        cdef:
+            int time_together
+            int year
+            float latest_start
+            float earliest_end
+            char* admission_string
+            char* demission_string
+
+        time_together = 0
 
         # we did some string concatenation in the class init method
         # lets reference to it here.
