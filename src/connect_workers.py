@@ -70,6 +70,53 @@ class WorkerConnector(object):
         graph_save_path = "../output_graphs/cds_connected_" + str(year) + ".graph"
         connected_graph.save_graph(graph_save_path)
 
+    def add_edges_between(self, coworker, employer, get_edge_attrs, get_edge_between,
+                    new_graph, should_connect, worker, worker_edge_attrs):
+        # sometimes, we can just skip a step in the algorithm...
+        if not should_skip(worker, coworker, new_graph):
+            coworker_edge = get_edge_between(coworker, employer)
+            coworker_edge_attrs = get_edge_attrs(coworker_edge)
+
+            if should_connect(worker_edge_attrs, coworker_edge_attrs):
+                new_graph.add_node(coworker)
+                new_graph.add_edge(worker, coworker)
+
+    def for_each_employer(self, attrs_from_edge, employer, get_edge_attrs,
+                          get_edge_between, get_neighboring_nodes, worker, new_graph,
+                          should_connect):
+        worker_edge = get_edge_between(worker, employer)
+        worker_edge_attrs = get_edge_attrs(worker_edge)
+        map(lambda x: self.add_edges_between(x, employer, get_edge_attrs,
+                                             get_edge_between, new_graph,
+                                             should_connect, worker,
+                                             worker_edge_attrs),
+            get_neighboring_nodes(employer))
+        # this worker-employer edge will never be examined again
+        # and we are running out of memory, so we might as well
+        # nuke the worker_edge_attr from memory. We just set it to None..
+        del attrs_from_edge[worker_edge]
+
+    def for_each_worker(self, affiliation_graph, get_neighboring_nodes,
+                        new_graph, progress_counter, worker, attrs_from_edge,
+                        get_edge_attrs, get_edge_between, should_connect):
+        # log every once in a while
+        progress_counter += 1
+        if progress_counter % 1000 == 0:
+            logging.warn("proc " + self.proc_num +
+                         ": processed " + str(progress_counter) +
+                         " workers.")
+
+        # add this worker to the new graph, if necessary
+        affiliation_graph.copy_node(worker, new_graph)
+        # In an affiliation graph, we can get the employers just by
+        # following the edges from worker and retrieving the neighbors.
+        employer_nodes = get_neighboring_nodes(worker)
+        map(lambda x: self.for_each_employer(attrs_from_edge, x,
+                                             get_edge_attrs, get_edge_between,
+                                             get_neighboring_nodes, worker,
+                                             new_graph, should_connect),
+            employer_nodes)
+
     def connect_workers(self, affiliation_graph, new_graph):
 
         # get method addresses for performance reasonts
@@ -80,45 +127,11 @@ class WorkerConnector(object):
         should_connect = self.should_connect
 
         progress_counter = -1
-        for worker in get_worker_iterator(affiliation_graph):
 
-            # log every once in a while
-            progress_counter += 1
-            if progress_counter % 1000 == 0:
-                logging.warn("proc " + self.proc_num +
-                ": processed " + str(progress_counter) +
-                " workers.")
-
-            # add this worker to the new graph, if necessary
-            affiliation_graph.copy_node(worker, new_graph)
-
-            # In an affiliation graph, we can get the employers just by
-            # following the edges from worker and retrieving the neighbors.
-            employer_nodes = get_neighboring_nodes(worker)
-
-            for employer in employer_nodes:
-                worker_edge = get_edge_between(worker, employer)
-                worker_edge_attrs = get_edge_attrs(worker_edge)
-
-                for coworker in get_neighboring_nodes(employer):
-
-                    # sometimes, we can just skip a step in the algorithm...
-                    if should_skip(worker, coworker, new_graph):
-                        continue
-
-                    coworker_edge = get_edge_between(coworker, employer)
-                    coworker_edge_attrs = get_edge_attrs(coworker_edge)
-
-                    if should_connect(worker_edge_attrs, coworker_edge_attrs):
-                        new_graph.add_node(coworker)
-                        new_graph.add_edge(worker, coworker)
-                        # TODO: maybe put time together in the attr?
-                        # TODO: maybe put in some other attrs?
-
-                # this worker-employer edge will never be examined again
-                # and we are running out of memory, so we might as well
-                # nuke the worker_edge_attr from memory. We just set it to None..
-                del attrs_from_edge[worker_edge]
+        map(lambda x: self.for_each_worker(affiliation_graph, get_neighboring_nodes,
+                                 new_graph, progress_counter, x, attrs_from_edge,
+                                 get_edge_attrs, get_edge_between, should_connect),
+            get_worker_iterator(affiliation_graph))
 
         return new_graph
 
