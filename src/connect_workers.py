@@ -156,8 +156,8 @@ class WorkerConnector(object):
         return time_together >= self.min_days_together
 
     def time_together_for_year(self, admission_strings, coworker_edge_attrs,
-                               demission_strings, time_together,
-                               worker_edge_attrs, year):
+                               demission_strings, worker_edge_attrs, year):
+
         admission_string = admission_strings[year]
         demission_string = demission_strings[year]
         if (admission_string in worker_edge_attrs) and \
@@ -168,10 +168,10 @@ class WorkerConnector(object):
                                coworker_edge_attrs[demission_string])
 
             # timestamps
-            time_together += round(
-                max(((earliest_end - latest_start) / 60 / 60 / 24) + 1, 0))
+            return  round( max(((earliest_end - latest_start) / 60 / 60 / 24) + 1, 0))
+        else:
+            return 0
 
-        return time_together
 
     def get_time_together(self, worker_edge_attrs, coworker_edge_attrs, min_days = None):
         # although less general, receiving attributes as parameters
@@ -185,7 +185,6 @@ class WorkerConnector(object):
         list_of_time_together = map(lambda x :self.time_together_for_year(admission_strings,
                                                         coworker_edge_attrs,
                                                         demission_strings,
-                                                        time_together,
                                                         worker_edge_attrs, x),
             xrange(self.max_year, 1980, -1))
 
