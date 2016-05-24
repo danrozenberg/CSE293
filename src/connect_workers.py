@@ -46,7 +46,6 @@ class WorkerConnector(object):
 
         self.proc_num = sys.argv[1]
 
-
     def start_connect_worker_proc(self):
         """ This is what gets called by Popen, so it is the
          entry point of processing, if called by the script start.py
@@ -119,7 +118,7 @@ class WorkerConnector(object):
                 # this worker-employer edge will never be examined again
                 # and we are running out of memory, so we might as well
                 # nuke the worker_edge_attr from memory. We just set it to None..
-                attrs_from_edge[worker_edge] = None
+                del attrs_from_edge[worker_edge]
 
         return new_graph
 
