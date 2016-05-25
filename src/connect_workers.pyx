@@ -1,14 +1,6 @@
 import logging
 from graph_manager import SnapManager
 
-
-cdef extern from "math.h" nogil:
-    double round(double x)
-    double max(double x, double y)
-    double min(double x, double y)
-    double fmod(double x, double y)
-
-
 def get_worker_iterator(affiliation_graph):
     node_iterator = affiliation_graph.get_node_iterator()
     for node in node_iterator:
@@ -80,7 +72,7 @@ class WorkerConnector(object):
 
             # log every once in a while
             progress_counter += 1
-            if fmod(progress_counter,1000) == 0:
+            if divmod(progress_counter,1000)[1] == 0:
                 logging.warn("proc " + str(self.max_year) +
                 ": processed " + str(progress_counter) +
                 " workers.")
