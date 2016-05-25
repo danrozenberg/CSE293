@@ -9,18 +9,6 @@ def get_worker_iterator(affiliation_graph):
         if node_type == "worker":
             yield node
 
-def should_skip(worker, coworker, new_graph):
-    # no need to connect someone with oneself...
-    if worker == coworker:
-        return True
-
-    # no need to connect with someone already connected...
-    if new_graph.is_node(coworker) and \
-        new_graph.is_edge_between(worker, coworker):
-        return True
-
-    return  False
-
 class WorkerConnector(object):
     def __init__(self):
         # defaults allows workers with 0 days in common to be connected.
@@ -73,7 +61,6 @@ class WorkerConnector(object):
     def connect_workers(self, affiliation_graph, new_graph):
 
         # get method addresses for performance reasonts
-        get_neighboring_nodes = affiliation_graph.get_neighboring_nodes
         get_edge_between = affiliation_graph.get_edge_between
         get_edge_attrs = affiliation_graph.get_edge_attrs
         should_connect = self.should_connect
@@ -88,21 +75,23 @@ class WorkerConnector(object):
                 ": processed " + str(progress_counter) +
                 " workers.")
 
-            # add this worker to the new graph, if necessary
-            affiliation_graph.copy_node(worker, new_graph)
+            # in the future we might copy if needed instead
+            new_graph.add_node(worker)
+
+            # get currently connected nodes (in the new graph)
+            currently_connected = new_graph.get_connected(worker)
 
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
-            employer_nodes = get_neighboring_nodes(worker)
-
-            for employer in employer_nodes:
+            for employer in affiliation_graph.get_employers(worker):
                 worker_edge = get_edge_between(worker, employer)
                 worker_edge_attrs = get_edge_attrs(worker_edge)
 
-                for coworker in get_neighboring_nodes(employer):
-
-                    # sometimes, we can just skip a step in the algorithm...
-                    if should_skip(worker, coworker, new_graph):
+                for coworker in affiliation_graph.get_employees(employer):
+                    # no need to connect with someone already connected...
+                    if worker == coworker:
+                        continue
+                    if coworker in currently_connected:
                         continue
 
                     coworker_edge = get_edge_between(coworker, employer)
