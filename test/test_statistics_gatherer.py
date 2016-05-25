@@ -43,7 +43,7 @@ class TestSnapStatisticsGatherer(unittest.TestCase):
         # cleanup
         os.remove(output_path)
 
-    def test_et_valid_plants(self):
+    def test_valid_plants(self):
         affiliation_graph = graph_manager.SnapManager()
 
         # some workers
