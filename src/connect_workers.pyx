@@ -4,8 +4,8 @@ from graph_manager import SnapManager
 
 cdef extern from "math.h" nogil:
     double round(double x)
-    double fmax(double x, double y)
-    double fmin(double x, double y)
+    double max(double x, double y)
+    double min(double x, double y)
     double fmod(double x, double y)
 
 
@@ -156,9 +156,9 @@ class WorkerConnector(object):
             demission_string = demission_strings[year]
             if (admission_string in worker_edge_attrs) and \
                (admission_string in coworker_edge_attrs):
-                    latest_start = fmax(worker_edge_attrs[admission_string],
+                    latest_start = max(worker_edge_attrs[admission_string],
                                        coworker_edge_attrs[admission_string])
-                    earliest_end = fmin(worker_edge_attrs[demission_string],
+                    earliest_end = min(worker_edge_attrs[demission_string],
                                        coworker_edge_attrs[demission_string])
 
                     # timestamps
