@@ -9,7 +9,7 @@ class TableBuilder(object):
         self.count_from_municipality = defaultdict(int)
         self.entrant_from_municipality = defaultdict(int)
         self.spinnoff_from_municipality = defaultdict(int)
-        self.ground_truth = statistics_gatherer.StatisticsGatherer.load_ground_truth("X:/state-csv/")
+        self.ground_truth = statistics_gatherer.StatisticsGatherer.load_ground_truth("../output_stats/ground_truth_new_25.p")
 
     def process_files(self, source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
 
@@ -22,12 +22,12 @@ class TableBuilder(object):
         # graph should be complete at this point
         if save_path is not None:
             with open(save_path, "wb") as target:
-                target.writeline("Municipality, company count, entrant count, spinoff count")
+                target.write("Municipality, company count, entrant count, spinoff count\n")
                 for key in self.count_from_municipality.keys():
-                    target.writelines(str(key) + "," +
-                                      self.count_from_municipality[key]  + "," +
-                                      self.entrant_from_municipality[key]  + "," +
-                                      self.spinnoff_from_municipality[key])
+                    target.write(str(key) + "," +
+                                     str(self.count_from_municipality[key])  + "," +
+                                     str(self.entrant_from_municipality[key])  + "," +
+                                     str(self.spinnoff_from_municipality[key]) + "\n")
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
@@ -36,14 +36,17 @@ class TableBuilder(object):
         """
         interpreter = interpreter_class()
         logging.warn("Started processing file " + file_path)
-        for line in data_parser.lines_reader(file_path, 0):
+        for line in data_parser.lines_reader(file_path, 100000):
                 parsed_line = data_parser.parse_line(line)
+                interpreter.feed_line(parsed_line)
 
-                if self.passes_filter(interpreter.feed_line(parsed_line)):
+                if self.passes_filter(interpreter):
                     municipality = interpreter.municipality
                     self.count_from_municipality[municipality] += 1
                     if interpreter.employer_id in self.ground_truth:
                         self.entrant_from_municipality[municipality] += 1
+                        if self.ground_truth[interpreter.employer_id][1] == "EMPLOYEE_SPINOFF":
+                            self.spinnoff_from_municipality[municipality] += 1
 
 
     def passes_filter(self, interpreter):
@@ -78,7 +81,7 @@ def enable_logging(log_level):
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     source_folder = "c:/csv_data/"
-    output_file_path = "../output_stats/company_tables.csv"
+    output_file_path = "../output_stats/company_tables_new_25.csv"
 
     builder = TableBuilder()
 
