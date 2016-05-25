@@ -447,7 +447,7 @@ class ClassificationLoader():
         if self.line_dictionary is None:
             return None
         else:
-            plant_id = int(self.line_dictionary['CNPJ'].zfill(14))
+            plant_id = int(float(self.line_dictionary['CNPJ']))
             return plant_id
 
     @property
