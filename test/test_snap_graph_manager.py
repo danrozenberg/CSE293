@@ -768,6 +768,11 @@ class TestSnapManager(unittest.TestCase):
         possible_coworkers = manager.get_employees(5)
         self.assertEqual([20,30], sorted(possible_coworkers))
 
+    def test_get_connected(self):
+        manager = self.manager
+        self.create_affiliation_graph(manager)
+        possible_coworkers = manager.get_connected(5)
+        self.assertEqual([20,30], sorted(possible_coworkers))
 
     def create_affiliation_graph(self, manager):
         # 9 workers
@@ -893,9 +898,6 @@ class TestSnapManager(unittest.TestCase):
                               mktime(datetime(2005,7,1).timetuple()))
         manager.add_edge_attr(900, "2005_demission_date",
                               mktime(datetime(2005,7,1).timetuple()))
-
-
-
 
 if __name__ == "__main__":
     unittest.main()
