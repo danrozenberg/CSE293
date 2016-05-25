@@ -61,7 +61,7 @@ class WorkerConnector(object):
     def connect_workers(self, affiliation_graph, new_graph):
 
         # get method addresses for performance reasonts
-        get_edge_between = affiliation_graph.get_edge_between
+        fast_get_edge_between = affiliation_graph.fast_get_edge_between
         get_edge_attrs = affiliation_graph.get_edge_attrs
         should_connect = self.should_connect
 
@@ -84,7 +84,7 @@ class WorkerConnector(object):
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
             for employer in affiliation_graph.get_employers(worker):
-                worker_edge = get_edge_between(worker, employer)
+                worker_edge = fast_get_edge_between(worker, employer)
                 worker_edge_attrs = get_edge_attrs(worker_edge)
 
                 for coworker in affiliation_graph.get_employees(employer):
@@ -94,7 +94,7 @@ class WorkerConnector(object):
                     if coworker in currently_connected:
                         continue
 
-                    coworker_edge = get_edge_between(coworker, employer)
+                    coworker_edge = fast_get_edge_between(coworker, employer)
                     coworker_edge_attrs = get_edge_attrs(coworker_edge)
 
                     if should_connect(worker_edge_attrs, coworker_edge_attrs):

@@ -96,6 +96,14 @@ class SnapManager(object):
 
         return list(edges)
 
+    def fast_get_edge_between(self, src, target):
+        # assumes that edge exist with correct orientation
+        # remember, currently src is worker!
+        NId1 = self.NId_from_id[src]
+        NId2 = self.NId_from_id[target]
+        return self.network.GetEI(NId1, NId2).GetId()
+
+
     def get_edge_between(self, node1, node2):
         """This only returns the FIRST edge ever added between
         node 1 and node 2"""
@@ -315,12 +323,6 @@ class SnapManager(object):
 
         return self.network.IsEdge(src_NId, dest_NId) or \
          self.network.IsEdge(dest_NId, src_NId)
-
-    def fast_is_edge_between(self, src_id, dest_id):
-        src_NId = self.NId_from_id[src_id]
-        dest_NId = self.NId_from_id[dest_id]
-        NIdToDistH = snap.TIntH()
-
 
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)
