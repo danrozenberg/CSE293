@@ -22,7 +22,7 @@ def should_skip(worker, coworker, new_graph):
     return  False
 
 class WorkerConnector(object):
-    def __init__(self):
+    def __init__(self, max_year = 2016):
         # defaults allows workers with 0 days in common to be connected.
         self.min_days_together = -1
 
@@ -38,36 +38,33 @@ class WorkerConnector(object):
         # final year: this represents the year (including it up to Dec-31st)...
         # We will ignore any edges that represents date after that
         # as such, we can create a snapshot at the end of that year.
-        self.max_year = 2016
+        self.max_year = max_year
 
         for year in xrange(0, self.max_year+1):
             self.admission_strings.append(str(year) + "_admission_date")
             self.demission_strings.append(str(year) + "_demission_date")
-
-        self.proc_num = sys.argv[1]
 
     def start_connect_worker_proc(self):
         """ This is what gets called by Popen, so it is the
          entry point of processing, if called by the script start.py
         """
         # year from argvs
-        year = int(sys.argv[2])
-        self.max_year = year
         graph_load_path = "../output_graphs/test_affiliation.graph"
 
         # load affiliation
         affiliation_graph = SnapManager()
-        logging.warn("proc " + self.proc_num + ": Beginning to load graph...")
+        logging.warn("proc " + str(self.max_year) + ": Beginning to load graph...")
         affiliation_graph.load_graph(graph_load_path)
-        logging.warn("proc " + self.proc_num + ": Affiliations graph loaded!")
+        logging.warn("proc " + str(self.max_year )+ ": Affiliations graph loaded!")
 
         # Get this process' work load
         connected_graph = SnapManager()
         self.connect_workers(affiliation_graph, connected_graph)
-        logging.warn("proc " + self.proc_num + ": Finished!")
+        logging.warn("proc " + str(self.max_year) + ": Finished!")
 
         # save connected graph
-        graph_save_path = "../output_graphs/test_connected_" + str(year) + ".graph"
+        graph_save_path = "../output_graphs/test_connected_" + \
+                          str(self.max_year) + ".graph"
         connected_graph.save_graph(graph_save_path)
 
     def connect_workers(self, affiliation_graph, new_graph):
@@ -85,7 +82,7 @@ class WorkerConnector(object):
             # log every once in a while
             progress_counter += 1
             if progress_counter % 1000 == 0:
-                logging.warn("proc " + self.proc_num +
+                logging.warn("proc " + str(self.max_year) +
                 ": processed " + str(progress_counter) +
                 " workers.")
 
@@ -137,15 +134,12 @@ class WorkerConnector(object):
     def get_time_together(self, worker_edge_attrs, coworker_edge_attrs,min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
-        cdef:
-            int time_together
-            int year
-            float latest_start
-            float earliest_end
-            char* admission_string
-            char* demission_string
-
-        time_together = 0
+        cdef int time_together = 0
+        cdef int year = 0
+        cdef float latest_start = 0
+        cdef float earliest_end = 0
+        cdef char* admission_string = ''
+        cdef char* demission_string = ''
 
         # we did some string concatenation in the class init method
         # lets reference to it here.
@@ -177,9 +171,5 @@ def enable_logging(log_level):
     datefmt='%d %b - %H:%M:%S -',
     level=log_level)
 
-if __name__ == '__main__':
-    enable_logging(logging.WARNING)
-    connector = WorkerConnector()
-    connector.min_days_together = 90
-    connector.start_connect_worker_proc()
+
 
