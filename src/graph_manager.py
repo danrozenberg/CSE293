@@ -316,6 +316,12 @@ class SnapManager(object):
         return self.network.IsEdge(src_NId, dest_NId) or \
          self.network.IsEdge(dest_NId, src_NId)
 
+    def fast_is_edge_between(self, src_id, dest_id):
+        src_NId = self.NId_from_id[src_id]
+        dest_NId = self.NId_from_id[dest_id]
+        NIdToDistH = snap.TIntH()
+
+
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)
         self.network.Save(FOut)
@@ -373,6 +379,14 @@ class SnapManager(object):
         NId = self.NId_from_id[src_id]
         NodeVec = snap.TIntV()
         snap.GetNodesAtHop(self.network, NId, 2, NodeVec, False)
+
+        return map(lambda x: self.id_from_NId[x], NodeVec )
+
+    def get_connected(self, src_id):
+        # return connected by 1 edge
+        NId = self.NId_from_id[src_id]
+        NodeVec = snap.TIntV()
+        snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
 
         return map(lambda x: self.id_from_NId[x], NodeVec )
 
