@@ -185,6 +185,55 @@ class TestSnapManager(unittest.TestCase):
         d = manager.get_edge_attrs(1)
         self.assertEquals("basd", d["third"])
 
+    def test_quick_add_edge(self):
+        manager = self.manager
+        self.assertEquals(0, manager.get_edge_count())
+
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+
+        edge = manager.quick_add_edge(1, 2, 1)
+        self.assertEquals(1, manager.get_edge_count())
+        self.assertEquals(1, edge)
+
+        edge = manager.quick_add_edge(2, 3, 2)
+        self.assertEquals(2, manager.get_edge_count())
+        self.assertEquals(2, edge)
+
+        edge = manager.quick_add_edge(1, 3, 3)
+        self.assertEquals(3, manager.get_edge_count())
+        self.assertEquals(3, edge)
+
+        manager.add_edge_attr(1, "first", 33.33)
+        manager.add_edge_attr(2, "second", 100)
+        manager.add_edge_attr(1, "third", "asd")
+
+        # First edge:
+        d = manager.get_edge_attrs(1)
+        self.assertEquals(33.33, d["first"])
+        self.assertEquals("asd", d["third"])
+        self.assertEquals(33.33, manager.get_edge_attr(1, 'first'))
+        self.assertEquals("asd", manager.get_edge_attr(1, 'third'))
+
+        # Second node:
+        d = manager.get_edge_attrs(2)
+        self.assertEquals(100, d["second"])
+        self.assertEquals(100, manager.get_edge_attr(2, 'second'))
+
+        # third, empty node
+        d = manager.get_edge_attrs(3)
+        self.assertEquals(len(d.keys()), 0)
+        with self.assertRaises(RuntimeError) as bad_call:
+            manager.get_edge_attr(3, "i dont exist")
+        the_exception = bad_call.exception
+        self.assertIn("does not have attribute", the_exception.message)
+
+        # what if we add the same attribute again?
+        manager.add_edge_attr(1, "third", "basd")
+        d = manager.get_edge_attrs(1)
+        self.assertEquals("basd", d["third"])
+
     def test_edge_attr_dictionary(self):
         manager = self.manager
         self.assertEquals(0, manager.get_edge_count())
@@ -700,6 +749,25 @@ class TestSnapManager(unittest.TestCase):
         for i in range(50):
             self.assertIn(manager.get_random_node()
                           ,possible_range)
+
+    def test_get_possible_coworkers(self):
+        manager = self.manager
+        self.create_affiliation_graph(manager)
+        possible_coworkers = manager.get_possible_coworkers(5)
+        self.assertEqual([4,6,7,9], sorted(possible_coworkers))
+
+    def test_get_employees(self):
+        manager = self.manager
+        self.create_affiliation_graph(manager)
+        possible_coworkers = manager.get_employees(20)
+        self.assertEqual([4,5,6,9], sorted(possible_coworkers))
+
+    def test_get_employer(self):
+        manager = self.manager
+        self.create_affiliation_graph(manager)
+        possible_coworkers = manager.get_employees(5)
+        self.assertEqual([20,30], sorted(possible_coworkers))
+
 
     def create_affiliation_graph(self, manager):
         # 9 workers

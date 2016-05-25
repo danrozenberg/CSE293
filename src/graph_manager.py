@@ -44,6 +44,12 @@ class SnapManager(object):
             logging.debug("Could not delete node with id = "
                             + str(NId) + " because it doesn't exist" )
 
+    def quick_add_edge(self, id_1, id_2, EId=-1):
+        # only do it if you knoe nodes exist, edge doesnt exist
+        NId1 = self.NId_from_id[id_1]
+        NId2 = self.NId_from_id[id_2]
+        return self.network.AddEdge(NId1, NId2, EId)
+
     def add_edge(self, id_1, id_2, EId=-1):
 
         if not self.is_node(id_1):
@@ -127,7 +133,6 @@ class SnapManager(object):
 
         # in case we get this far...
         return edges
-
 
     def get_nodes(self):
         return list(self.get_node_iterator())
@@ -362,6 +367,30 @@ class SnapManager(object):
     def get_random_node(self):
         NId = self.network.GetRndNId()
         return self.id_from_NId[NId]
+
+    def get_possible_coworkers(self, src_id):
+        # just make sure src_id as worker node, ok?
+        NId = self.NId_from_id[src_id]
+        NodeVec = snap.TIntV()
+        snap.GetNodesAtHop(self.network, NId, 2, NodeVec, False)
+
+        return map(lambda x: self.id_from_NId[x], NodeVec )
+
+    def get_employees(self, src_id):
+        # just make sure src_id as employer node, ok?
+        NId = self.NId_from_id[src_id]
+        NodeVec = snap.TIntV()
+        snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
+
+        return map(lambda x: self.id_from_NId[x], NodeVec )
+
+    def get_employers(self, src_id):
+        # just make sure src_id as worker node, ok?
+        NId = self.NId_from_id[src_id]
+        NodeVec = snap.TIntV()
+        snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
+
+        return map(lambda x: self.id_from_NId[x], NodeVec )
 
     def generate_random_graph(self, node_num, node_out_deg, rewire_prob):
         # this substitutes the old graph, so beware
