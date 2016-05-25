@@ -1,6 +1,96 @@
 import logging
-import sys
 from graph_manager import SnapManager
+
+
+cdef extern from "math.h" nogil:
+    double M_E
+    double M_LOG2E
+    double M_LOG10E
+    double M_LN2
+    double M_LN10
+    double M_PI
+    double M_PI_2
+    double M_PI_4
+    double M_1_PI
+    double M_2_PI
+    double M_2_SQRTPI
+    double M_SQRT2
+    double M_SQRT1_2
+    # C99 constants
+    float INFINITY
+    float NAN
+    double HUGE_VAL
+    float HUGE_VALF
+    long double HUGE_VALL
+    double acos(double x)
+    double asin(double x)
+    double atan(double x)
+    double atan2(double y, double x)
+    double cos(double x)
+    double sin(double x)
+    double tan(double x)
+    double cosh(double x)
+    double sinh(double x)
+    double tanh(double x)
+    double acosh(double x)
+    double asinh(double x)
+    double atanh(double x)
+    double hypot(double x, double y)
+    double exp(double x)
+    double exp2(double x)
+    double expm1(double x)
+    double log(double x)
+    double logb(double x)
+    double log2(double x)
+    double log10(double x)
+    double log1p(double x)
+    int ilogb(double x)
+    double lgamma(double x)
+    double tgamma(double x)
+    double frexp(double x, int* exponent)
+    double ldexp(double x, int exponent)
+    double modf(double x, double* iptr)
+    double fmod(double x, double y)
+    double remainder(double x, double y)
+    double remquo(double x, double y, int *quot)
+    double pow(double x, double y)
+    double sqrt(double x)
+    double cbrt(double x)
+    double fabs(double x)
+    double ceil(double x)
+    double floor(double x)
+    double trunc(double x)
+    double rint(double x)
+    double round(double x)
+    double nearbyint(double x)
+    double nextafter(double, double)
+    double nexttoward(double, long double)
+    long long llrint(double)
+    long lrint(double)
+    long long llround(double)
+    long lround(double)
+    double copysign(double, double)
+    float copysignf(float, float)
+    long double copysignl(long double, long double)
+    double erf(double)
+    float erff(float)
+    long double erfl(long double)
+    double erfc(double)
+    float erfcf(float)
+    long double erfcl(long double)
+    double fdim(double x, double y)
+    double fma(double x, double y)
+    double fmax(double x, double y)
+    double fmin(double x, double y)
+    double scalbln(double x, long n)
+    double scalbn(double x, int n)
+    double nan(const char*)
+    int isinf(long double) # -1 / 0 / 1
+    bint isfinite(long double)
+    bint isnan(long double)
+    bint isnormal(long double)
+    bint signbit(long double)
+
 
 def get_worker_iterator(affiliation_graph):
     node_iterator = affiliation_graph.get_node_iterator()
@@ -8,18 +98,6 @@ def get_worker_iterator(affiliation_graph):
         node_type = affiliation_graph.get_node_attr(node, "type")
         if node_type == "worker":
             yield node
-
-def should_skip(worker, coworker, new_graph):
-    # no need to connect someone with oneself...
-    if worker == coworker:
-        return True
-
-    # no need to connect with someone already connected...
-    if new_graph.is_node(coworker) and \
-        new_graph.is_edge_between(worker, coworker):
-        return True
-
-    return  False
 
 class WorkerConnector(object):
     def __init__(self, max_year = 2016):
@@ -76,12 +154,16 @@ class WorkerConnector(object):
         attrs_from_edge = affiliation_graph.attrs_from_edge
         should_connect = self.should_connect
 
+        cdef double progress_counter
+        cdef long long worker, coworker, employer
+        cdef int worker_edge, coworker_edge
+
         progress_counter = -1
         for worker in get_worker_iterator(affiliation_graph):
 
             # log every once in a while
             progress_counter += 1
-            if progress_counter % 1000 == 0:
+            if fmod(progress_counter,1000) == 0:
                 logging.warn("proc " + str(self.max_year) +
                 ": processed " + str(progress_counter) +
                 " workers.")
@@ -99,8 +181,13 @@ class WorkerConnector(object):
 
                 for coworker in get_neighboring_nodes(employer):
 
-                    # sometimes, we can just skip a step in the algorithm...
-                    if should_skip(worker, coworker, new_graph):
+                    # should skip1
+                    if worker == coworker:
+                        continue
+
+                    # should skip2
+                    if new_graph.is_node(coworker) and \
+                        new_graph.is_edge_between(worker, coworker):
                         continue
 
                     coworker_edge = get_edge_between(coworker, employer)
@@ -124,6 +211,7 @@ class WorkerConnector(object):
         # allows us to call get_edge_attrs almost half the number of times...
         # TODO, make worker_edge attrs a class property or something...
 
+        cdef double time_together
         time_together = self.get_time_together(worker_edge_attrs,
                                                coworker_edge_attrs,
                                                self.min_days_together)
@@ -134,7 +222,7 @@ class WorkerConnector(object):
     def get_time_together(self, worker_edge_attrs, coworker_edge_attrs,min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
-        cdef int time_together = 0
+        cdef double time_together = 0
         cdef int year = 0
         cdef float latest_start = 0
         cdef float earliest_end = 0
@@ -151,9 +239,9 @@ class WorkerConnector(object):
             demission_string = demission_strings[year]
             if (admission_string in worker_edge_attrs) and \
                (admission_string in coworker_edge_attrs):
-                    latest_start = max(worker_edge_attrs[admission_string],
+                    latest_start = fmax(worker_edge_attrs[admission_string],
                                        coworker_edge_attrs[admission_string])
-                    earliest_end = min(worker_edge_attrs[demission_string],
+                    earliest_end = fmin(worker_edge_attrs[demission_string],
                                        coworker_edge_attrs[demission_string])
 
                     # timestamps
