@@ -225,14 +225,9 @@ class SnapManager(object):
         """
         names = snap.TStrV()
         values = snap.TStrV()
-        converted_values = []
         self.network.AttrNameEI(EId, names)
         self.network.AttrValueEI(EId, values)
-
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
+        converted_values = [self.__convert(value) for value in values]
 
         return dict(zip(names, converted_values))
 
@@ -347,6 +342,8 @@ class SnapManager(object):
         self.id_from_NId =\
             pickle.load(open(file_path.replace(".graph", "_id_from_nid.p"), 'rb'))
 
+
+
         return self
 
     def copy_node(self, node_id, dst_graph):
@@ -382,7 +379,7 @@ class SnapManager(object):
         NodeVec = snap.TIntV()
         snap.GetNodesAtHop(self.network, NId, 2, NodeVec, False)
 
-        return map(lambda x: self.id_from_NId[x], NodeVec )
+        return [self.id_from_NId[x] for x in NodeVec]
 
     def get_connected(self, src_id):
         # return connected by 1 edge
@@ -390,7 +387,7 @@ class SnapManager(object):
         NodeVec = snap.TIntV()
         snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
 
-        return map(lambda x: self.id_from_NId[x], NodeVec )
+        return  [self.id_from_NId[x] for x in NodeVec]
 
     def get_employees(self, src_id):
         # just make sure src_id as employer node, ok?
@@ -398,7 +395,7 @@ class SnapManager(object):
         NodeVec = snap.TIntV()
         snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
 
-        return map(lambda x: self.id_from_NId[x], NodeVec )
+        return  [self.id_from_NId[x] for x in NodeVec]
 
     def get_employers(self, src_id):
         # just make sure src_id as worker node, ok?
@@ -406,7 +403,7 @@ class SnapManager(object):
         NodeVec = snap.TIntV()
         snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
 
-        return map(lambda x: self.id_from_NId[x], NodeVec )
+        return  [self.id_from_NId[x] for x in NodeVec]
 
     def generate_random_graph(self, node_num, node_out_deg, rewire_prob):
         # this substitutes the old graph, so beware
