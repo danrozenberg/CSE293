@@ -99,7 +99,7 @@ class WorkerConnector(object):
 
                     if should_connect(worker_edge_attrs, coworker_edge_attrs):
                         new_graph.add_node(coworker)
-                        new_graph.add_edge(worker, coworker)
+                        new_graph.quick_add_edge(worker, coworker)
                         # TODO: maybe put time together in the attr?
                         # TODO: maybe put in some other attrs?
 
