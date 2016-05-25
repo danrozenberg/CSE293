@@ -174,12 +174,14 @@ class SnapManager(object):
 
     def get_node_attr(self, long node_id, char* attr_name):
 
+        cdef int NId
         NId = self.NId_from_id[node_id]
         names = snap.TStrV()
         values = snap.TStrV()
         self.network.AttrNameNI(NId, names)
 
-        cdef int index, i
+        cdef int index
+        cdef long i
         index = -1
         for i in xrange(len(names)):
             if names[i] == attr_name:
@@ -220,6 +222,7 @@ class SnapManager(object):
         values = snap.TStrV()
         self.network.AttrNameEI(EId, names)
 
+        cdef long index
         index = -1
         for i in xrange(len(names)):
             if names[i] == attr_name:
@@ -245,12 +248,14 @@ class SnapManager(object):
         :param node_id: the id of the node in question.
         :return: set of nodes connected by an edge to the node in question.
         """
-        cdef int NId, i
+        cdef int NId, \
+
         NId = self.NId_from_id[node_id]
         nodeI = self.network.GetNI(NId)
         num_neighbours = nodeI.GetOutDeg() + nodeI.GetInDeg()
 
         neighboring_nodes = set()
+        cdef long i
         for i in xrange(num_neighbours):
             neighboring_nodes.add(self.id_from_NId[nodeI.GetNbrNId(i)])
 
