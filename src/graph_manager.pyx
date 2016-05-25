@@ -18,7 +18,7 @@ class SnapManager(object):
         self.edge_from_tuple = defaultdict(_get_defaults_dict)
         self.attrs_from_edge = defaultdict(_get_defaults_dict)
 
-    def add_node(self, long node_id):
+    def add_node(self, long long node_id):
         """
         Adds a node to the network, if it doesn't exist yet.
         Note that: Accessing arbitrary node takes constant time.
@@ -34,7 +34,7 @@ class SnapManager(object):
 
         return node_id
 
-    def delete_node(self, long node_id):
+    def delete_node(self, long long node_id):
         """
         Deletes a node, but only if it exists.
         Note that: Accessing arbitrary node takes constant time.
@@ -49,7 +49,7 @@ class SnapManager(object):
             logging.debug("Could not delete node with id = "
                             + str(NId) + " because it doesn't exist" )
 
-    def add_edge(self, long id_1, long id_2, int EId=-1):
+    def add_edge(self, long long id_1, long long id_2, int EId=-1):
 
         if not self.is_node(id_1):
             logging.info("Couldn't add edge from node "
@@ -78,7 +78,7 @@ class SnapManager(object):
             self.edge_from_tuple[(NId1, NId2)] = new_edge
             return new_edge
 
-    def get_edges(self, long node_id):
+    def get_edges(self, long long node_id):
         """
         Note that this only returns the first edge ever added between
         node and its neighbors. So this fails if there is more than
@@ -102,7 +102,7 @@ class SnapManager(object):
 
         return list(edges)
 
-    def get_edge_between(self, long node1, long node2):
+    def get_edge_between(self, long long node1, long long node2):
         """This only returns the FIRST edge ever added between
         node 1 and node 2"""
         cdef int NId1, NId2
@@ -151,7 +151,7 @@ class SnapManager(object):
                 except RuntimeError:
                     break
 
-    def get_node_attrs(self, long node_id):
+    def get_node_attrs(self, long long node_id):
         """
         :param NId: the node to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
@@ -172,7 +172,7 @@ class SnapManager(object):
 
         return dict(zip(names, converted_values))
 
-    def get_node_attr(self, long node_id, char* attr_name):
+    def get_node_attr(self, long long node_id, char* attr_name):
 
         cdef int NId
         NId = self.NId_from_id[node_id]
@@ -181,7 +181,7 @@ class SnapManager(object):
         self.network.AttrNameNI(NId, names)
 
         cdef int index
-        cdef long i
+        cdef long long i
         index = -1
         for i in xrange(len(names)):
             if names[i] == attr_name:
@@ -195,7 +195,7 @@ class SnapManager(object):
             self.network.AttrValueNI(NId, values)
             return self.__convert(values[index])
 
-    def get_edge_attrs(self, long EId):
+    def get_edge_attrs(self, long long EId):
         """
         :param EId: the edge to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
@@ -216,13 +216,13 @@ class SnapManager(object):
 
         return self.attrs_from_edge[EId]
 
-    def get_edge_attr(self, long EId, char* attr_name):
+    def get_edge_attr(self, long long EId, char* attr_name):
 
         names = snap.TStrV()
         values = snap.TStrV()
         self.network.AttrNameEI(EId, names)
 
-        cdef long index
+        cdef long long index
         index = -1
         for i in xrange(len(names)):
             if names[i] == attr_name:
@@ -242,7 +242,7 @@ class SnapManager(object):
     def get_edge_count(self):
         return self.network.GetEdges()
 
-    def get_neighboring_nodes(self, long node_id):
+    def get_neighboring_nodes(self, long long node_id):
         """
 
         :param node_id: the id of the node in question.
@@ -255,14 +255,14 @@ class SnapManager(object):
         num_neighbours = nodeI.GetOutDeg() + nodeI.GetInDeg()
 
         neighboring_nodes = set()
-        cdef long i
+        cdef long long i
         for i in xrange(num_neighbours):
             neighboring_nodes.add(self.id_from_NId[nodeI.GetNbrNId(i)])
 
 
         return list(neighboring_nodes)
 
-    def add_node_attr(self, long node_id, char* name, value):
+    def add_node_attr(self, long long node_id, char* name, value):
         cdef int NId
         NId = self.NId_from_id[node_id]
 
@@ -276,7 +276,7 @@ class SnapManager(object):
         else:
             raise Exception('Invalid data type')
 
-    def add_edge_attr(self, long EId, char* name, value):
+    def add_edge_attr(self, long long EId, char* name, value):
 
         # reset anything we knew about edge attrs
         self.attrs_from_edge[EId] = None
@@ -291,12 +291,12 @@ class SnapManager(object):
         else:
             raise Exception('Invalid data type')
 
-    def is_node(self, long node_id):
+    def is_node(self, long long node_id):
         # this will give bad results if we mess with self.NId_from_id
         # from outside.
         return node_id in self.NId_from_id
 
-    def is_edge(self, long edge_id):
+    def is_edge(self, long long edge_id):
         try:
             # if we got an iterator, then edge exists
             self.network.GetEI(edge_id)
@@ -305,7 +305,7 @@ class SnapManager(object):
             # couldn't get iterator means that edge doesn't exist
             return False
 
-    def is_edge_between(self, long src_id, long dest_id):
+    def is_edge_between(self, long long src_id, long long dest_id):
         src_NId = self.NId_from_id[src_id]
         dest_NId = self.NId_from_id[dest_id]
 
@@ -352,7 +352,7 @@ class SnapManager(object):
 
         return self
 
-    def copy_node(self, long node_id, dst_graph):
+    def copy_node(self, long long node_id, dst_graph):
         """
         :param node_id: id of the node to be copied into dst_graph
         :param dst_graph: a different graph manager object, where
