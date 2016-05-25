@@ -76,7 +76,6 @@ class WorkerConnector(object):
         get_neighboring_nodes = affiliation_graph.get_neighboring_nodes
         get_edge_between = affiliation_graph.get_edge_between
         get_edge_attrs = affiliation_graph.get_edge_attrs
-        attrs_from_edge = affiliation_graph.attrs_from_edge
         should_connect = self.should_connect
 
         progress_counter = -1
@@ -115,10 +114,6 @@ class WorkerConnector(object):
                         # TODO: maybe put time together in the attr?
                         # TODO: maybe put in some other attrs?
 
-                # this worker-employer edge will never be examined again
-                # and we are running out of memory, so we might as well
-                # nuke the worker_edge_attr from memory. We just set it to None..
-                del attrs_from_edge[worker_edge]
 
         return new_graph
 

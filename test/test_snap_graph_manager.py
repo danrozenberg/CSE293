@@ -326,7 +326,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertTrue(os.path.isfile(graph_path))
         self.assertTrue(os.path.isfile(nid_from_id_path))
         self.assertTrue(os.path.isfile(id_from_nid_path))
-        self.assertTrue(os.path.isfile(edge_from_tuple_path))
 
         # file gets loaded
         manager2 = graph_manager.SnapManager()
@@ -350,7 +349,6 @@ class TestSnapManager(unittest.TestCase):
         os.remove(graph_path)
         os.remove(nid_from_id_path)
         os.remove(id_from_nid_path)
-        os.remove(edge_from_tuple_path)
 
     def test_node_generator(self):
 
