@@ -804,6 +804,9 @@ class TestSnapManager(unittest.TestCase):
         self.assertEqual(2, manager.get_node_degree(2))
         self.assertEqual(1, manager.get_node_degree(3))
 
+        node_degrees = [self.manager.get_node_degree(n) for n in [1,2,3]]
+        self.assertEqual(node_degrees, [3,2,1])
+
     def create_affiliation_graph(self, manager):
         # 9 workers
         manager.add_node(1)
