@@ -89,7 +89,7 @@ class CboBuilder(object):
                 for key in self.manager_positions_from_pis.keys():
                     target.write(str(key) + "," +
                                       str(self.manager_positions_from_pis[key])  + "," +
-                                      str(len(self.other_jobs_groups)) + "\n")
+                                      str(len(self.other_jobs_from_pis[key])) + "\n")
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
