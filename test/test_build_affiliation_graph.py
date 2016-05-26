@@ -206,6 +206,11 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         interpreter.municipality = ''
         self.assertFalse(passes_filter(interpreter))
 
+        # CBO rule
+        interpreter = FakeInterpreter()
+        interpreter.cbo_group = 432
+        self.assertFalse(passes_filter(interpreter))
+
     def process_line(self):
         graph = graph_manager.SnapManager()
 
@@ -247,6 +252,7 @@ class FakeInterpreter():
         self.employer_id = 0
         self.time_at_employer = 0
         self.municipality = '430510' #some valid value
+        self.cbo_group = 150
 
 
 if __name__ == "__main__":

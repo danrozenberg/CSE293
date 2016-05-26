@@ -56,6 +56,10 @@ def passes_filter(interpreter):
     if interpreter.year == -1:
         return False
 
+    # CBO group must indicate position as a directo
+    if interpreter.cbo_group > 199 or interpreter.cbo_group < 99:
+        return False
+
     # single state rule
     # just process a single state, derived from municipality
     # TODO: one of these days, don't hard code it...
