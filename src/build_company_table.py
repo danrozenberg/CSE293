@@ -22,12 +22,12 @@ class TableBuilder(object):
         # graph should be complete at this point
         if save_path is not None:
             with open(save_path, "wb") as target:
-                target.writeline("Municipality, company count, entrant count, spinoff count")
+                target.write("Municipality, company count, entrant count, spinoff count\n")
                 for key in self.count_from_municipality.keys():
-                    target.writelines(str(key) + "," +
+                    target.write(str(key) + "," +
                                       self.count_from_municipality[key]  + "," +
                                       self.entrant_from_municipality[key]  + "," +
-                                      self.spinnoff_from_municipality[key])
+                                      self.spinnoff_from_municipality[key] + "\n")
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
