@@ -774,6 +774,36 @@ class TestSnapManager(unittest.TestCase):
         possible_coworkers = manager.get_connected(5)
         self.assertEqual([20,30], sorted(possible_coworkers))
 
+    def test_get_diameter(self):
+       manager = self.manager
+       manager.generate_random_graph(20, 3, 0)
+       self.assertGreater(manager.get_diameter(), 0)
+
+    def test_get_degree(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+
+        self.assertEqual(0, manager.get_node_degree(1))
+        self.assertEqual(0, manager.get_node_degree(2))
+        self.assertEqual(0, manager.get_node_degree(3))
+
+        manager.quick_add_edge(1,2)
+        self.assertEqual(1, manager.get_node_degree(1))
+        self.assertEqual(1, manager.get_node_degree(2))
+        self.assertEqual(0, manager.get_node_degree(3))
+
+        manager.quick_add_edge(2,1)
+        self.assertEqual(2, manager.get_node_degree(1))
+        self.assertEqual(2, manager.get_node_degree(2))
+        self.assertEqual(0, manager.get_node_degree(3))
+
+        manager.quick_add_edge(3,1)
+        self.assertEqual(3, manager.get_node_degree(1))
+        self.assertEqual(2, manager.get_node_degree(2))
+        self.assertEqual(1, manager.get_node_degree(3))
+
     def create_affiliation_graph(self, manager):
         # 9 workers
         manager.add_node(1)

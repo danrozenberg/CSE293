@@ -103,7 +103,6 @@ class SnapManager(object):
         NId2 = self.NId_from_id[target]
         return self.network.GetEI(NId1, NId2).GetId()
 
-
     def get_edge_between(self, node1, node2):
         """This only returns the FIRST edge ever added between
         node 1 and node 2"""
@@ -417,6 +416,11 @@ class SnapManager(object):
         # gotta jig the dictionary, unfortunatelly
         self.jig_dictionary()
 
+    def get_node_degree(self, node_id):
+        NId = self.NId_from_id[node_id]
+        nodeI = self.network.GetNI(NId)
+        return nodeI.GetDeg()
+
     # GRAPH PATH LENGHTS
     def get_shortest_path_size(self, node_id):
         """Returns the length of the shortest path from node SrcNId to
@@ -427,6 +431,13 @@ class SnapManager(object):
         return snap.GetShortPath(self.network,
                                 NId,
                                 NIdToDistH)
+
+    def get_diameter(self, test_nodes = 0):
+        if test_nodes == 0:
+            test_nodes = self.get_node_count()
+
+        diam = snap.GetBfsFullDiam(self.network, test_nodes, False)
+        return diam
 
     # NODE CENTRALITY
     def get_degree_centrality(self, node_id):
@@ -473,7 +484,6 @@ class SnapManager(object):
         defined in  Watts and Strogatz, Collective dynamics of
         small-world networks"""
         return snap.GetClustCf(self.network, -1)
-
 
     # Print general graph information
     def print_info(self, file_path, description):
