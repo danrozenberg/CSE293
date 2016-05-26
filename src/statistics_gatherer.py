@@ -4,7 +4,6 @@ as such, so save coding / plannign time, it will be super specific"""
 import random
 import cPickle as pickle
 import numpy as np
-import matplotlib.pyplot as plt
 from graph_manager import SnapManager
 from data_parser import ClassificationLoader
 
