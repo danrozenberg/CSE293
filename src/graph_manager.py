@@ -103,7 +103,6 @@ class SnapManager(object):
         NId2 = self.NId_from_id[target]
         return self.network.GetEI(NId1, NId2).GetId()
 
-
     def get_edge_between(self, node1, node2):
         """This only returns the FIRST edge ever added between
         node 1 and node 2"""
@@ -184,18 +183,24 @@ class SnapManager(object):
         :return: a dictionary with 'attr name' - 'attr value' pairs
         """
         NId = self.NId_from_id[node_id]
-
         names = snap.TStrV()
         values = snap.TStrV()
-        converted_values = []
         self.network.AttrNameNI(NId, names)
         self.network.AttrValueNI(NId, values)
+        converted_values = [self.__convert(value) for value in values]
+        return dict(zip(names, converted_values))
 
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
-
+    def get_fast_node_attrs(self, node_id):
+        """
+        :param NId: the node to retrieve attributes from
+        :return: a dictionary with 'attr name' - 'attr value' pairs
+        """
+        NId = self.NId_from_id[node_id]
+        names = snap.TStrV()
+        values = snap.TFltV()
+        self.network.FltAttrNameNI(NId, names)
+        self.network.FltAttrValueNI(NId, values)
+        converted_values = [float(x) for x in values]
         return dict(zip(names, converted_values))
 
     def get_node_attr(self, node_id, attr_name):
@@ -277,9 +282,7 @@ class SnapManager(object):
         NId = self.NId_from_id[node_id]
 
         node = self.network.GetNI(NId)
-        if isinstance(value, int):
-            self.network.AddIntAttrDatN(node, value, name)
-        elif isinstance(value, float):
+        if isinstance(value, float) or isinstance(value, int):
             self.network.AddFltAttrDatN(node, value, name)
         elif isinstance(value, str):
             self.network.AddStrAttrDatN(node, value, name)
@@ -471,7 +474,6 @@ class SnapManager(object):
         defined in  Watts and Strogatz, Collective dynamics of
         small-world networks"""
         return snap.GetClustCf(self.network, -1)
-
 
     # Print general graph information
     def print_info(self, file_path, description):
