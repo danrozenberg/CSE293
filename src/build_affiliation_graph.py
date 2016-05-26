@@ -82,11 +82,11 @@ def create_nodes(interpreter, graph):
     graph.add_node_attr(node_id, str(year) +
                         "_admission_date_" +
                         str(employer_id),
-                        interpreter.admission_timestamp)
+                        float(interpreter.admission_timestamp))
     graph.add_node_attr(node_id, str(year) +
                         "_admission_date_" +
                         str(employer_id),
-                        interpreter.admission_timestamp)
+                        float(interpreter.admission_timestamp))
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
