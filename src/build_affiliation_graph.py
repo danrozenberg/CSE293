@@ -74,24 +74,13 @@ def passes_filter(interpreter):
 def create_nodes(interpreter, graph):
 
     # add employer node and a 'employer' property
-    employer_id = interpreter.employer_id
-    node_id = graph.add_node(employer_id)
-    graph.add_node_attr(node_id, "type", "employer")
-
     # add worker node and a 'worker' property
     node_id = graph.add_node(interpreter.worker_id)
     graph.add_node_attr(node_id, "type", "worker")
 
-    # add to worker node snapshot data.
-    year = interpreter.year
-    graph.add_node_attr(node_id, str(year) +
-                        "_ad_" +
-                        str(graph.NId_from_id[employer_id]),
-                        float(interpreter.admission_timestamp))
-    graph.add_node_attr(node_id, str(year) +
-                        "_de_" +
-                        str(graph.NId_from_id[employer_id]),
-                        float(interpreter.demission_timestamp))
+    # add employer node and a 'employer' property
+    node_id = graph.add_node(interpreter.employer_id)
+    graph.add_node_attr(node_id, "type", "employer")
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
@@ -101,8 +90,15 @@ def create_edges(interpreter, graph):
     # here we guarantee that there will be only 1 edge per pair of nodes.
     edge_id = graph.get_edge_between(src_node_id, dest_node_id)
     if edge_id is None:
-        graph.quick_add_edge(src_node_id, dest_node_id)
-        # We should add more edge attributes here as they are needed.
+        edge_id = graph.quick_add_edge(src_node_id, dest_node_id)
+
+    year = interpreter.year
+    graph.add_edge_attr(edge_id, str(year) + "_ad",
+                        interpreter.admission_timestamp)
+    graph.add_edge_attr(edge_id, str(year) + "_de",
+                        interpreter.demission_timestamp)
+
+    # We should add more edge attributes here as they are needed.
 
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
@@ -112,7 +108,7 @@ def enable_logging(log_level):
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     source_folder = "X:/csv_data/"
-    output_file_path = "X/output_graphs/test_affiliation.graph"
+    output_file_path = "X/output_graphs/cds_affiliation.graph"
 
 
     process_files(source_folder,
