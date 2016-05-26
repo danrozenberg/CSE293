@@ -121,35 +121,6 @@ class TestSnapManager(unittest.TestCase):
         the_exception = bad_call.exception
         self.assertIn("does not have attribute", the_exception.message)
 
-    def test_fast_add_node_attr(self):
-        manager = self.manager
-
-        manager.add_node(1)
-        manager.add_node(2)
-        manager.add_node(3)
-        manager.add_node_attr(1, "one_attr", 13.5)
-        manager.add_node_attr(2, "another_attr", 5.0)
-
-        # First node:
-        d = manager.get_fast_node_attrs(1)
-        self.assertEquals(13.5, d["one_attr"])
-        self.assertEquals(13.5, manager.get_node_attr(1, 'one_attr'))
-
-        # Second node:
-        d = manager.get_fast_node_attrs(2)
-        self.assertEquals(5, d["another_attr"])
-        self.assertEquals(5, manager.get_node_attr(2, 'another_attr'))
-
-        # third, empty node
-        d = manager.get_fast_node_attrs(3)
-        self.assertEquals(len(d.keys()), 0)
-
-        # Error
-        with self.assertRaises(RuntimeError) as bad_call:
-            manager.get_node_attr(3, "i dont exist")
-        the_exception = bad_call.exception
-        self.assertIn("does not have attribute", the_exception.message)
-
     def test_is_node(self):
         manager = self.manager
         self.assertFalse(manager.is_node(10))
