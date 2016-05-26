@@ -64,7 +64,8 @@ def passes_filter(interpreter):
     # just process a single state, derived from municipality
     # TODO: one of these days, don't hard code it...
     # 43 is Rio Grande do Sul...
-    if interpreter.municipality <> '430510':
+    if len(interpreter.municipality) < 2 or \
+        interpreter.municipality[:2] <> '43':
         return False
 
     # finally...
@@ -110,8 +111,8 @@ def enable_logging(log_level):
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    source_folder = "c:/csv_data/"
-    output_file_path = "../output_graphs/cds_affiliation.graph"
+    source_folder = "X:/csv_data/"
+    output_file_path = "X/output_graphs/test_affiliation.graph"
 
 
     process_files(source_folder,
