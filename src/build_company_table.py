@@ -100,7 +100,8 @@ class CboBuilder(object):
         logging.warn("Started processing file " + file_path)
         for line in data_parser.lines_reader(file_path, 0):
                 parsed_line = data_parser.parse_line(line)
-                if self.passes_filter(interpreter.feed_line(parsed_line)):
+                interpreter.feed_line(parsed_line)
+                if self.passes_filter(interpreter):
                     worker_id = interpreter.worker_id
                     if 100 <= interpreter.cbo_group <= 199:
                         self.manager_positions_from_pis[worker_id] += 1
