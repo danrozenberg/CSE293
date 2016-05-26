@@ -27,11 +27,6 @@ class WorkerConnector(object):
         # We will ignore any edges that represents date after that
         # as such, we can create a snapshot at the end of that year.
         self.max_year = 2016
-
-        for year in xrange(0, self.max_year+1):
-            self.admission_strings.append(str(year) + "_admission_date")
-            self.demission_strings.append(str(year) + "_demission_date")
-
         self.proc_num = sys.argv[1]
 
     def start_connect_worker_proc(self):
@@ -61,8 +56,7 @@ class WorkerConnector(object):
     def connect_workers(self, affiliation_graph, new_graph):
 
         # get method addresses for performance reasonts
-        fast_get_edge_between = affiliation_graph.fast_get_edge_between
-        get_edge_attrs = affiliation_graph.get_edge_attrs
+        get_node_attrs = affiliation_graph.get_node_attrs
         should_connect = self.should_connect
 
         progress_counter = -1
@@ -77,27 +71,21 @@ class WorkerConnector(object):
 
             # in the future we might copy if needed instead
             new_graph.add_node(worker)
-
-            # get currently connected nodes (in the new graph)
             currently_connected = new_graph.get_connected(worker)
+            worker_attrs = get_node_attrs(worker)
 
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
             for employer in affiliation_graph.get_employers(worker):
-                worker_edge = fast_get_edge_between(worker, employer)
-                worker_edge_attrs = get_edge_attrs(worker_edge)
-
                 for coworker in affiliation_graph.get_employees(employer):
                     # no need to connect with someone already connected...
                     if worker == coworker:
                         continue
                     if coworker in currently_connected:
                         continue
+                    coworker_attrs = get_node_attrs(coworker)
 
-                    coworker_edge = fast_get_edge_between(coworker, employer)
-                    coworker_edge_attrs = get_edge_attrs(coworker_edge)
-
-                    if should_connect(worker_edge_attrs, coworker_edge_attrs):
+                    if should_connect(worker_attrs, coworker_attrs):
                         new_graph.add_node(coworker)
                         new_graph.quick_add_edge(worker, coworker)
                         # TODO: maybe put time together in the attr?
@@ -106,40 +94,50 @@ class WorkerConnector(object):
 
         return new_graph
 
-    def should_connect(self, worker_edge_attrs, coworker_edge_attrs):
+    def should_connect(self, worker_node_attrs, coworker_node_attr):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
         # TODO, make worker_edge attrs a class property or something...
 
-        time_together = self.get_time_together(worker_edge_attrs,
-                                               coworker_edge_attrs,
+        time_together = self.get_time_together(worker_node_attrs,
+                                               coworker_node_attr,
                                                self.min_days_together)
 
         # add more checks here, as needed.
         return time_together >= self.min_days_together
 
-    def get_time_together(self, worker_edge_attrs, coworker_edge_attrs, min_days = None):
+    def get_time_together(self, worker_attrs, coworker_attrs, min_days = None):
         # although less general, receiving attributes as parameters
         # allows us to call get_edge_attrs almost half the number of times...
         time_together = 0
+        max_year = self.max_year
 
-        # we did some string concatenation in the class init method
-        # lets reference to it here.
-        admission_strings = self.admission_strings
-        demission_strings = self.demission_strings
+        worker_set = set(worker_attrs.keys())
+        coworker_set = set(coworker_attrs.keys())
+        valid_set = sorted(worker_set & coworker_set)
+        i = 0
+        while i < (len(valid_set)):
+            if valid_set[i] == "type":
+                i += 2
+                continue
+            year = int(valid_set[i][:4])
+            if year > self.max_year:
+                i += 2
+                continue
+            worker_admission = worker_attrs[valid_set[i]]
+            coworker_admission = coworker_attrs[valid_set[i]]
+            worker_demission = worker_attrs[valid_set[i+1]]
+            coworker_demission = coworker_attrs[valid_set[i+1]]
 
-        for year in xrange(self.max_year, 1980, -1):
-            admission_string = admission_strings[year]
-            demission_string = demission_strings[year]
-            if (admission_string in worker_edge_attrs) and \
-               (admission_string in coworker_edge_attrs):
-                    latest_start = max(worker_edge_attrs[admission_string],
-                                       coworker_edge_attrs[admission_string])
-                    earliest_end = min(worker_edge_attrs[demission_string],
-                                       coworker_edge_attrs[demission_string])
+            i += 2
 
-                    # timestamps
-                    time_together += round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
+            latest_start = max(worker_admission,
+                               coworker_admission)
+            earliest_end = min(worker_demission,
+                               coworker_demission)
+
+            # timestamps
+            time_together += round(max(((earliest_end - latest_start)/60/60/24) + 1, 0))
 
             # we can stop if we were given a min_days, and
             # if that min time has been reached
