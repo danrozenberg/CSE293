@@ -388,6 +388,18 @@ class TestPis12DataInterpreter(unittest.TestCase):
         answer = interpreter.municipality
         self.assertEquals('', answer)
 
+    def test_cbo_group(self):
+        interpreter = Pis12DataInterpreter()
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'CBOGRP':'137'})
+        answer = interpreter.cbo_group
+        self.assertEquals(137, answer)
+
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'CBOGRP':''})
+        answer = interpreter.cbo_group
+        self.assertEquals(-1, answer)
+
     def test_time_at_employer(self):
         interpreter = Pis12DataInterpreter()
 

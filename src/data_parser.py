@@ -55,7 +55,6 @@ class Pis12DataParser():
                 if 0 < fetch_num <= lines_read:
                     break
 
-
     # TODO: maybe put this in the interpreter instead...
     def parse_line(self, line):
         """
@@ -75,7 +74,8 @@ class Pis12DataParser():
                   'DIADESL': line[11], 'DT_ADMISSAO': line[18],
                   'EMP_EM_31_12': line[20], 'IDENTIFICAD': line[25],
                   'MES_ADM': line[35], 'MES_DESLIG': line[36],
-                  'PIS': line[45], 'MUNICIPIO': line[38]}
+                  'PIS': line[45], 'MUNICIPIO': line[38],
+                  'CBOGRP': line[7]}
 
         return answer
 
@@ -106,6 +106,7 @@ class Pis12DataInterpreter():
         self._time_at_employer = None
         self._worker_id = None
         self._employer_id = None
+        self._cbo_group = None
 
     def feed_line(self, values):
         """
@@ -348,6 +349,13 @@ class Pis12DataInterpreter():
         if self._employer_id is None:
             self._employer_id = self._simple_retrieval('IDENTIFICAD', 'info')
         return self._employer_id
+
+    @property
+    def cbo_group(self):
+        if self._cbo_group is None:
+            self._cbo_group = self._simple_retrieval('CBOGRP', 'info')
+        return self._cbo_group
+
 
     def _simple_retrieval(self, field_name, alert_level='warn'):
         """
