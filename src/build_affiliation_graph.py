@@ -81,11 +81,11 @@ def create_nodes(interpreter, graph):
     year = interpreter.year
     graph.add_node_attr(node_id, str(year) +
                         "_ad_" +
-                        str(employer_id),
+                        str(graph.NId_from_id[employer_id]),
                         float(interpreter.admission_timestamp))
     graph.add_node_attr(node_id, str(year) +
                         "_de_" +
-                        str(employer_id),
+                        str(graph.NId_from_id[employer_id]),
                         float(interpreter.demission_timestamp))
 
 def create_edges(interpreter, graph):
