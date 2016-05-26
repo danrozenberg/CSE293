@@ -96,7 +96,7 @@ def create_edges(interpreter, graph):
     # here we guarantee that there will be only 1 edge per pair of nodes.
     edge_id = graph.get_edge_between(src_node_id, dest_node_id)
     if edge_id is None:
-        edge_id = graph.quick_add_edge(src_node_id, dest_node_id)
+        graph.quick_add_edge(src_node_id, dest_node_id)
         # We should add more edge attributes here as they are needed.
 
 def enable_logging(log_level):
