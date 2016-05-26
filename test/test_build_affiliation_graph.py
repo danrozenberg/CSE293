@@ -96,6 +96,9 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertTrue("2012_admission_date_888" in attributes)
         self.assertFalse("2011_admission_date_888" in attributes)
         self.assertFalse("2012_admission_date_8833" in attributes)
+        self.assertTrue("2012_demission_date_888" in attributes)
+        self.assertFalse("2011_demission_date_888" in attributes)
+        self.assertFalse("2012_demission_date_8833" in attributes)
 
         # same graph, should add just another employer node
         interpreter.worker_id = 19
