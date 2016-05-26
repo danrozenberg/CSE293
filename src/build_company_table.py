@@ -85,11 +85,11 @@ class CboBuilder(object):
         # graph should be complete at this point
         if save_path is not None:
             with open(save_path, "wb") as target:
-                target.writeline("PIS, manager_jobs, other_jobs")
+                target.write("PIS, manager_jobs, other_jobs\n")
                 for key in self.manager_positions_from_pis.keys():
-                    target.writelines(str(key) + "," +
+                    target.write(str(key) + "," +
                                       str(self.manager_positions_from_pis[key])  + "," +
-                                      str(len(self.other_jobs_groups)))
+                                      str(len(self.other_jobs_groups)) + "\n")
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
