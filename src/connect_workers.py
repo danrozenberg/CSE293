@@ -112,16 +112,16 @@ class WorkerConnector(object):
         time_together = 0
         max_year = self.max_year
 
+        removal_set = set()
+        removal_set.add("type")
         worker_set = set(worker_attrs.keys())
         coworker_set = set(coworker_attrs.keys())
-        valid_set = sorted(worker_set & coworker_set)
+        valid_set = sorted((worker_set & coworker_set)-removal_set)
+
         i = 0
         while i < (len(valid_set)):
-            if valid_set[i] == "type":
-                i += 2
-                continue
             year = int(valid_set[i][:4])
-            if year > self.max_year:
+            if year > max_year:
                 i += 2
                 continue
             worker_admission = worker_attrs[valid_set[i]]
