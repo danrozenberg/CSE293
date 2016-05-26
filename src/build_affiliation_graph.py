@@ -68,14 +68,25 @@ def passes_filter(interpreter):
 
 def create_nodes(interpreter, graph):
 
+    # add employer node and a 'employer' property
+    employer_id = interpreter.employer_id
+    node_id = graph.add_node(employer_id)
+    graph.add_node_attr(node_id, "type", "employer")
+
     # add worker node and a 'worker' property
     node_id = graph.add_node(interpreter.worker_id)
     graph.add_node_attr(node_id, "type", "worker")
 
-    # add employer node and a 'employer' property
-    node_id = graph.add_node(interpreter.employer_id)
-    graph.add_node_attr(node_id, "type", "employer")
-    graph.add_node_attr(node_id, "municipality", interpreter.municipality)
+    # add to worker node snapshot data.
+    year = interpreter.year
+    graph.add_node_attr(node_id, str(year) +
+                        "_admission_date_" +
+                        str(employer_id),
+                        interpreter.admission_timestamp)
+    graph.add_node_attr(node_id, str(year) +
+                        "_admission_date_" +
+                        str(employer_id),
+                        interpreter.admission_timestamp)
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
@@ -85,15 +96,8 @@ def create_edges(interpreter, graph):
     # here we guarantee that there will be only 1 edge per pair of nodes.
     edge_id = graph.get_edge_between(src_node_id, dest_node_id)
     if edge_id is None:
-        edge_id = graph.add_edge(src_node_id, dest_node_id)
-
-    year = interpreter.year
-    graph.add_edge_attr(edge_id, str(year) + "_admission_date",
-                        interpreter.admission_timestamp)
-    graph.add_edge_attr(edge_id, str(year) + "_demission_date",
-                        interpreter.demission_timestamp)
-
-    # We should add more edge attributes here as they are needed.
+        edge_id = graph.quick_add_edge(src_node_id, dest_node_id)
+        # We should add more edge attributes here as they are needed.
 
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
