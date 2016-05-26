@@ -93,12 +93,12 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
         self.assertEquals('employer', graph.get_node_attr(888, 'type'))
         attributes = graph.get_node_attrs(19)
-        self.assertTrue("2012_admission_date_888" in attributes)
-        self.assertFalse("2011_admission_date_888" in attributes)
-        self.assertFalse("2012_admission_date_8833" in attributes)
-        self.assertTrue("2012_demission_date_888" in attributes)
-        self.assertFalse("2011_demission_date_888" in attributes)
-        self.assertFalse("2012_demission_date_8833" in attributes)
+        self.assertTrue("2012_ad_888" in attributes)
+        self.assertFalse("2011_ad_888" in attributes)
+        self.assertFalse("2012_ad_8833" in attributes)
+        self.assertTrue("2012_de_888" in attributes)
+        self.assertFalse("2011_de_888" in attributes)
+        self.assertFalse("2012_de_8833" in attributes)
 
         # same graph, should add just another employer node
         interpreter.worker_id = 19
@@ -110,8 +110,8 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertEquals('employer', graph.get_node_attr(888, 'type'))
         self.assertEquals('employer', graph.get_node_attr(999, 'type'))
         attributes = graph.get_node_attrs(19)
-        self.assertTrue("2012_admission_date_999" in attributes)
-        self.assertFalse("2011_admission_date_999" in attributes)
+        self.assertTrue("2012_ad_999" in attributes)
+        self.assertFalse("2011_ad_999" in attributes)
 
         # add an entry with same ids, don't change anything
         interpreter.worker_id = 19

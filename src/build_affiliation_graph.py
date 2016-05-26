@@ -80,11 +80,11 @@ def create_nodes(interpreter, graph):
     # add to worker node snapshot data.
     year = interpreter.year
     graph.add_node_attr(node_id, str(year) +
-                        "_admission_date_" +
+                        "_ad_" +
                         str(employer_id),
                         float(interpreter.admission_timestamp))
     graph.add_node_attr(node_id, str(year) +
-                        "_demission_date_" +
+                        "_de_" +
                         str(employer_id),
                         float(interpreter.demission_timestamp))
 
