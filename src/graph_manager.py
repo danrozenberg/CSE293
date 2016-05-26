@@ -233,7 +233,6 @@ class SnapManager(object):
         self.network.AttrNameEI(EId, names)
         self.network.AttrValueEI(EId, values)
         converted_values = [self.__convert(value) for value in values]
-
         return dict(zip(names, converted_values))
 
     def get_edge_attr(self, EId, attr_name):
