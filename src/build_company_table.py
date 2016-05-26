@@ -22,12 +22,12 @@ class TableBuilder(object):
         # graph should be complete at this point
         if save_path is not None:
             with open(save_path, "wb") as target:
-                target.write("Municipality, company count, entrant count, spinoff count\n")
+                target.writeline("Municipality, company count, entrant count, spinoff count")
                 for key in self.count_from_municipality.keys():
-                    target.write(str(key) + "," +
+                    target.writelines(str(key) + "," +
                                       self.count_from_municipality[key]  + "," +
                                       self.entrant_from_municipality[key]  + "," +
-                                      self.spinnoff_from_municipality[key] + "\n")
+                                      self.spinnoff_from_municipality[key])
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
@@ -90,6 +90,15 @@ class CboBuilder(object):
                     target.write(str(key) + "," +
                                       str(self.manager_positions_from_pis[key])  + "," +
                                       str(len(self.other_jobs_from_pis[key])) + "\n")
+
+
+        with_dir_keys = set(self.manager_positions_from_pis.keys())
+        other_jobs = set(self.other_jobs_from_pis.keys())
+        dir_count = len(with_dir_keys)
+        no_dir_count = len(other_jobs - with_dir_keys)
+
+        logging.warn("Number of people with some director job = "  +str(dir_count) + " out of " +
+                     str(dir_count + no_dir_count))
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
@@ -98,7 +107,7 @@ class CboBuilder(object):
         """
         interpreter = interpreter_class()
         logging.warn("Started processing file " + file_path)
-        for line in data_parser.lines_reader(file_path, 0):
+        for line in data_parser.lines_reader(file_path, 100):
                 parsed_line = data_parser.parse_line(line)
                 interpreter.feed_line(parsed_line)
                 if self.passes_filter(interpreter):
