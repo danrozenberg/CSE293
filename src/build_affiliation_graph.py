@@ -57,7 +57,9 @@ def passes_filter(interpreter):
         return False
 
     # CBO group must indicate position as a directo
-    if interpreter.cbo_group > 199 or interpreter.cbo_group < 99:
+    # directors_and_managers = [231,232,233,234,235,236,237,238,239,174,241,242,243,249,352,353,354,355,661]
+    directors = [231,232,233,234,235,236,237,238,239]
+    if interpreter.cbo_group not in directors:
         return False
 
     # single state rule
