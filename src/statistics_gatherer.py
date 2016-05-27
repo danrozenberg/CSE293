@@ -149,7 +149,7 @@ def run_script(graph, stream=sys.stdout):
 
 if __name__ == '__main__':
     graph = SnapManager()
-    graph.generate_random_graph_power_law(1000,2.0)
+    graph.generate_random_graph(1000,4,0.3)
     run_script(graph)
 
     # with open("../output_stats/graph_summary.csv", 'wb') as f:
