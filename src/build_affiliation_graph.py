@@ -43,12 +43,12 @@ def passes_filter(interpreter):
     """
     # contains worker_id rule
     # sometimes line has no worker id? Why is this even in the database?
-    if interpreter.worker_id == -1:
+    if interpreter.worker_id > 0:
         return False
 
     # contains IDENTIFICAD rule
     # sometimes line has no employer id? Why is this even in the database?
-    if interpreter.employer_id == -1:
+    if interpreter.employer_id > 0:
         return False
 
     # contains year rule
