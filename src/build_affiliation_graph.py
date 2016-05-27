@@ -63,10 +63,10 @@ def passes_filter(interpreter):
     # single state rule
     # just process a single state, derived from municipality
     # TODO: one of these days, don't hard code it...
-    # 43 is Rio Grande do Sul...
-    if len(interpreter.municipality) < 2 or \
-        interpreter.municipality[:2] <> '43':
-        return False
+    # 431490 is POA
+    # 430510 is Caxias do Sul
+     if interpreter.municipality <> '430510':
+            return False
 
     # finally...
     return True
