@@ -406,7 +406,7 @@ class SnapManager(object):
 
         return  [self.id_from_NId[x] for x in NodeVec]
 
-    def generate_random_graph(self, node_num, node_out_deg, rewire_prob):
+    def generate_random_graph(self, node_num=20, node_out_deg=3, rewire_prob=0):
         # this substitutes the old graph, so beware
         # from: https://snap.stanford.edu/snappy/doc/reference/GenSmallWorld.html?highlight=generate%20random%20network
         self.network = snap.GenSmallWorld(node_num,
@@ -461,7 +461,7 @@ class SnapManager(object):
         snap.GetBetweennessCentr(self.network, Nodes, Edges, fraction)
         return Nodes
 
-    def get_eigenvector_centrallity(self):
+    def get_eigenvector_centrality(self):
         """  :return: hash from Id to centrality """
         NIdEigenH = snap.TIntFltH()
         snap.GetEigenVectorCentr(self.network, NIdEigenH)
