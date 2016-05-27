@@ -421,7 +421,6 @@ class SnapManager(object):
         nodeI = self.network.GetNI(NId)
         return nodeI.GetDeg()
 
-    # GRAPH PATH LENGHTS
     def get_shortest_path_size(self, node_id):
         """Returns the length of the shortest path from node SrcNId to
          all other nodes in the network."""
@@ -439,7 +438,6 @@ class SnapManager(object):
         diam = snap.GetBfsFullDiam(self.network, test_nodes, False)
         return diam
 
-    # NODE CENTRALITY
     def get_degree_centrality(self, node_id):
         """Returns degree centrality of a given node NId in Graph.
         Degree centrality of a node is defined as its degree/(N-1),
@@ -451,6 +449,14 @@ class SnapManager(object):
     def get_eccentricity(self, node_id):
         NId = self.NId_from_id[node_id]
         return snap.GetNodeEcc(self.network,NId)
+
+    def get_degree_dist(self):
+        DegToCntV = snap.TIntPrV()
+        snap.GetDegCnt(self.network, DegToCntV)
+        answer = defaultdict(int)
+        for item in DegToCntV:
+            answer[item.GetVal1()] = item.GetVal2()
+        return answer
 
     def get_betweeness_centrality(self, fraction=1.0):
         """Computes (approximate) Node and Edge Betweenness Centrality based
@@ -467,7 +473,6 @@ class SnapManager(object):
         snap.GetEigenVectorCentr(self.network, NIdEigenH)
         return NIdEigenH
 
-    # CONNECTED COMPONENTS
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.
         :returns list of component sizes [s1, s2, ... , sn]"""
@@ -478,14 +483,12 @@ class SnapManager(object):
             sizes.append(component.Len())
         return sizes
 
-    # TRIADS AND CLUSTERING
     def get_clustering_coefficient(self):
         """Computes the average clustering coefficient as
         defined in  Watts and Strogatz, Collective dynamics of
         small-world networks"""
         return snap.GetClustCf(self.network, -1)
 
-    # Print general graph information
     def print_info(self, file_path, description):
         snap.PrintInfo(self.network,
                        description,

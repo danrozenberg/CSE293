@@ -690,10 +690,27 @@ class TestSnapManager(unittest.TestCase):
         manager = self.manager
         manager.generate_random_graph(20, 3, 0)
 
-        answer_hash = manager.get_eigenvector_centrallity()
+        answer_hash = manager.get_eigenvector_centrality()
         self.assertGreater(answer_hash[0], 0)
         self.assertGreater(answer_hash[2], 0)
         self.assertGreater(answer_hash[10], 0)
+
+    def test_get_degree_dist(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+        manager.add_node(3)
+        manager.add_node(4)
+        answer = manager.get_degree_dist()
+        self.assertEqual(4, answer[0])
+        self.assertEqual(0, answer[1])
+
+        manager.add_edge(1,2)
+        manager.add_edge(2,3)
+        answer = manager.get_degree_dist()
+        self.assertEqual(1, answer[0])
+        self.assertEqual(2, answer[1])
+        self.assertEqual(1, answer[2])
 
     def test_get_betweeness_centrality(self):
         manager = self.manager
