@@ -65,8 +65,8 @@ def passes_filter(interpreter):
     # TODO: one of these days, don't hard code it...
     # 431490 is POA
     # 430510 is Caxias do Sul
-     if interpreter.municipality <> '430510':
-            return False
+    if interpreter.municipality <> '430510':
+        return False
 
     # finally...
     return True
@@ -108,7 +108,7 @@ def enable_logging(log_level):
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     source_folder = "X:/csv_data/"
-    output_file_path = "X/output_graphs/cds_affiliation.graph"
+    output_file_path = "X:/output_graphs/cds_affiliation.graph"
 
 
     process_files(source_folder,
