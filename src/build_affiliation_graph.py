@@ -66,11 +66,8 @@ def passes_filter(interpreter):
     if interpreter.cbo_group not in directors:
         return False
 
-    # single state rule
-    # just process a single state, derived from municipality
-    # TODO: one of these days, don't hard code it...
-    # 431490 is POA
-    # 430510 is Caxias do Sul
+    # municipality rule
+    # 430510 is Caxias do Sul || 431490 is POA
     if interpreter.municipality <> '431490':
         return False
 
