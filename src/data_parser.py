@@ -75,7 +75,8 @@ class Pis12DataParser():
                   'EMP_EM_31_12': line[20], 'IDENTIFICAD': line[25],
                   'MES_ADM': line[35], 'MES_DESLIG': line[36],
                   'PIS': line[45], 'MUNICIPIO': line[38],
-                  'CBOGRP': line[7], 'SEXO': line[55]}
+                  'CBOGRP': line[7], 'SEXO': line[55],
+                  'REM_MEDIA': line[51]}
 
         return answer
 
@@ -108,6 +109,7 @@ class Pis12DataInterpreter():
         self._employer_id = None
         self._cbo_group = None
         self._gender = None
+        self._avg_wage = None
 
     def feed_line(self, values):
         """
@@ -363,6 +365,17 @@ class Pis12DataInterpreter():
             self._gender = self._simple_retrieval('SEXO', 'info')
         return self._gender
 
+    @property
+    def avg_wage(self):
+        if self._avg_wage is None:
+            raw_value = self.dict['REM_MEDIA']
+            if "," not in raw_value:
+                return -1
+            else:
+                parsed_value = float(raw_value.replace(",","."))
+                self._avg_wage = parsed_value
+                return parsed_value
+        return self._avg_wage
 
 
     def _simple_retrieval(self, field_name, alert_level='warn'):

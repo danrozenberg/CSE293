@@ -412,6 +412,24 @@ class TestPis12DataInterpreter(unittest.TestCase):
         answer = interpreter.gender
         self.assertEquals(-1, answer)
 
+    def test_wage(self):
+        interpreter = Pis12DataInterpreter()
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'REM_MEDIA':'12,1'})
+        answer = interpreter.avg_wage
+        self.assertEquals(12.1, answer)
+
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'REM_MEDIA':''})
+        answer = interpreter.avg_wage
+        self.assertEquals(-1, answer)
+
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'REM_MEDIA':'13,35'})
+        answer = interpreter.avg_wage
+        self.assertEquals(13.35, answer)
+
+
     def test_time_at_employer(self):
         interpreter = Pis12DataInterpreter()
 
