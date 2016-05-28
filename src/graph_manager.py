@@ -16,6 +16,8 @@ class SnapManager(object):
         self.NId_from_id = {}
         self.id_from_NId = {}
 
+        self.eigenvector_centralities = None
+
     def add_node(self, node_id):
         """
         Adds a node to the network, if it doesn't exist yet.
@@ -467,11 +469,20 @@ class SnapManager(object):
         snap.GetBetweennessCentr(self.network, Nodes, Edges, fraction)
         return Nodes
 
-    def get_eigenvector_centrality(self):
+    def get_eigenvector_centrality(self, node_id=None):
         """  :return: hash from Id to centrality """
+        if self.eigenvector_centralities is None:
+            self.calculate_eigenvector_centralities()
+        if node_id is None:
+            return self.eigenvector_centralities
+        else:
+            NId = self.NId_from_id[node_id]
+            return self.eigenvector_centralities[NId]
+
+    def calculate_eigenvector_centralities(self):
         NIdEigenH = snap.TIntFltH()
         snap.GetEigenVectorCentr(self.network, NIdEigenH)
-        return NIdEigenH
+        self.eigenvector_centralities  = NIdEigenH
 
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.

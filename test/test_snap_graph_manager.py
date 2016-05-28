@@ -695,6 +695,9 @@ class TestSnapManager(unittest.TestCase):
         self.assertGreater(answer_hash[2], 0)
         self.assertGreater(answer_hash[10], 0)
 
+        answer = manager.get_eigenvector_centrality(2)
+        self.assertGreater(answer, 0)
+
     def test_get_degree_dist(self):
         manager = self.manager
         manager.add_node(1)
