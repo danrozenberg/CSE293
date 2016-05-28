@@ -89,7 +89,10 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         expected_nodes = [19,888]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
+        self.assertEqual(1, len(graph.get_node_attrs(19)))
+        self.assertEqual(1, len(graph.get_node_attrs(888)))
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
+        self.assertEquals('employer', graph.get_node_attr(888, 'type'))
         self.assertEquals('employer', graph.get_node_attr(888, 'type'))
 
         # same graph, should add just another employer node
@@ -98,6 +101,9 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         expected_nodes = [19,888,999]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
+        self.assertEqual(1, len(graph.get_node_attrs(19)))
+        self.assertEqual(1, len(graph.get_node_attrs(888)))
+        self.assertEqual(1, len(graph.get_node_attrs(999)))
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
         self.assertEquals('employer', graph.get_node_attr(888, 'type'))
         self.assertEquals('employer', graph.get_node_attr(999, 'type'))
@@ -139,25 +145,34 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         # just adding an edge
         interpreter.worker_id = 19
         interpreter.employer_id = 888
+        interpreter.avg_wage = 12.34
         interpreter.year = 2015
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
         attributes = graph.get_edge_attrs(graph.get_edge_between(19,888))
+        self.assertEqual(3, len(attributes))
         self.assertTrue('2015_ad' in  attributes)
         self.assertFalse('2014_ad' in  attributes)
         self.assertTrue('2015_de' in  attributes)
         self.assertFalse('2014_de' in  attributes)
+        self.assertTrue('2015_aw' in  attributes)
+        self.assertFalse('2014_aw' in  attributes)
+        self.assertEquals(12.34, attributes['2015_aw'])
 
         # same ids, we DON'T add an edge!
         # but we do add another attribute!
         interpreter.worker_id = 19
         interpreter.employer_id = 888
         interpreter.year = 2014
+        interpreter.avg_wage = 1.14
         create_edges(interpreter, graph)
         self.assertEquals(1, graph.get_edge_count())
         attributes = graph.get_edge_attrs(graph.get_edge_between(19,888))
         self.assertTrue('2015_ad' in  attributes)
         self.assertTrue('2014_ad' in  attributes)
+        self.assertTrue('2014_aw' in  attributes)
+        self.assertEquals(12.34, attributes['2015_aw'])
+        self.assertEquals(1.14, attributes['2014_aw'])
 
         # different ids, add an edge...
         interpreter.worker_id = 123
@@ -248,9 +263,9 @@ class FakeInterpreter():
         self.worker_id = 3
         self.employer_id = 30
         self.time_at_employer = 0
-        self.municipality = '430510' #some valid value
-        self.cbo_group = 661
-        self.gender = 1
+        self.municipality = '431490' #some valid value
+        self.cbo_group = 239
+        self.avg_wage = 12.2
 
 
 if __name__ == "__main__":

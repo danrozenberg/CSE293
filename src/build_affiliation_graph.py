@@ -56,6 +56,10 @@ def passes_filter(interpreter):
     if interpreter.year == -1:
         return False
 
+    # must have wage
+    if interpreter.avg_wage <= 0:
+        return  False
+
     # CBO group must indicate position as a directo
     # directors_and_managers = [231,232,233,234,235,236,237,238,239,174,241,242,243,249,352,353,354,355,661]
     directors = [231,232,233,234,235,236,237,238,239]
@@ -67,7 +71,7 @@ def passes_filter(interpreter):
     # TODO: one of these days, don't hard code it...
     # 431490 is POA
     # 430510 is Caxias do Sul
-    if interpreter.municipality <> '430510':
+    if interpreter.municipality <> '431490':
         return False
 
     # finally...
@@ -95,10 +99,12 @@ def create_edges(interpreter, graph):
         edge_id = graph.quick_add_edge(src_node_id, dest_node_id)
 
     year = interpreter.year
-    graph.add_edge_attr(edge_id, str(year) + "_ad",
+    graph.add_edge_attr(edge_id, str(year) + "_ad",      #admission date
                         interpreter.admission_timestamp)
-    graph.add_edge_attr(edge_id, str(year) + "_de",
+    graph.add_edge_attr(edge_id, str(year) + "_de",      #demissionn date
                         interpreter.demission_timestamp)
+    graph.add_edge_attr(edge_id, str(year) + "_aw",      #avg wage
+                        interpreter.avg_wage)
 
     # We should add more edge attributes here as they are needed.
 

@@ -114,16 +114,12 @@ class WorkerConnector(object):
         return time_together >= self.min_days_together
 
     def get_time_together(self, worker_attrs, coworker_attrs, min_days = None):
-        # although less general, receiving attributes as parameters
-        # allows us to call get_edge_attrs almost half the number of times...
+        # This is the worst method in the project, be careful!
         time_together = 0
         max_year = self.max_year
+        valid_set = sorted(worker_attrs.keys() & coworker_attrs.keys())
+        valid_set = filter(lambda x: ("ad_" in x or "de_" in x), valid_set)
 
-        removal_set = set()
-        removal_set.add("type")
-        worker_set = set(worker_attrs.keys())
-        coworker_set = set(coworker_attrs.keys())
-        valid_set = sorted((worker_set & coworker_set)-removal_set)
 
         i = 0
         while i < (len(valid_set)):
