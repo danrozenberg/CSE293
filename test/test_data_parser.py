@@ -400,6 +400,18 @@ class TestPis12DataInterpreter(unittest.TestCase):
         answer = interpreter.cbo_group
         self.assertEquals(-1, answer)
 
+    def test_gender(self):
+        interpreter = Pis12DataInterpreter()
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'SEXO':'1137'})
+        answer = interpreter.gender
+        self.assertEquals(1137, answer)
+
+        interpreter.feed_line({'IDENTIFICAD':'asd',
+                               'SEXO':''})
+        answer = interpreter.gender
+        self.assertEquals(-1, answer)
+
     def test_time_at_employer(self):
         interpreter = Pis12DataInterpreter()
 

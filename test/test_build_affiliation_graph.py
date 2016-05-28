@@ -245,11 +245,12 @@ class FakeInterpreter():
         self.demission_date = 0
         self.admission_timestamp = 0
         self.demission_timestamp = 0
-        self.worker_id = 0
-        self.employer_id = 0
+        self.worker_id = 3
+        self.employer_id = 30
         self.time_at_employer = 0
         self.municipality = '430510' #some valid value
-        self.cbo_group = 150
+        self.cbo_group = 661
+        self.gender = 1
 
 
 if __name__ == "__main__":
