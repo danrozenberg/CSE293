@@ -314,83 +314,83 @@ class WorkerConnector(unittest.TestCase):
 
 
         # 1 worked with 3 and 2
-        manager.add_node_attr(1, "1999_admission_date_10",
+        manager.add_edge_attr(100, "1999_admission_date",
                               mktime(datetime(1999,1,1).timetuple()))
-        manager.add_node_attr(1, "1999_demission_date_10",
+        manager.add_edge_attr(100, "1999_demission_date",
                               mktime(datetime(1999,12,31).timetuple()))
-        manager.add_node_attr(1, "2000_admission_date_10",
+        manager.add_edge_attr(100, "2000_admission_date",
                               mktime(datetime(2000,1,1).timetuple()))
-        manager.add_node_attr(1, "2000_demission_date_10",
+        manager.add_edge_attr(100, "2000_demission_date",
                               mktime(datetime(2000,12,31).timetuple()))
-        manager.add_node_attr(1, "2001_admission_date_10",
+        manager.add_edge_attr(100, "2001_admission_date",
                               mktime(datetime(2001,1,1).timetuple()))
-        manager.add_node_attr(1, "2001_demission_date_10",
+        manager.add_edge_attr(100, "2001_demission_date",
                               mktime(datetime(2001,12,31).timetuple()))
 
-        manager.add_node_attr(2, "1999_admission_date_10",
+        manager.add_edge_attr(200, "1999_admission_date",
                               mktime(datetime(1999,5,5).timetuple()))
-        manager.add_node_attr(2, "1999_demission_date_10",
+        manager.add_edge_attr(200, "1999_demission_date",
                               mktime(datetime(1999,12,31).timetuple()))
 
-        manager.add_node_attr(3, "2001_admission_date_10",
+        manager.add_edge_attr(300, "2001_admission_date",
                               mktime(datetime(2001,6,6).timetuple()))
-        manager.add_node_attr(3, "2001_demission_date_10",
+        manager.add_edge_attr(300, "2001_demission_date",
                               mktime(datetime(2001,12,31).timetuple()))
 
         # 2 worked with 9
-        manager.add_node_attr(2, "2002_admission_date_10",
+        manager.add_edge_attr(200, "2002_admission_date",
                               mktime(datetime(2002,5,5).timetuple()))
-        manager.add_node_attr(2, "2002_demission_date_10",
+        manager.add_edge_attr(200, "2002_demission_date",
                               mktime(datetime(2002,12,31).timetuple()))
-        manager.add_node_attr(9, "2002_admission_date_10",
+        manager.add_edge_attr(400, "2002_admission_date",
                               mktime(datetime(2002,1,1).timetuple()))
-        manager.add_node_attr(9, "2002_demission_date_10",
+        manager.add_edge_attr(400, "2002_demission_date",
                               mktime(datetime(2002,6,1).timetuple()))
 
         # 9 worked with 4
-        manager.add_node_attr(9, "2003_admission_date_20",
+        manager.add_edge_attr(800, "2003_admission_date",
                               mktime(datetime(2003,1,1).timetuple()))
-        manager.add_node_attr(9, "2003_demission_date_20",
+        manager.add_edge_attr(800, "2003_demission_date",
                               mktime(datetime(2003,6,1).timetuple()))
-        manager.add_node_attr(9, "2004_admission_date_20",
+        manager.add_edge_attr(800, "2004_admission_date",
                               mktime(datetime(2004,1,1).timetuple()))
-        manager.add_node_attr(9, "2004_demission_date_20",
+        manager.add_edge_attr(800, "2004_demission_date",
                               mktime(datetime(2004,6,1).timetuple()))
 
-        manager.add_node_attr(4, "2004_admission_date_20",
+        manager.add_edge_attr(500, "2004_admission_date",
                               mktime(datetime(2004,1,1).timetuple()))
-        manager.add_node_attr(4, "2004_demission_date_20",
+        manager.add_edge_attr(500, "2004_demission_date",
                               mktime(datetime(2004,10,31).timetuple()))
 
 
         # 4 worked with 5
-        manager.add_node_attr(5, "2004_admission_date_20",
+        manager.add_edge_attr(600, "2004_admission_date",
                               mktime(datetime(2004,7,1).timetuple()))
-        manager.add_node_attr(5, "2004_demission_date_20",
+        manager.add_edge_attr(600, "2004_demission_date",
                               mktime(datetime(2004,12,31).timetuple()))
 
         # 5 worked with 6
-        manager.add_node_attr(6, "2004_admission_date_20",
+        manager.add_edge_attr(700, "2004_admission_date",
                               mktime(datetime(2004,11,1).timetuple()))
-        manager.add_node_attr(6, "2004_demission_date_20",
+        manager.add_edge_attr(700, "2004_demission_date",
                               mktime(datetime(2004,12,25).timetuple()))
 
         # 5 worked with 7
-        manager.add_node_attr(5, "2005_admission_date_30",
+        manager.add_edge_attr(1000, "2005_admission_date",
                               mktime(datetime(2005,1,1).timetuple()))
-        manager.add_node_attr(5, "2005_demission_date_30",
+        manager.add_edge_attr(1000, "2005_demission_date",
                               mktime(datetime(2005,7,1).timetuple()))
 
-        manager.add_node_attr(7, "2005_admission_date_30",
+        manager.add_edge_attr(1100, "2005_admission_date",
                               mktime(datetime(2005,1,1).timetuple()))
-        manager.add_node_attr(7, "2005_demission_date_30",
+        manager.add_edge_attr(1100, "2005_demission_date",
                               mktime(datetime(2005,6,1).timetuple()))
 
         # try to trick the algorithm
         # 4 will work with 5 again, but in a different company
-        manager.add_node_attr(4, "2005_admission_date_30",
+        manager.add_edge_attr(900, "2005_admission_date",
                               mktime(datetime(2005,7,1).timetuple()))
-        manager.add_node_attr(4, "2005_demission_date_30",
+        manager.add_edge_attr(900, "2005_demission_date",
                               mktime(datetime(2005,7,1).timetuple()))
 
 if __name__ == "__main__":

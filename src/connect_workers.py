@@ -56,7 +56,8 @@ class WorkerConnector(object):
     def connect_workers(self, affiliation_graph, new_graph):
 
         # get method addresses for performance reasonts
-        get_node_attrs = affiliation_graph.get_node_attrs
+        fast_get_edge_between = affiliation_graph.fast_get_edge_between
+        get_edge_attrs = affiliation_graph.get_edge_attrs
         should_connect = self.should_connect
 
         progress_counter = -1
@@ -71,21 +72,27 @@ class WorkerConnector(object):
 
             # in the future we might copy if needed instead
             new_graph.add_node(worker)
+
+            # get currently connected nodes (in the new graph)
             currently_connected = new_graph.get_connected(worker)
-            worker_attrs = get_node_attrs(worker)
 
             # In an affiliation graph, we can get the employers just by
             # following the edges from worker and retrieving the neighbors.
             for employer in affiliation_graph.get_employers(worker):
+                worker_edge = fast_get_edge_between(worker, employer)
+                worker_edge_attrs = get_edge_attrs(worker_edge)
+
                 for coworker in affiliation_graph.get_employees(employer):
                     # no need to connect with someone already connected...
                     if worker == coworker:
                         continue
                     if coworker in currently_connected:
                         continue
-                    coworker_attrs = get_node_attrs(coworker)
 
-                    if should_connect(worker_attrs, coworker_attrs):
+                    coworker_edge = fast_get_edge_between(coworker, employer)
+                    coworker_edge_attrs = get_edge_attrs(coworker_edge)
+
+                    if should_connect(worker_edge_attrs, coworker_edge_attrs):
                         new_graph.add_node(coworker)
                         new_graph.quick_add_edge(worker, coworker)
                         # TODO: maybe put time together in the attr?
