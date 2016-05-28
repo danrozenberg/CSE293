@@ -117,9 +117,8 @@ class WorkerConnector(object):
         # This is the worst method in the project, be careful!
         time_together = 0
         max_year = self.max_year
-        valid_set = sorted(worker_attrs.keys() & coworker_attrs.keys())
-        valid_set = filter(lambda x: ("ad_" in x or "de_" in x), valid_set)
-
+        intersection = sorted(set(worker_attrs.keys()) & set(coworker_attrs.keys()))
+        valid_set = filter(lambda x: ("_ad" in x or "_de" in x), intersection)
 
         i = 0
         while i < (len(valid_set)):
