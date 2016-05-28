@@ -125,11 +125,22 @@ class StatisticsGatherer(object):
         stream.write("\n" + "edges;" + str(graph.get_edge_count()))
         stream.write("\n" + "diameter;" + str(graph.get_diameter()))
 
-
         component_sizes = list(graph.get_connected_components())
         stream.write("\n" + "connected components;" + str(len(component_sizes)))
         stream.write("\n" + "component sizes;" + str(component_sizes)[1:-1])
 
+    @staticmethod
+    def print_correl_info(x_axis_method, y_axis_method, sample=None, stream=sys.stdout):
+
+        # use everything is we were not given a sample
+        if sample is None:
+            sample = graph.get_nodes()
+
+        x_axis = [x_axis_method(n) for n in sample]
+        y_axis = [y_axis_method(n) for n in sample]
+
+        for i in xrange(len(x_axis)):
+            stream.write("\n" + str(y_axis[i]) + ";" + str(x_axis[i]))
 
     @staticmethod
     def print_node_degree_dist(graph, stream=sys.stdout):
@@ -137,14 +148,14 @@ class StatisticsGatherer(object):
         for key in dist.keys():
             stream.write(str(key) + ";" + str(dist[key]) + "\n")
 
-
-
 def run_script(graph, stream=sys.stdout):
     gatherer = StatisticsGatherer
     gatherer.print_datetime(stream)
     # gatherer.print_graph_specific_metrics(graph, stream)
     # gatherer.print_sample_specific_stats(graph, stream=stream)
-    gatherer.print_node_degree_dist(graph, stream)
+    # gatherer.print_node_degree_dist(graph, stream)
+    gatherer.print_correl_info(graph.get_eigenvector_centrality,
+                               graph.get_node_degree)
 
 
 if __name__ == '__main__':
