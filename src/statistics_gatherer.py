@@ -138,7 +138,7 @@ class StatisticsGatherer(object):
 
         x_axis = [x_axis_method(n) for n in sample]
         y_axis = [y_axis_method(n) for n in sample]
-
+        
         for i in xrange(len(x_axis)):
             stream.write("\n" + str(y_axis[i]) + ";" + str(x_axis[i]))
 
