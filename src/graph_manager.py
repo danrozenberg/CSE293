@@ -15,6 +15,8 @@ class SnapManager(object):
         self.network = snap.TNEANet().New()
         self.NId_from_id = {}
         self.id_from_NId = {}
+        self.edge_from_tuple = defaultdict(_get_defaults_dict)
+        self.attrs_from_edge = defaultdict(_get_defaults_dict)
 
         self.eigenvector_centralities = None
 
@@ -50,7 +52,16 @@ class SnapManager(object):
         # only do it if you knoe nodes exist, edge doesnt exist
         NId1 = self.NId_from_id[id_1]
         NId2 = self.NId_from_id[id_2]
-        return self.network.AddEdge(NId1, NId2, EId)
+
+        # we only add (x, y) edges where x <= y
+        if NId2 < NId1:
+            temp = NId1
+            NId1 = NId2
+            NId2 = temp
+
+        new_edge = self.network.AddEdge(NId1, NId2, EId)
+        self.edge_from_tuple[(NId1, NId2)] = new_edge
+        return new_edge
 
     def add_edge(self, id_1, id_2, EId=-1):
 
@@ -72,8 +83,12 @@ class SnapManager(object):
             NId1 = NId2
             NId2 = temp
 
-        if not self.is_edge_between(id_1, id_2):
+        found_edge = self.edge_from_tuple[(NId1, NId2)]
+        if found_edge is not None:
+            return found_edge
+        else:
             new_edge = self.network.AddEdge(NId1, NId2, EId)
+            self.edge_from_tuple[(NId1, NId2)] = new_edge
             return new_edge
 
     def get_edges(self, node_id):
@@ -103,7 +118,11 @@ class SnapManager(object):
         # remember, currently src is worker!
         NId1 = self.NId_from_id[src]
         NId2 = self.NId_from_id[target]
-        return self.network.GetEI(NId1, NId2).GetId()
+
+        if NId1 < NId2:
+            return self.edge_from_tuple[NId1, NId2]
+        else:
+            return self.edge_from_tuple[NId2, NId1]
 
     def get_edge_between(self, node1, node2):
         """This only returns the FIRST edge ever added between
@@ -111,12 +130,10 @@ class SnapManager(object):
         NId1 = self.NId_from_id[node1]
         NId2 = self.NId_from_id[node2]
 
-        if self.network.IsEdge(NId1, NId2):
-            return self.network.GetEI(NId1, NId2).GetId()
-        elif self.network.IsEdge(NId2, NId1):
-            return self.network.GetEI(NId2, NId1).GetId()
+        if NId1 < NId2:
+            return self.edge_from_tuple[NId1, NId2]
         else:
-            return None
+            return self.edge_from_tuple[NId2, NId1]
 
     def get_edges_between(self, node1, node2):
         # TODO: make this less aweful, maybe using GetInEdges or something.
@@ -226,13 +243,14 @@ class SnapManager(object):
         :param EId: the edge to retrieve attributes from
         :return: a dictionary with 'attr name' - 'attr value' pairs
         """
-        names = snap.TStrV()
-        values = snap.TStrV()
-        self.network.AttrNameEI(EId, names)
-        self.network.AttrValueEI(EId, values)
-        converted_values = [self.__convert(value) for value in values]
-
-        return dict(zip(names, converted_values))
+        if self.attrs_from_edge[EId] is None:
+            names = snap.TStrV()
+            values = snap.TStrV()
+            self.network.AttrNameEI(EId, names)
+            self.network.AttrValueEI(EId, values)
+            converted_values = [self.__convert(value) for value in values]
+            self.attrs_from_edge[EId] = dict(zip(names, converted_values))
+        return self.attrs_from_edge[EId]
 
     def get_edge_attr(self, EId, attr_name):
 
@@ -291,6 +309,9 @@ class SnapManager(object):
 
     def add_edge_attr(self, EId, name, value):
 
+        # reset anything we knew about edge attrs
+        self.attrs_from_edge[EId] = None
+
         edge = self.network.GetEI(EId)
         if isinstance(value, int):
             self.network.AddIntAttrDatE(edge, value, name)
@@ -319,8 +340,13 @@ class SnapManager(object):
         src_NId = self.NId_from_id[src_id]
         dest_NId = self.NId_from_id[dest_id]
 
-        return self.network.IsEdge(src_NId, dest_NId) or \
-         self.network.IsEdge(dest_NId, src_NId)
+        # direction 1
+        edge1 = self.edge_from_tuple[src_NId, dest_NId]
+
+        # direction 2
+        edge2 = self.edge_from_tuple[dest_NId, src_NId]
+
+        return (edge1 is not None) or (edge2 is not None)
 
     def save_graph(self, file_path):
         FOut = snap.TFOut(file_path)
@@ -332,6 +358,10 @@ class SnapManager(object):
                     open(file_path.replace(".graph", "_nid_from_id.p"), 'wb'))
         pickle.dump(self.id_from_NId,
                     open(file_path.replace(".graph", "_id_from_nid.p"), 'wb'))
+        pickle.dump(self.edge_from_tuple,
+                    open(file_path.replace(".graph", "_edge_from_tuple.p"), 'wb'))
+        pickle.dump(self.attrs_from_edge,
+                    open(file_path.replace(".graph", "_attrs_from_edge.p"), 'wb'))
 
     def load_graph(self, file_path, graph_type=snap.TNEANet):
         FIn = snap.TFIn(file_path)
@@ -344,6 +374,12 @@ class SnapManager(object):
 
         self.id_from_NId =\
             pickle.load(open(file_path.replace(".graph", "_id_from_nid.p"), 'rb'))
+
+        self.edge_from_tuple = \
+            pickle.load(open(file_path.replace(".graph", "_edge_from_tuple.p"), 'rb'))
+
+        self.attrs_from_edge = \
+            pickle.load(open(file_path.replace(".graph", "_attrs_from_edge.p"), 'rb'))
 
 
 
