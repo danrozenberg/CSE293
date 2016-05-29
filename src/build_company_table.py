@@ -79,7 +79,7 @@ class CorporateBuilder(object):
 
         # get a graph from manager
         manager = graph_manager()
-        self.process_file("X:/csv_data/POA_only.csv", data_parser, interpreter_class, manager)
+        self.process_file("X:/csv_data/poa_only.csv", data_parser, interpreter_class, manager)
 
         with open("X:/output_stats/poa_directors", "wb") as target:
             target.write("PIS, manager_jobs, other_jobs\n")
