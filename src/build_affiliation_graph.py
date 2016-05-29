@@ -56,12 +56,6 @@ def passes_filter(interpreter, worker_id_filter=None):
     if interpreter.avg_wage <= 0:
         return  False
 
-    # CBO group must indicate position as a directo
-    # directors_and_managers = [231,232,233,234,235,236,237,238,239,174,241,242,243,249,352,353,354,355,661]
-    directors = [231,232,233,234,235,236,237,238,239]
-    if interpreter.cbo_group not in directors:
-        return False
-
     # municipality rule
     # 430510 is Caxias do Sul || 431490 is POA
     if interpreter.municipality <> '431490':

@@ -14,34 +14,6 @@ class TestBuildAffiliationGraph(unittest.TestCase):
     def setUp(self):
         logging.disable(logging.CRITICAL)
 
-    @mock.patch('build_affiliation_graph.process_file')
-    def test_process_files(self, process_file_mock):
-
-        save_path = "./test.graph"
-
-        # should process 3 files, don't save
-        src_folder = "./test_file_path_folder/"
-        parser = data_parser.Pis12DataParser()
-        interpreter = data_parser.Pis12DataInterpreter()
-        manager = graph_manager.SnapManager
-        process_files(src_folder, parser, interpreter, manager)
-        self.assertEquals(3, process_file_mock.call_count)
-        self.assertFalse(os.path.isfile(save_path))
-
-        # should process 3 files and save
-        src_folder = "./test_file_path_folder/"
-        parser = data_parser.Pis12DataParser()
-        interpreter = data_parser.Pis12DataInterpreter()
-        manager = graph_manager.SnapManager
-        process_files(src_folder, parser, interpreter, manager, save_path)
-
-        # we add 3 more calls to process_file...
-        self.assertEquals(6, process_file_mock.call_count)
-        self.assertTrue(os.path.isfile(save_path))
-
-        # cleanup
-        os.remove(save_path)
-
     def test_process_file(self):
 
         # should call process_line 30 times
@@ -193,7 +165,6 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         interpreter = FakeInterpreter()
         interpreter.worker_id = 33
         self.assertTrue(passes_filter(interpreter))
-
         interpreter.worker_id = -1
         self.assertFalse(passes_filter(interpreter))
 
@@ -218,10 +189,19 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         interpreter.municipality = ''
         self.assertFalse(passes_filter(interpreter))
 
-        # CBO rule
+        # extra worker id filter rule
+        allowed_ids = [33,44]
         interpreter = FakeInterpreter()
-        interpreter.cbo_group = 432
-        self.assertFalse(passes_filter(interpreter))
+        interpreter.worker_id = 33
+        self.assertTrue(passes_filter(interpreter, allowed_ids))
+
+        interpreter = FakeInterpreter()
+        interpreter.worker_id = 44
+        self.assertTrue(passes_filter(interpreter, allowed_ids))
+
+        interpreter = FakeInterpreter()
+        interpreter.worker_id = 55
+        self.assertFalse(passes_filter(interpreter, allowed_ids))
 
     def process_line(self):
         graph = graph_manager.SnapManager()
