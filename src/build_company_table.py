@@ -107,7 +107,7 @@ class CorporateBuilder(object):
 
         interpreter = interpreter_class()
         logging.warn("Started processing file " + file_path)
-        for line in data_parser.lines_reader(file_path, 100):
+        for line in data_parser.lines_reader(file_path, 0):
                 parsed_line = data_parser.parse_line(line)
                 interpreter.feed_line(parsed_line)
                 if self.passes_filter(interpreter):
