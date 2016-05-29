@@ -1,22 +1,10 @@
 import logging
 import graph_manager
 import data_parser
+import cPickle as pickle
 
-def process_files(source_folder, data_parser, interpreter_class, graph_manager, save_path=None):
-
-    # get a graph from manager
-    manager = graph_manager()
-
-    for file_path in data_parser.find_files(source_folder, 0):
-        process_file(file_path, data_parser, interpreter_class, manager)
-
-    # graph should be complete at this point
-    if save_path is not None:
-        manager.save_graph(save_path)
-
-    return manager
-
-def process_file(file_path, data_parser, interpreter_class, graph):
+def process_file(file_path, data_parser, interpreter_class, graph,
+                 save_path=None, worker_id_filter=None):
     """
     :param graph: a graph/graph manager object, which will be changed
     """
@@ -28,15 +16,19 @@ def process_file(file_path, data_parser, interpreter_class, graph):
             # line is parsed as a dictionary, but needs interpretation.
             # This is because our data is wacky wacky!
             interpreter.feed_line(parsed_line)
-            process_line(interpreter, graph)
+            process_line(interpreter, graph, worker_id_filter)
 
-def process_line(interpreter, graph):
+    # graph should be complete at this point
+    if save_path is not None:
+        graph.save_graph(save_path)
 
-    if passes_filter(interpreter):
+def process_line(interpreter, graph, worker_id_filter=None):
+
+    if passes_filter(interpreter, worker_id_filter):
         create_nodes(interpreter, graph)
         create_edges(interpreter, graph)
 
-def passes_filter(interpreter):
+def passes_filter(interpreter, worker_id_filter=None):
     """
     Checks if the interpreted data is good enough to be considered
     :return: true or false
@@ -44,6 +36,10 @@ def passes_filter(interpreter):
     # contains worker_id rule
     # sometimes line has no worker id? Why is this even in the database?
     if interpreter.worker_id < 2:
+        return False
+
+    if worker_id_filter is not None and \
+        interpreter.worker_id not in worker_id_filter:
         return False
 
     # contains IDENTIFICAD rule
@@ -112,11 +108,11 @@ def enable_logging(log_level):
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    source_folder = "X:/csv_data/"
-    output_file_path = "X:/output_graphs/cds_affiliation.graph"
+    source_file = "X:/csv_data/poa_only.csv"
+    output_file_path = "X:/output_graphs/poa_affiliation.graph"
+    allowed_worker_ids = pickle.load(open("X:/output_stats/poa_managers.p",'wb'))
 
-
-    process_files(source_folder,
+    process_file(source_file,
                   data_parser.Pis12DataParser(),
                   data_parser.Pis12DataInterpreter,
                   graph_manager.SnapManager,
