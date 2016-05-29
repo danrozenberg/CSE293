@@ -110,7 +110,7 @@ if __name__ == '__main__':
     enable_logging(logging.WARNING)
     source_file = "X:/csv_data/poa_only.csv"
     output_file_path = "X:/output_graphs/poa_affiliation.graph"
-    allowed_worker_ids = pickle.load(open("X:/output_stats/poa_managers.p",'wb'))
+    allowed_worker_ids = pickle.load(open("X:/output_stats/poa_corporate.p",'wb'))
 
     process_file(source_file,
                   data_parser.Pis12DataParser(),

@@ -81,7 +81,7 @@ class CorporateBuilder(object):
         manager = graph_manager()
         self.process_file("X:/csv_data/poa_only.csv", data_parser, interpreter_class, manager)
 
-        with open("X:/output_stats/poa_directors", "wb") as target:
+        with open("X:/output_stats/poa_corporate.csv", "wb") as target:
             target.write("PIS, manager_jobs, other_jobs\n")
             for key in self.manager_positions_from_pis.keys():
                 target.write(str(key) + "," +
@@ -97,13 +97,13 @@ class CorporateBuilder(object):
                      str(dir_count + no_dir_count))
 
         pickle.dump(self.manager_positions_from_pis.keys(),
-                    open("X:/output_stats/managers_poa.p", 'wb'))
+                    open("X:/output_stats/poa_corporate.p", 'wb'))
 
         return manager
 
     def process_file(self, file_path, data_parser, interpreter_class, graph):
         directors_and_managers = [231,232,233,234,235,236,237,238,239,174,241,242,243,249,352,353,354,355,661]
-        directors = [231,232,233,234,235,236,237,238,239]
+        # directors = [231,232,233,234,235,236,237,238,239]
 
         interpreter = interpreter_class()
         logging.warn("Started processing file " + file_path)
@@ -112,7 +112,7 @@ class CorporateBuilder(object):
                 interpreter.feed_line(parsed_line)
                 if self.passes_filter(interpreter):
                     worker_id = interpreter.worker_id
-                    if interpreter.cbo_group in directors:
+                    if interpreter.cbo_group in directors_and_managers:
                         self.manager_positions_from_pis[worker_id] += 1
                     else:
                         self.other_jobs_from_pis[worker_id].add(interpreter.cbo_group)
