@@ -45,7 +45,7 @@ class WorkerConnector(object):
         logging.warn("proc " + self.proc_num + ": Affiliations graph loaded!")
 
         # Get this process' work load
-        connected_graph = SnapManager()
+        connected_graph = SnapManager("TUNGraph")
         self.connect_workers(affiliation_graph, connected_graph)
         logging.warn("proc " + self.proc_num + ": Finished!")
 
