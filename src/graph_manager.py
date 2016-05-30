@@ -6,17 +6,13 @@ from collections import defaultdict
 class SnapManager(object):
     """ This implementation deals with SNAP networks. """
 
-    def __init__(self, type = "TNEANet"):
+    def __init__(self):
         """The following dictionaries basically transform a CEI or CNJP into
         values that fit a C++ integers. We want CEI and CNPJ to be
         our IDs, but their values do not fit SNAP integers which are
         used as node ids :(
         This is the reason you can see the use of the following dictionaries:"""
-
-        if type == "TNEANet":
-            self.network = snap.TNEANet().New()
-        if type == "TUNGraph":
-            self.network = snap.TUNGraph().New()
+        self.network = snap.TNEANet().New()
         self.NId_from_id = {}
         self.id_from_NId = {}
         self.edge_from_tuple = defaultdict(_get_defaults_dict)
