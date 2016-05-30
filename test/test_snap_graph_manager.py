@@ -172,6 +172,31 @@ class TestSnapManager(unittest.TestCase):
         self.assertEqual(1.1, manager.get_wage(2, 1999))
         self.assertEqual(3.3, manager.get_wage(2, 1993))
 
+    def test_has_wage(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+
+        # add wage
+        self.assertFalse(manager.has_wage(1,2002))
+        self.assertFalse(manager.has_wage(1,2003))
+        self.assertFalse(manager.has_wage(2,1999))
+        self.assertFalse(manager.has_wage(2,1999))
+
+        manager.add_wage(1, 2002, 10.10)
+        manager.add_wage(1, 2003, 12.20)
+        self.assertTrue(manager.has_wage(1,2002))
+        self.assertTrue(manager.has_wage(1,2003))
+        self.assertFalse(manager.has_wage(2,1999))
+        self.assertFalse(manager.has_wage(2,1999))
+
+        manager.add_wage(2, 1999, 1.1)
+        manager.add_wage(2, 1993, 3.3)
+        self.assertTrue(manager.has_wage(1,2002))
+        self.assertTrue(manager.has_wage(1,2003))
+        self.assertTrue(manager.has_wage(2,1999))
+        self.assertTrue(manager.has_wage(2,1999))
+        self.assertFalse(manager.has_wage(1,2033))
 
 
     def test_is_node(self):
