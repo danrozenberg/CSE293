@@ -475,6 +475,8 @@ class SnapManager(object):
 
     def get_diameter(self, num_runs=1):
         #https://snap.stanford.edu/snappy/doc/reference/GetAnfEffDiam1.html?highlight=diameter
+
+        #this prints to stdout for some reason, no worries...
         return snap.GetAnfEffDiam(self.network, num_runs)
 
     def get_degree_centrality(self, node_id):
@@ -488,6 +490,11 @@ class SnapManager(object):
     def get_eccentricity(self, node_id):
         NId = self.NId_from_id[node_id]
         return snap.GetNodeEcc(self.network,NId)
+
+    def get_clustering_coefficient(self, node_id):
+        " clustering coeff. for a single node"
+        NId = self.NId_from_id[node_id]
+        return snap.GetNodeClustCf(self.network, NId)
 
     def get_degree_dist(self):
         DegToCntV = snap.TIntPrV()
@@ -530,12 +537,6 @@ class SnapManager(object):
         for component in components:
             sizes.append(component.Len())
         return sizes
-
-    def get_clustering_coefficient(self):
-        """Computes the average clustering coefficient as
-        defined in  Watts and Strogatz, Collective dynamics of
-        small-world networks"""
-        return snap.GetClustCf(self.network, -1)
 
     def print_info(self, file_path, description):
         snap.PrintInfo(self.network,

@@ -684,7 +684,7 @@ class TestSnapManager(unittest.TestCase):
     def test_get_clustering_coefficient(self):
         manager = self.manager
         manager.generate_random_graph(20, 3, 0)
-        self.assertGreater(manager.get_clustering_coefficient(), 0)
+        self.assertGreater(manager.get_clustering_coefficient(1), 0)
 
     def test_get_eigenvector_centrallity(self):
         manager = self.manager
@@ -738,6 +738,9 @@ class TestSnapManager(unittest.TestCase):
 
         manager.add_edge(2,3)
         self.assertEquals(3, manager.get_shortest_path_size(1))
+
+        manager.add_edge(2,4)
+        self.assertEquals(2, manager.get_shortest_path_size(1))
 
     def test_get_connected_components(self):
         manager = self.manager
