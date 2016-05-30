@@ -127,7 +127,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertFalse("2002_aw" in manager.get_node_attrs(1))
         self.assertFalse("2003_aw" in manager.get_node_attrs(1))
 
-
         # add wage
         manager.add_wage(1, 2002, 10.10)
         self.assertTrue("2002_aw" in manager.get_node_attrs(1))
@@ -157,6 +156,22 @@ class TestSnapManager(unittest.TestCase):
         self.assertEqual(20.20, wage)
         wage = manager.get_node_attrs(1)["2003_aw"]
         self.assertEqual(30.30, wage)
+
+    def test_get_wage(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(2)
+
+        # add wage
+        manager.add_wage(1, 2002, 10.10)
+        manager.add_wage(1, 2003, 12.20)
+        manager.add_wage(2, 1999, 1.1)
+        manager.add_wage(2, 1993, 3.3)
+        self.assertEqual(10.10, manager.get_wage(1, 2002))
+        self.assertEqual(12.20, manager.get_wage(1, 2003))
+        self.assertEqual(1.1, manager.get_wage(2, 1999))
+        self.assertEqual(3.3, manager.get_wage(2, 1993))
+
 
 
     def test_is_node(self):
