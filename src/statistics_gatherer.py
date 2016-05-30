@@ -131,17 +131,24 @@ class StatisticsGatherer(object):
         stream.write("\n" + "component sizes;" + str(component_sizes)[1:-1] + "\n")
 
     @staticmethod
-    def print_correl_info(x_axis_method, y_axis_method, sample=None, stream=sys.stdout):
-
-        # use everything is we were not given a sample
-        if sample is None:
-            sample = graph.get_nodes()
-
+    def print_correl_info(x_axis_method, y_axis_method, sample, stream=sys.stdout):
         x_axis = [x_axis_method(n) for n in sample]
         y_axis = [y_axis_method(n) for n in sample]
         
         for i in xrange(len(x_axis)):
             stream.write("\n" + str(y_axis[i]) + ";" + str(x_axis[i]))
+
+    @staticmethod
+    def print_correl_wages(x_axis_method, get_wage_method, year, sample, stream=sys.stdout):
+        """  get_wage method should come from an affiliation graph. """
+
+        stream.write("\n wages correl\n")
+        x_axis = [x_axis_method(n) for n in sample]
+        y_axis = [get_wage_method(n, year) for n in sample]
+
+        for i in xrange(len(x_axis)):
+            stream.write("\n" + str(y_axis[i]) + ";" + str(x_axis[i]))
+
 
     @staticmethod
     def print_node_degree_dist(graph, stream=sys.stdout):
@@ -156,20 +163,25 @@ def run_script(graph, stream=sys.stdout):
     # gatherer.print_graph_specific_metrics(graph, stream)
     # gatherer.print_sample_specific_stats(graph, sample=sample,  stream=stream)
     # gatherer.print_node_degree_dist(graph, stream)
-    gatherer.print_correl_info(graph.get_eigenvector_centrality,
-                               graph.get_node_degree,
-                               sample=sample)
+
+    gatherer.print_correl_wages(graph.get_eigenvector_centrality,
+                                graph.get_wage,
+                                2005,
+                                sample)
 
 
     # so we know how long it took
 if __name__ == '__main__':
     graph = SnapManager()
-    graph.generate_random_graph(183214,4,0.3)
+    graph.generate_random_graph(183214,4)
+    from random import random
+    for n in graph.get_nodes():
+        graph.add_wage(n, 2005, random()*100)
 
-    file_name = "X:/output_graphs/poa_directors_and_managers_affiliation.graph"
-    graph.load_graph_lite(file_name)
-    print "will now work on " + file_name
 
+
+    # file_name = "X:/output_graphs/poa_directors_affiliation.graph"
+    # graph.load_graph_lite(file_name)
 
     run_script(graph)
     # with open("../output_stats/graph_summary.csv", 'wb') as f:
