@@ -121,6 +121,44 @@ class TestSnapManager(unittest.TestCase):
         the_exception = bad_call.exception
         self.assertIn("does not have attribute", the_exception.message)
 
+    def test_add_wage(self):
+        manager = self.manager
+        manager.add_node(1)
+        self.assertFalse("2002_aw" in manager.get_node_attrs(1))
+        self.assertFalse("2003_aw" in manager.get_node_attrs(1))
+
+
+        # add wage
+        manager.add_wage(1, 2002, 10.10)
+        self.assertTrue("2002_aw" in manager.get_node_attrs(1))
+        self.assertFalse("2003_aw" in manager.get_node_attrs(1))
+        wage = manager.get_node_attrs(1)["2002_aw"]
+        self.assertEqual(10.10, wage)
+
+        # add lower wage
+        manager.add_wage(1, 2002, 5.50)
+        self.assertTrue("2002_aw" in manager.get_node_attrs(1))
+        self.assertFalse("2003_aw" in manager.get_node_attrs(1))
+        wage = manager.get_node_attrs(1)["2002_aw"]
+        self.assertEqual(10.10, wage)
+
+        # add higher wage
+        manager.add_wage(1, 2002, 20.20)
+        self.assertTrue("2002_aw" in manager.get_node_attrs(1))
+        self.assertFalse("2003_aw" in manager.get_node_attrs(1))
+        wage = manager.get_node_attrs(1)["2002_aw"]
+        self.assertEqual(20.20, wage)
+
+        # add different year
+        manager.add_wage(1, 2003, 30.30)
+        self.assertTrue("2002_aw" in manager.get_node_attrs(1))
+        self.assertTrue("2003_aw" in manager.get_node_attrs(1))
+        wage = manager.get_node_attrs(1)["2002_aw"]
+        self.assertEqual(20.20, wage)
+        wage = manager.get_node_attrs(1)["2003_aw"]
+        self.assertEqual(30.30, wage)
+
+
     def test_is_node(self):
         manager = self.manager
         self.assertFalse(manager.is_node(10))

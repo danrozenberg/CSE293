@@ -70,10 +70,12 @@ def create_nodes(interpreter, graph):
     # add worker node and a 'worker' property
     node_id = graph.add_node(interpreter.worker_id)
     graph.add_node_attr(node_id, "type", "worker")
+    graph.add_wage(node_id, interpreter.year, interpreter.avg_wage)
 
     # add employer node and a 'employer' property
     node_id = graph.add_node(interpreter.employer_id)
     graph.add_node_attr(node_id, "type", "employer")
+
 
 def create_edges(interpreter, graph):
     # add values as edge attributes
@@ -90,9 +92,6 @@ def create_edges(interpreter, graph):
                         interpreter.admission_timestamp)
     graph.add_edge_attr(edge_id, str(year) + "_de",      #demissionn date
                         interpreter.demission_timestamp)
-    graph.add_edge_attr(edge_id, str(year) + "_aw",      #avg wage
-                        interpreter.avg_wage)
-
     # We should add more edge attributes here as they are needed.
 
 def enable_logging(log_level):

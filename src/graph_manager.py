@@ -20,6 +20,15 @@ class SnapManager(object):
 
         self.eigenvector_centralities = None
 
+    def add_wage(self, node_id, year, value):
+        node_attrs = self.get_node_attrs(node_id)
+        if (str(year) + "_aw") in node_attrs:
+            current_value = node_attrs[str(year) + "_aw"]
+            if value > current_value:
+                self.add_node_attr(node_id, str(year) + "_aw", value)
+        else:
+            self.add_node_attr(node_id, str(year) + "_aw", value)
+
     def add_node(self, node_id):
         """
         Adds a node to the network, if it doesn't exist yet.
@@ -209,7 +218,6 @@ class SnapManager(object):
         self.network.AttrValueNI(NId, values)
         converted_values = [self.__convert(value) for value in values]
         return dict(zip(names, converted_values))
-
 
     def get_node_attr(self, node_id, attr_name):
 
