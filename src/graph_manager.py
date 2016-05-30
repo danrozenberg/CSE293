@@ -381,8 +381,19 @@ class SnapManager(object):
         self.attrs_from_edge = \
             pickle.load(open(file_path.replace(".graph", "_attrs_from_edge.p"), 'rb'))
 
+        return self
 
+    def load_graph_lite(self, file_path, graph_type=snap.TNEANet):
+        FIn = snap.TFIn(file_path)
 
+        self.network = graph_type.Load(FIn)
+
+        # grab dictionaries too!
+        self.NId_from_id =\
+            pickle.load(open(file_path.replace(".graph", "_nid_from_id.p"), 'rb'))
+
+        self.id_from_NId =\
+            pickle.load(open(file_path.replace(".graph", "_id_from_nid.p"), 'rb'))
         return self
 
     def copy_node(self, node_id, dst_graph):
@@ -469,12 +480,9 @@ class SnapManager(object):
                                 NId,
                                 NIdToDistH)
 
-    def get_diameter(self, test_nodes = 0):
-        if test_nodes == 0:
-            test_nodes = self.get_node_count()
-
-        diam = snap.GetBfsFullDiam(self.network, test_nodes, False)
-        return diam
+    def get_diameter(self, num_runs=1):
+        #https://snap.stanford.edu/snappy/doc/reference/GetAnfEffDiam1.html?highlight=diameter
+        return snap.GetAnfEffDiam(self.network, num_runs)
 
     def get_degree_centrality(self, node_id):
         """Returns degree centrality of a given node NId in Graph.
