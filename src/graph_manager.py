@@ -19,6 +19,7 @@ class SnapManager(object):
         self.attrs_from_edge = defaultdict(_get_defaults_dict)
 
         self.eigenvector_centralities = None
+        self.tungraph = None
 
     def add_wage(self, node_id, year, value):
         node_attrs = self.get_node_attrs(node_id)
@@ -461,13 +462,13 @@ class SnapManager(object):
 
         return  [self.id_from_NId[x] for x in NodeVec]
 
-    def generate_random_graph(self, node_num=20, node_out_deg=3, rewire_prob=0):
+    def generate_random_graph(self, node_num=20, edges=3):
         # this substitutes the old graph, so beware
         # from: https://snap.stanford.edu/snappy/doc/reference/GenSmallWorld.html?highlight=generate%20random%20network
-        self.network = snap.GenSmallWorld(node_num,
-                                          node_out_deg,
-                                          rewire_prob,
-                                          snap.TRnd(1,0))
+        self.network = snap.GenRndGnm(snap.PNEANet,
+                                      node_num,
+                                      edges)
+
         # gotta jig the dictionary, unfortunatelly
         self.jig_dictionary()
 
@@ -497,17 +498,24 @@ class SnapManager(object):
         Degree centrality of a node is defined as its degree/(N-1),
         where N is the number of nodes in the network."""
 
+        if self.tungraph is None:
+            self.build_tungraph()
+
         NId = self.NId_from_id[node_id]
-        return snap.GetDegreeCentr(self.network, NId)
+        return snap.GetDegreeCentr(self.tungraph, NId)
 
     def get_eccentricity(self, node_id):
         NId = self.NId_from_id[node_id]
         return snap.GetNodeEcc(self.network,NId)
 
     def get_clustering_coefficient(self, node_id):
+
+        if self.tungraph is None:
+            self.build_tungraph()
+
         " clustering coeff. for a single node"
         NId = self.NId_from_id[node_id]
-        return snap.GetNodeClustCf(self.network, NId)
+        return snap.GetNodeClustCf(self.tungraph, NId)
 
     def get_degree_dist(self):
         DegToCntV = snap.TIntPrV()
@@ -521,9 +529,13 @@ class SnapManager(object):
         """Computes (approximate) Node and Edge Betweenness Centrality based
         on a sample of NodeFrac nodes.
         It does so for all all nodes in the graph. Returns a HashMap"""
+
+        if self.tungraph is None:
+            self.build_tungraph()
+
         Nodes = snap.TIntFltH()
         Edges = snap.TIntPrFltH()
-        snap.GetBetweennessCentr(self.network, Nodes, Edges, fraction)
+        snap.GetBetweennessCentr(self.tungraph, Nodes, Edges, fraction)
         return Nodes
 
     def get_eigenvector_centrality(self, node_id=None):
@@ -537,8 +549,12 @@ class SnapManager(object):
             return self.eigenvector_centralities[NId]
 
     def calculate_eigenvector_centralities(self):
+
+        if self.tungraph is None:
+            self.build_tungraph()
+
         NIdEigenH = snap.TIntFltH()
-        snap.GetEigenVectorCentr(self.network, NIdEigenH)
+        snap.GetEigenVectorCentr(self.tungraph, NIdEigenH)
         self.eigenvector_centralities  = NIdEigenH
 
     def get_connected_components(self):
@@ -556,6 +572,23 @@ class SnapManager(object):
                        description,
                        file_path,
                        False)
+
+    def build_tungraph(self):
+        logging.info("Started converting to TUNGraph....")
+        tungraph = snap.TUNGraph.New(self.get_node_count(),
+                                     self.get_edge_count())
+
+        # add all nodes
+        for node in self.get_node_iterator():
+            tungraph.AddNode(node)
+
+        # all all edges
+        for node in self.get_node_iterator():
+            for other_node in self.get_connected(node):
+                tungraph.AddEdge(node, other_node)
+
+        self.tungraph = tungraph
+        logging.info("Finish converting to TUNGraph....")
 
     def jig_dictionary(self, NId_from_id=None, id_from_NId=None ):
         # TODO: apologize for having to do this.

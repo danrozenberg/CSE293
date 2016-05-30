@@ -316,7 +316,6 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(44.44, d["first"])
         self.assertEquals("basd", d["third"])
 
-
     def test_get_nodes(self):
         manager = self.manager
 
@@ -720,28 +719,28 @@ class TestSnapManager(unittest.TestCase):
         self.assertEquals(0, manager.get_edge_count())
 
         # generate stuff
-        manager.generate_random_graph(20, 3, 0)
+        manager.generate_random_graph(20, 60)
         self.assertEquals(20, manager.get_node_count())
         self.assertEquals(60, manager.get_edge_count())
 
     def test_get_degree_centrality(self):
         manager = self.manager
-        manager.generate_random_graph(20, 3, 0)
+        manager.generate_random_graph(20, 60)
         self.assertGreater(manager.get_degree_centrality(0), 0)
 
     def test_get_eccentricity(self):
         manager = self.manager
-        manager.generate_random_graph(20, 3, 0)
+        manager.generate_random_graph(20, 60)
         self.assertGreater(manager.get_eccentricity(0), 0)
 
     def test_get_clustering_coefficient(self):
         manager = self.manager
-        manager.generate_random_graph(20, 3, 0)
+        manager.generate_random_graph(20, 60)
         self.assertGreater(manager.get_clustering_coefficient(1), 0)
 
     def test_get_eigenvector_centrallity(self):
         manager = self.manager
-        manager.generate_random_graph(20, 3, 0)
+        manager.generate_random_graph(20, 60)
 
         answer_hash = manager.get_eigenvector_centrality()
         self.assertGreater(answer_hash[0], 0)
@@ -770,7 +769,7 @@ class TestSnapManager(unittest.TestCase):
 
     def test_get_betweeness_centrality(self):
         manager = self.manager
-        manager.generate_random_graph(20, 3, 0)
+        manager.generate_random_graph(20, 60)
 
         answer_hash = manager.get_betweeness_centrality()
         self.assertGreater(answer_hash[0], 0)
@@ -852,7 +851,7 @@ class TestSnapManager(unittest.TestCase):
 
     def test_get_diameter(self):
        manager = self.manager
-       manager.generate_random_graph(20, 3, 0)
+       manager.generate_random_graph(20, 60)
        self.assertGreater(manager.get_diameter(), 0)
 
     def test_get_degree(self):
@@ -882,6 +881,15 @@ class TestSnapManager(unittest.TestCase):
 
         node_degrees = [self.manager.get_node_degree(n) for n in [1,2,3]]
         self.assertEqual(node_degrees, [3,2,1])
+
+    def test_get_tungraph(self):
+        manager = self.manager
+        self.create_affiliation_graph(manager)
+        manager.build_tungraph()
+        self.assertEqual(12, manager.tungraph.GetNodes())
+
+        self.assertEqual(manager.get_edge_count(),
+                         manager.tungraph.GetEdges())
 
     def create_affiliation_graph(self, manager):
         # 9 workers
