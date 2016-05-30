@@ -36,7 +36,7 @@ class WorkerConnector(object):
         # year from argvs
         year = int(sys.argv[2])
         self.max_year = year
-        graph_load_path = "X:/output_graphs/poa_affiliation.graph"
+        graph_load_path = "X:/output_graphs/poa_directors_and_managers_affiliation.graph"
 
         # load affiliation
         affiliation_graph = SnapManager()
@@ -50,7 +50,7 @@ class WorkerConnector(object):
         logging.warn("proc " + self.proc_num + ": Finished!")
 
         # save connected graph
-        graph_save_path = "X:/output_graphs/poa_connected_" + str(year) + ".graph"
+        graph_save_path = "X:/output_graphs/poa_directors_and_managers_connected_" + str(year) + ".graph"
         connected_graph.save_graph(graph_save_path)
 
     def connect_workers(self, affiliation_graph, new_graph):

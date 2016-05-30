@@ -8,8 +8,8 @@ level=logging.WARN)
 
 procs = []
 first_year = 1994
-last_year = 2004
-for year in range(first_year,last_year + 1):
+last_year = 2001
+for year in range(first_year, last_year + 1):
     proc = subprocess.Popen([sys.executable,
                              "connect_workers.py",
                              str(year),
