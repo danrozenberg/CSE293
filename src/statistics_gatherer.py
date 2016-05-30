@@ -174,7 +174,8 @@ if __name__ == '__main__':
         print_correl_wages(connected_graph.get_eigenvector_centrality,
                            affiliation_graph,
                            year,
-                           sample_size)
+                           sample_size,
+                           stream)
 
     logging.warn("Finished")
 
