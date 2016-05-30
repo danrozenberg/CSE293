@@ -205,18 +205,11 @@ class SnapManager(object):
 
         names = snap.TStrV()
         values = snap.TStrV()
-        converted_values = []
         self.network.AttrNameNI(NId, names)
         self.network.AttrValueNI(NId, values)
         converted_values = [self.__convert(value) for value in values]
         return dict(zip(names, converted_values))
 
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
-
-        return dict(zip(names, converted_values))
 
     def get_node_attr(self, node_id, attr_name):
 
@@ -389,10 +382,10 @@ class SnapManager(object):
         self.network = graph_type.Load(FIn)
 
         # grab dictionaries too!
-        self.NId_from_id =\
+        self.NId_from_id = \
             pickle.load(open(file_path.replace(".graph", "_nid_from_id.p"), 'rb'))
 
-        self.id_from_NId =\
+        self.id_from_NId = \
             pickle.load(open(file_path.replace(".graph", "_id_from_nid.p"), 'rb'))
         return self
 
@@ -437,7 +430,7 @@ class SnapManager(object):
         NodeVec = snap.TIntV()
         snap.GetNodesAtHop(self.network, NId, 1, NodeVec, False)
 
-        return  [self.id_from_NId[x] for x in NodeVec]
+        return  set([self.id_from_NId[x] for x in NodeVec])
 
     def get_employees(self, src_id):
         # just make sure src_id as employer node, ok?

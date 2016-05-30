@@ -15,7 +15,7 @@ class StatisticsGatherer(object):
     @staticmethod
     def print_datetime(stream=sys.stdout):
         now = str(datetime.now())
-        stream.write("\ndate;" + now + "\n")
+        stream.write("date;" + now + "\n")
 
     @staticmethod
     def build_ground_truth(load_folder, output_file_path, save=True):
@@ -106,11 +106,6 @@ class StatisticsGatherer(object):
             "node_degree")
         gatherer.print_statistics(results, stream)
 
-        results = gatherer.get_statistics(
-            [graph.get_clustering_coefficient(n) for n in sample],
-            "clustering_coefficient")
-        gatherer.print_statistics(results, stream)
-
         # TODO, use closeness maybe?
         results = gatherer.get_statistics(
             [graph.get_degree_centrality(n) for n in sample],
@@ -123,11 +118,12 @@ class StatisticsGatherer(object):
     def print_graph_specific_metrics(graph, stream=sys.stdout):
         stream.write("\n" + "nodes;" + str(graph.get_node_count()))
         stream.write("\n" + "edges;" + str(graph.get_edge_count()))
-        stream.write("\n" + "diameter;" + str(graph.get_diameter()))
+        stream.write("\n" + "90th percentile diameter;" + str(graph.get_diameter()))
+        # stream.write("\n" + "Clustering coefficient;" + str(graph.get_clustering_coefficient()))
 
         component_sizes = list(graph.get_connected_components())
         stream.write("\n" + "connected components;" + str(len(component_sizes)))
-        stream.write("\n" + "component sizes;" + str(component_sizes)[1:-1])
+        stream.write("\n" + "component sizes;" + str(component_sizes)[1:-1] + "\n")
 
     @staticmethod
     def print_correl_info(x_axis_method, y_axis_method, sample=None, stream=sys.stdout):
@@ -151,16 +147,22 @@ class StatisticsGatherer(object):
 def run_script(graph, stream=sys.stdout):
     gatherer = StatisticsGatherer
     gatherer.print_datetime(stream)
-    # gatherer.print_graph_specific_metrics(graph, stream)
-    # gatherer.print_sample_specific_stats(graph, stream=stream)
-    # gatherer.print_node_degree_dist(graph, stream)
+    sample = gatherer.get_node_sample(graph, 1000)
+    gatherer.print_graph_specific_metrics(graph, stream)
+    gatherer.print_sample_specific_stats(graph, sample=sample,  stream=stream)
+    gatherer.print_node_degree_dist(graph, stream)
     gatherer.print_correl_info(graph.get_eigenvector_centrality,
-                               graph.get_node_degree)
+                               graph.get_node_degree,
+                               sample=sample)
+    gatherer.print_datetime(stream)
 
 
 if __name__ == '__main__':
     graph = SnapManager()
-    graph.generate_random_graph(1000,4,0.3)
+    # graph.generate_random_graph(1000,4,0.3)
+    file_name = "X:/output_graphs/poa_directors_and_managers_affiliation.graph"
+    graph.load_graph_lite(file_name)
+    print "will now work on " + file_name
     run_script(graph)
 
     # with open("../output_stats/graph_summary.csv", 'wb') as f:
