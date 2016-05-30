@@ -10,7 +10,7 @@ from graph_manager import SnapManager
 from data_parser import ClassificationLoader
 from datetime import datetime
 
-def print_datetime(stream=sys.stdout):
+def print_datetime(stream):
     now = str(datetime.now())
     stream.write("date;" + now)
 
@@ -62,29 +62,28 @@ def print_statistics(statistics, stream):
         stream.write(stat[0] + ";" + str(stat[1]) +"\n")
     stream.write("\n")
 
+def print_node_statistics(graph, sample, stream):
+    logging.warn("Calculating node statistics:")
 
-def print_node_metrics(graph, sample=None, stream=sys.stdout):
-    # use everything is we were not given a sample
-    if sample is None:
-        sample = graph.get_nodes()
-    stream.write("\nsample size;\n" + str(len(sample)))
-
+    logging.warn("shortest_paths...")
     results = get_statistics(
         [graph.get_shortest_path_size(n) for n in sample],
         "shortest_path")
     print_statistics(results, stream)
 
+    logging.warn("node_degrees...")
     results = get_statistics(
         [graph.get_node_degree(n) for n in sample],
         "node_degree")
     print_statistics(results, stream)
 
+    logging.warn("clustering_coefficient...")
     results = get_statistics(
         [graph.get_clustering_coefficient(n) for n in sample],
         "clustering_coefficient")
     print_statistics(results, stream)
 
-    # TODO, use closeness maybe?
+    logging.warn("get_degree_centrality...")
     results = get_statistics(
         [graph.get_degree_centrality(n) for n in sample],
         "degree_centrality")
@@ -92,7 +91,8 @@ def print_node_metrics(graph, sample=None, stream=sys.stdout):
 
     # add more stuff here.
 
-def print_structure_metrics(graph, stream=sys.stdout):
+def print_structure_metrics(graph, stream):
+    logging.warn("Calculating structure metrics...")
     stream.write("\n" + "nodes;" + str(graph.get_node_count()))
     stream.write("\n" + "edges;" + str(graph.get_edge_count()))
     stream.write("\n" + "90th percentile diameter;" + str(graph.get_diameter()))
@@ -101,14 +101,15 @@ def print_structure_metrics(graph, stream=sys.stdout):
     stream.write("\n" + "connected components;" + str(len(component_sizes)))
     stream.write("\n" + "component sizes;" + str(component_sizes)[1:-1] + "\n")
 
-def print_correl_info(x_axis_method, y_axis_method, sample, stream=sys.stdout):
+def print_correl_info(x_axis_method, y_axis_method, sample):
     x_axis = [x_axis_method(n) for n in sample]
     y_axis = [y_axis_method(n) for n in sample]
 
     for i in xrange(len(x_axis)):
         stream.write("\n" + str(y_axis[i]) + ";" + str(x_axis[i]))
 
-def print_correl_wages(x_axis_method, affiliation_graph, year, sample_size, stream=sys.stdout):
+def print_correl_wages(x_axis_method, affiliation_graph, year, sample_size, stream):
+    logging.warn("Start calculating wage correlation...")
     node_candidates = filter_nodes_with_wage_in_year(affiliation_graph,
                                                      year)
     sample = random.sample(node_candidates, sample_size)
@@ -120,8 +121,8 @@ def print_correl_wages(x_axis_method, affiliation_graph, year, sample_size, stre
     for i in xrange(len(x_axis)):
         stream.write("\n" + str(x_axis[i]) + ";" + str(y_axis[i]))
 
-
-def print_node_degree_dist(graph, stream=sys.stdout):
+def print_node_degree_dist(graph, stream):
+    logging.warn("Calculating degree distribution...")
     dist = graph.get_degree_dist()
     stream.write("\n degree distribution\n")
     for key in dist.keys():
@@ -132,51 +133,49 @@ def filter_nodes_with_wage_in_year(graph, year):
                         graph.get_nodes())
     return candidates
 
-
-
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
     datefmt='%d %b - %H:%M:%S -',
     level=log_level)
 
     # so we know how long it took
+
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     logging.warn("Started gathering statistics")
 
-    # setup
-    year = 2001
-    stream = sys.stdout
-    sample_size = 1000
+    target_name = "poa_directors"
+    with open("../anonymized_results/" + target_name + "_summary.csv", 'wb') as f:
 
-    # set graphs
-    affiliation_graph = SnapManager()
-    affiliation_graph.load_graph_lite("X:/output_graphs/poa_directors_affiliation.graph")
+        # setup
+        year = 2001
+        stream = f   # stream = sys.stdout
+        sample_size = 1000
 
-    connected_graph = SnapManager()
-    connected_graph.load_graph_lite("X:/output_graphs/poa_directors_connected_" + \
-        str(year) + ".graph")
+        # set graphs
+        affiliation_graph = SnapManager()
+        affiliation_graph.load_graph_lite("X:/output_graphs/" + target_name + "_affiliation.graph")
 
-    # networks tructure as a whole
-    print_structure_metrics(connected_graph, stream)
+        connected_graph = SnapManager()
+        connected_graph.load_graph_lite("X:/output_graphs/" + target_name + "_connected_" + \
+            str(year) + ".graph")
 
-    # these take a sample
-    sample = random.sample(connected_graph.get_nodes())
-    print_node_metrics(connected_graph, sample, stream)
+        # networks tructure as a whole
+        print_structure_metrics(connected_graph, stream)
 
-    # specific distributions
-    print_node_degree_dist(connected_graph, stream)
+        # these take a sample explicitely
+        sample = random.sample(connected_graph.get_nodes(), sample_size)
+        print_node_statistics(connected_graph, sample, stream)
 
-    # wage vs centrality...uses a specific sample
-    print_correl_wages(connected_graph.get_eigenvector_centrality,
-                       affiliation_graph,
-                       year,
-                       sample_size)
+        # specific distributions
+        print_node_degree_dist(connected_graph, stream)
+
+        # wage vs centrality...gets its own sample inside
+        print_correl_wages(connected_graph.get_eigenvector_centrality,
+                           affiliation_graph,
+                           year,
+                           sample_size)
 
     logging.warn("Finished")
-
-    # with open("../output_stats/graph_summary.csv", 'wb') as f:
-    #     f.write(file_name + "\n")
-    #     run_script(graph, f)
 
 
