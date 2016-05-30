@@ -211,12 +211,6 @@ class SnapManager(object):
         converted_values = [self.__convert(value) for value in values]
         return dict(zip(names, converted_values))
 
-        for value in values:
-            # Due to a SNAP bug we are forced to convert attributes
-            #   back to their original type ourselves ;(
-            converted_values.append(self.__convert(value))
-
-        return dict(zip(names, converted_values))
 
     def get_node_attr(self, node_id, attr_name):
 

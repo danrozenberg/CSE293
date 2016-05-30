@@ -103,8 +103,8 @@ def enable_logging(log_level):
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
     source_file = "X:/csv_data/poa_only.csv"
-    output_file_path = "X:/output_graphs/poa_directors_affiliation.graph"
-    allowed_worker_ids = pickle.load(open("X:/output_stats/poa_directors.p",'rb'))
+    output_file_path = "X:/output_graphs/poa_managers_and_directors_affiliation.graph"
+    allowed_worker_ids = pickle.load(open("X:/output_stats/poa_managers_and_directors.p",'rb'))
 
     process_file(source_file,
                   data_parser.Pis12DataParser(),

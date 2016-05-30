@@ -154,6 +154,110 @@ class CorporateBuilder(object):
         return True
 
 
+class WagesBuilder(object):
+    def __init__(self):
+        self.director_wages = defaultdict(list)
+        self.manager_wages = defaultdict(list)
+        self.wages = defaultdict(list)
+
+    def run(self, data_parser, interpreter_class, graph_manager):
+
+        # get a graph from manager
+        manager = graph_manager()
+        self.process_file("X:/csv_data/poa_only.csv", data_parser, interpreter_class)
+
+        avg_director_wages = {}
+        for key in self.director_wages.keys():
+            avg_director_wages[key] = np.mean(self.director_wages[key])
+        print avg_director_wages
+        print "===="
+
+        avg_manager_wages = {}
+        for key in self.manager_wages.keys():
+            avg_manager_wages[key] = np.mean(self.manager_wages[key])
+        print avg_manager_wages
+        print "==="
+
+        avg_wages = {}
+        for key in self.wages.keys():
+            avg_wages[key] = np.mean(self.wages[key])
+        print avg_wages
+
+        pickle.dump(avg_director_wages,
+                    open("X:/output_stats/poa_director_wages.p", 'wb'))
+        pickle.dump(avg_manager_wages,
+                    open("X:/output_stats/poa_manager_wages.p", 'wb'))
+        pickle.dump(avg_wages,
+                    open("X:/output_stats/avg_wages.p", 'wb'))
+
+        pickle.dump(self.director_wages,
+                    open("X:/output_stats/poa_director_wages_list.p", 'wb'))
+        pickle.dump(self.manager_wages,
+                open("X:/output_stats/poa_manager_wages_list.p", 'wb'))
+        pickle.dump(self.wages,
+                open("X:/output_stats/avg_wages_list.p", 'wb'))
+
+
+    def process_file(self, file_path, data_parser, interpreter_class):
+        directors = [231,232,233,234,235,236,237,238,239]
+        managers = [174,241,242,243,249,352,353,354,355,661]
+
+        interpreter = interpreter_class()
+        logging.warn("Started processing file " + file_path)
+        for line in data_parser.lines_reader(file_path, 0):
+                parsed_line = data_parser.parse_line(line)
+                interpreter.feed_line(parsed_line)
+                if self.passes_filter(interpreter):
+
+                    # managers
+                    if interpreter.cbo_group in managers:
+                        self.manager_wages[interpreter.year].append(interpreter.avg_wage)
+
+                    # directors
+                    if interpreter.cbo_group in directors:
+                        self.director_wages[interpreter.year].append(interpreter.avg_wage)
+
+                    # either
+                    if interpreter.cbo_group in directors or \
+                        interpreter.cbo_group in managers:
+                        self.wages[interpreter.year].append(interpreter.avg_wage)
+
+
+    def passes_filter(self, interpreter):
+        """
+        Checks if the interpreted data is good enough to be considered
+        :return: true or false
+        """
+        # contains worker_id rule
+        # sometimes line has no worker id? Why is this even in the database?
+        if interpreter.worker_id < 2:
+            return False
+
+        # contains IDENTIFICAD rule
+        # sometimes line has no employer id? Why is this even in the database?
+        if interpreter.employer_id < 2:
+            return False
+
+        # contains year rule
+        # sometimes line has no year? Huh?
+        if interpreter.year == -1:
+            return False
+
+        # must have wage
+        if interpreter.avg_wage <= 0:
+            return  False
+
+        # single state rule
+        # just process a single state, derived from municipality
+        # 431490 is POA
+        # 430510 is Caxias do Sul
+        if interpreter.municipality <> '431490':
+            return False
+
+        # finally...
+        return True
+
+
 def enable_logging(log_level):
     logging.basicConfig(format='%(asctime)s %(message)s',
     datefmt='%d %b - %H:%M:%S -',
@@ -161,9 +265,9 @@ def enable_logging(log_level):
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    builder = CorporateBuilder()
-    builder.process_files( data_parser.Pis12DataParser(),
-                      data_parser.Pis12DataInterpreter,
-                      graph_manager.SnapManager)
+    builder = WagesBuilder()
+    builder.run(data_parser.Pis12DataParser(),
+                  data_parser.Pis12DataInterpreter,
+                  graph_manager.SnapManager)
 
     logging.warn("Finished!")
