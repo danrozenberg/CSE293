@@ -580,12 +580,14 @@ class SnapManager(object):
 
         # add all nodes
         for node in self.get_node_iterator():
-            tungraph.AddNode(node)
+            NId = self.NId_from_id[node]
+            tungraph.AddNode(NId)
 
         # all all edges
         for node in self.get_node_iterator():
             for other_node in self.get_connected(node):
-                tungraph.AddEdge(node, other_node)
+                tungraph.AddEdge(self.NId_from_id[node],
+                                 self.NId_from_id[other_node])
 
         self.tungraph = tungraph
         logging.info("Finish converting to TUNGraph....")
