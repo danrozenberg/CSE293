@@ -29,6 +29,11 @@ class SnapManager(object):
         else:
             self.add_node_attr(node_id, str(year) + "_aw", value)
 
+    def get_wage(self, node_id, year):
+        # will freak out if value doens't exist.
+        node_attrs = self.get_node_attrs(node_id)
+        return node_attrs[str(year) + "_aw"]
+
     def add_node(self, node_id):
         """
         Adds a node to the network, if it doesn't exist yet.
