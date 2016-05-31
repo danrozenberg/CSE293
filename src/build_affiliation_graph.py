@@ -70,12 +70,11 @@ def create_nodes(interpreter, graph):
     # add worker node and a 'worker' property
     node_id = graph.add_node(interpreter.worker_id)
     graph.add_node_attr(node_id, "type", "worker")
-    graph.add_wage(node_id, interpreter.year, interpreter.avg_wage)
+    graph.add_wage(node_id, interpreter.year, interpreter.avg_wage, interpreter.cbo_group)
 
     # add employer node and a 'employer' property
     node_id = graph.add_node(interpreter.employer_id)
     graph.add_node_attr(node_id, "type", "employer")
-
 
 def create_edges(interpreter, graph):
     # add values as edge attributes

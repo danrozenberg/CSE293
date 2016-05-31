@@ -19,16 +19,19 @@ class SnapManager(object):
         self.attrs_from_edge = defaultdict(_get_defaults_dict)
 
         self.eigenvector_centralities = None
+        self.betweenness_centralities = None
         self.tungraph = None
 
-    def add_wage(self, node_id, year, value):
+    def add_wage(self, node_id, year, value, cbo_group):
         node_attrs = self.get_node_attrs(node_id)
         if (str(year) + "_aw") in node_attrs:
             current_value = node_attrs[str(year) + "_aw"]
             if value > current_value:
                 self.add_node_attr(node_id, str(year) + "_aw", value)
+                self.add_node_attr(node_id, str(year) + "_cbo", cbo_group)
         else:
             self.add_node_attr(node_id, str(year) + "_aw", value)
+            self.add_node_attr(node_id, str(year) + "_cbo", cbo_group)
 
     def get_wage(self, node_id, year):
         # will freak out if value doens't exist.
@@ -529,18 +532,29 @@ class SnapManager(object):
             answer[item.GetVal1()] = item.GetVal2()
         return answer
 
-    def get_betweeness_centrality(self, fraction=1.0):
+    def get_betweenness_centrality(self, node_id=None):
         """Computes (approximate) Node and Edge Betweenness Centrality based
         on a sample of NodeFrac nodes.
         It does so for all all nodes in the graph. Returns a HashMap"""
+
+        """  :return: hash from Id to centrality """
+        if self.betweenness_centralities is None:
+            self.calculate_betweenness_centralities()
+        if node_id is None:
+            return self.betweenness_centralities
+        else:
+            NId = self.NId_from_id[node_id]
+            return self.betweenness_centralities[NId]
+
+    def calculate_betweenness_centralities(self):
 
         if self.tungraph is None:
             self.build_tungraph()
 
         Nodes = snap.TIntFltH()
         Edges = snap.TIntPrFltH()
-        snap.GetBetweennessCentr(self.tungraph, Nodes, Edges, fraction)
-        return Nodes
+        snap.GetBetweennessCentr(self.tungraph, Nodes, Edges, 0.90)
+        self.betweenness_centralities  = Nodes
 
     def get_eigenvector_centrality(self, node_id=None):
         """  :return: hash from Id to centrality """
@@ -560,6 +574,15 @@ class SnapManager(object):
         NIdEigenH = snap.TIntFltH()
         snap.GetEigenVectorCentr(self.tungraph, NIdEigenH)
         self.eigenvector_centralities  = NIdEigenH
+
+    def get_closeness_centrality(self, node_id):
+
+        if self.tungraph is None:
+            self.build_tungraph()
+
+        NId = self.NId_from_id[node_id]
+        return snap.GetClosenessCentr(self.tungraph, NId)
+
 
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.
