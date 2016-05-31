@@ -109,12 +109,11 @@ def print_correl_info(x_axis_method, y_axis_method, sample):
         stream.write("\n" + str(y_axis[i]) + ";" + str(x_axis[i]))
 
 def print_correl_wages(x_axis_method, affiliation_graph, year, sample_size, stream):
-    logging.warn("Start calculating wage correlation...")
     node_candidates = filter_nodes_with_wage_in_year(affiliation_graph,
                                                      year)
     sample = random.sample(node_candidates, sample_size)
 
-    stream.write("\n wages correl\n")
+    stream.write("\n wages correl with" + str(x_axis_method) + "\n")
     x_axis = [x_axis_method(n) for n in sample]
     y_axis = [affiliation_graph.get_wage(n, year) for n in sample]
 
@@ -144,7 +143,7 @@ if __name__ == '__main__':
     enable_logging(logging.WARNING)
     logging.warn("Started gathering statistics")
 
-    target_name = "poa_directors"
+    target_name = "poa_directors_and_managers"
     with open("../anonymized_results/" + target_name + "_summary.csv", 'wb') as f:
 
         # setup
@@ -171,7 +170,21 @@ if __name__ == '__main__':
         print_node_degree_dist(connected_graph, stream)
 
         # wage vs centrality...gets its own sample inside
+        logging.warn("Start calculating wage correlations with eigenvector...")
         print_correl_wages(connected_graph.get_eigenvector_centrality,
+                           affiliation_graph,
+                           year,
+                           sample_size,
+                           stream)
+
+        logging.warn("Start calculating wage correlations with betweenness...")
+        print_correl_wages(connected_graph.get_betweenness_centrality,
+                           affiliation_graph,
+                           year,
+                           sample_size,
+                           stream)
+        logging.warn("Start calculating wage correlations with closeness...")
+        print_correl_wages(connected_graph.get_closeness_centrality,
                            affiliation_graph,
                            year,
                            sample_size,
