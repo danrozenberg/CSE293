@@ -128,34 +128,45 @@ class TestSnapManager(unittest.TestCase):
         self.assertFalse("2003_aw" in manager.get_node_attrs(1))
 
         # add wage
-        manager.add_wage(1, 2002, 10.10)
+        manager.add_wage(1, 2002, 10.10, 13)
         self.assertTrue("2002_aw" in manager.get_node_attrs(1))
         self.assertFalse("2003_aw" in manager.get_node_attrs(1))
         wage = manager.get_node_attrs(1)["2002_aw"]
+        cbo = manager.get_node_attrs(1)["2002_cbo"]
         self.assertEqual(10.10, wage)
+        self.assertEqual(13, cbo)
 
         # add lower wage
-        manager.add_wage(1, 2002, 5.50)
+        manager.add_wage(1, 2002, 5.50, 77)
         self.assertTrue("2002_aw" in manager.get_node_attrs(1))
         self.assertFalse("2003_aw" in manager.get_node_attrs(1))
         wage = manager.get_node_attrs(1)["2002_aw"]
         self.assertEqual(10.10, wage)
+        cbo = manager.get_node_attrs(1)["2002_cbo"]
+        self.assertEqual(10.10, wage)
+        self.assertEqual(13, cbo)
 
         # add higher wage
-        manager.add_wage(1, 2002, 20.20)
+        manager.add_wage(1, 2002, 20.20, 99)
         self.assertTrue("2002_aw" in manager.get_node_attrs(1))
         self.assertFalse("2003_aw" in manager.get_node_attrs(1))
         wage = manager.get_node_attrs(1)["2002_aw"]
         self.assertEqual(20.20, wage)
+        cbo = manager.get_node_attrs(1)["2002_cbo"]
+        self.assertEqual(99, cbo)
 
         # add different year
-        manager.add_wage(1, 2003, 30.30)
+        manager.add_wage(1, 2003, 30.30, 987)
         self.assertTrue("2002_aw" in manager.get_node_attrs(1))
         self.assertTrue("2003_aw" in manager.get_node_attrs(1))
         wage = manager.get_node_attrs(1)["2002_aw"]
         self.assertEqual(20.20, wage)
         wage = manager.get_node_attrs(1)["2003_aw"]
         self.assertEqual(30.30, wage)
+        cbo = manager.get_node_attrs(1)["2002_cbo"]
+        self.assertEqual(99, cbo)
+        cbo = manager.get_node_attrs(1)["2003_cbo"]
+        self.assertEqual(987, cbo)
 
     def test_get_wage(self):
         manager = self.manager
@@ -796,10 +807,17 @@ class TestSnapManager(unittest.TestCase):
         manager = self.manager
         manager.generate_random_graph(20, 60)
 
-        answer_hash = manager.get_betweeness_centrality()
-        self.assertGreater(answer_hash[0], 0)
-        self.assertGreater(answer_hash[2], 0)
-        self.assertGreater(answer_hash[10], 0)
+        self.assertGreater(manager.get_betweenness_centrality(0), 0)
+        self.assertGreater(manager.get_betweenness_centrality(2), 0)
+        self.assertGreater(manager.get_betweenness_centrality(10), 0)
+
+    def test_get_closeness_centrality(self):
+        manager = self.manager
+        manager.generate_random_graph(20, 60)
+
+        self.assertGreater(manager.get_closeness_centrality(0), 0)
+        self.assertGreater(manager.get_closeness_centrality(2), 0)
+        self.assertGreater(manager.get_closeness_centrality(10), 0)
 
     def test_get_short_path_size(self):
         manager = self.manager
