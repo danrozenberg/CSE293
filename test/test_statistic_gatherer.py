@@ -20,11 +20,11 @@ class TestSnapStatisticsGatherer(unittest.TestCase):
 
 
         # add wage
-        manager.add_wage(1, 2002, 10.10)
-        manager.add_wage(1, 2003, 12.20)
-        manager.add_wage(2, 1999, 1.1)
-        manager.add_wage(2, 1993, 3.3)
-        manager.add_wage(4, 2002, 43.3)
+        manager.add_wage(1, 2002, 10.10,1)
+        manager.add_wage(1, 2003, 12.20,2)
+        manager.add_wage(2, 1999, 1.1,3)
+        manager.add_wage(2, 1993, 3.3,4)
+        manager.add_wage(4, 2002, 43.3,5)
 
         candidates = statistics_gatherer.filter_nodes_with_wage_in_year(manager,
                                                                         1986)
