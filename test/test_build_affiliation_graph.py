@@ -60,25 +60,28 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         interpreter.employer_id = 888
         interpreter.year = 2015
         interpreter.avg_wage = 12.34
+        interpreter.cbo_group = 123
         expected_nodes = [19,888]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
-        self.assertEqual(2, len(graph.get_node_attrs(19)))
+        self.assertEqual(3, len(graph.get_node_attrs(19)))
         self.assertEqual(1, len(graph.get_node_attrs(888)))
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
         self.assertEquals('employer', graph.get_node_attr(888, 'type'))
         self.assertTrue('2015_aw' in  graph.get_node_attrs(19))
         self.assertEquals(12.34, graph.get_node_attrs(19)['2015_aw'])
+        self.assertEquals(123, graph.get_node_attrs(19)['2015_cbo'])
 
         # same graph, should add just another employer node
         interpreter.worker_id = 19
         interpreter.employer_id = 999
         interpreter.year = 2015
         interpreter.avg_wage = 12.34
+        interpreter.cbo_group = 9090  #dont' change because wage is the same
         expected_nodes = [19,888,999]
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
-        self.assertEqual(2, len(graph.get_node_attrs(19)))
+        self.assertEqual(3, len(graph.get_node_attrs(19)))
         self.assertEqual(1, len(graph.get_node_attrs(888)))
         self.assertEqual(1, len(graph.get_node_attrs(999)))
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
@@ -86,13 +89,16 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertEquals('employer', graph.get_node_attr(999, 'type'))
         self.assertTrue('2015_aw' in  graph.get_node_attrs(19))
         self.assertEquals(12.34, graph.get_node_attrs(19)['2015_aw'])
+        self.assertEquals(123, graph.get_node_attrs(19)['2015_cbo'])
 
-        # add an entry with same ids, don't change anything, except wage
+        # add an entry with same ids, don't change anything,
+        # except wage and cboroup
         interpreter.worker_id = 19
         interpreter.employer_id = 999
         expected_nodes = [19,888,999]
         interpreter.year = 2015
         interpreter.avg_wage = 15.34
+        interpreter.cbo_group = 1010
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
@@ -100,6 +106,7 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertEquals('employer', graph.get_node_attr(999, 'type'))
         self.assertTrue('2015_aw' in  graph.get_node_attrs(19))
         self.assertEquals(15.34, graph.get_node_attrs(19)['2015_aw'])
+        self.assertEquals(1010, graph.get_node_attrs(19)['2015_cbo'])
 
         # add two more different node ids, just to check...
         interpreter.worker_id = 33
@@ -107,6 +114,7 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         interpreter.year = 2016
         expected_nodes = [19,888,999, 33, 3333]
         interpreter.avg_wage = 17.34
+        interpreter.cbo_group = 77
         create_nodes(interpreter, graph)
         self.assertLessEqual(expected_nodes, graph.get_nodes())
         self.assertEquals('worker', graph.get_node_attr(19, 'type'))
@@ -117,7 +125,9 @@ class TestBuildAffiliationGraph(unittest.TestCase):
         self.assertTrue('2015_aw' in  graph.get_node_attrs(19))
         self.assertEquals(15.34, graph.get_node_attrs(19)['2015_aw'])
         self.assertTrue('2016_aw' in  graph.get_node_attrs(33))
+        self.assertEquals(1010, graph.get_node_attrs(19)['2015_cbo'])
         self.assertEquals(17.34, graph.get_node_attrs(33)['2016_aw'])
+        self.assertEquals(77, graph.get_node_attrs(33)['2016_cbo'])
 
     def test_create_edges(self):
         interpreter = FakeInterpreter()
