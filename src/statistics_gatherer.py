@@ -3,7 +3,7 @@ as such, so save coding / plannign time, it will be super specific"""
 
 import random
 import logging
-import sys
+import numpy as np
 import cPickle as pickle
 import numpy as np
 from graph_manager import SnapManager
@@ -13,35 +13,6 @@ from datetime import datetime
 def print_datetime(stream):
     now = str(datetime.now())
     stream.write("date;" + now)
-
-def build_ground_truth(load_folder, output_file_path, save=True):
-    """ Builds ground truth from csv files,
-        it also pickles everything so we can load it later"""
-    loader = ClassificationLoader()
-    for file_path in loader.find_files(load_folder, 0):
-        for line in loader.lines_reader(file_path, 0):
-            loader.parse_line(line)
-    if save:
-        pickle.dump(loader.truth_data, open(output_file_path, 'wb'))
-    return loader.truth_data
-
-def load_ground_truth(target_file):
-    return pickle.load(open(target_file, 'rb'))
-
-def get_valid_plants(ground_truth, affiliation_graph):
-    """ depending on how we built affiliations graph
-    it will contain only a subset of plants found in ground truth
-    thus, we create a new ground trugh, containing only plants
-    that actually exist in our affiliation graph.
-    """
-    valid_ground_data = {}
-    for key in ground_truth.keys():
-        if affiliation_graph.is_node(key):
-            type = affiliation_graph.get_node_attr(key, "type")
-            if type == "employer":
-                valid_ground_data[key] = ground_truth[key]
-
-    return  valid_ground_data
 
 def get_statistics(result_list, name=""):
     results = list()
@@ -65,12 +36,6 @@ def print_statistics(statistics, stream):
 def print_node_statistics(graph, sample, stream):
     logging.warn("Calculating node statistics:")
 
-    logging.warn("shortest_paths...")
-    results = get_statistics(
-        [graph.get_shortest_path_size(n) for n in sample],
-        "shortest_path")
-    print_statistics(results, stream)
-
     logging.warn("node_degrees...")
     results = get_statistics(
         [graph.get_node_degree(n) for n in sample],
@@ -89,7 +54,11 @@ def print_node_statistics(graph, sample, stream):
         "degree_centrality")
     print_statistics(results, stream)
 
-    # add more stuff here.
+    logging.warn("shortest_paths...")
+    results = get_statistics(
+        [graph.get_shortest_path_size(n) for n in sample],
+        "shortest_path")
+    print_statistics(results, stream)
 
 def print_structure_metrics(graph, stream):
     logging.warn("Calculating structure metrics...")
@@ -113,12 +82,21 @@ def print_correl_wages(x_axis_method, affiliation_graph, year, sample_size, stre
                                                      year)
     sample = random.sample(node_candidates, sample_size)
 
-    stream.write("\n wages correl with" + str(x_axis_method) + "\n")
+    stream.write("\nwages correl with" + str(x_axis_method))
     x_axis = [x_axis_method(n) for n in sample]
-    y_axis = [affiliation_graph.get_wage(n, year) for n in sample]
+
+    # y_axis = [affiliation_graph.get_wage(n, year) for n in sample]
+    y_axis = [get_normalized_wage(affiliation_graph, n, year) for n in sample]
 
     for i in xrange(len(x_axis)):
         stream.write("\n" + str(x_axis[i]) + ";" + str(y_axis[i]))
+
+def get_normalized_wage(graph, node, year):
+    node_attrs = graph.get_node_attrs(node)
+    cbo = node_attrs[str(year) + "_cbo"]
+    raw_wage = node_attrs[str(year) + "_aw"]
+    avg_wage = np.average(wages_by_sector_and_year[(year,cbo)])
+    return  raw_wage / avg_wage
 
 def print_node_degree_dist(graph, stream):
     logging.warn("Calculating degree distribution...")
@@ -128,8 +106,17 @@ def print_node_degree_dist(graph, stream):
         stream.write(str(key) + ";" + str(dist[key]) + "\n")
 
 def filter_nodes_with_wage_in_year(graph, year):
-    candidates = filter(lambda n: graph.has_wage(n, year),
+    pre_candidates = filter(lambda n: graph.has_wage(n, year),
                         graph.get_nodes())
+
+    valid_cbos = [231,232,233,234,235,236,237,238,239,174,241,242,243,249,352,353,354,355,661]
+    candidates = []
+    for x in pre_candidates:
+        node_attrs = graph.get_node_attrs(x)
+        cbo = node_attrs[str(year) + "_cbo"]
+        if cbo in valid_cbos:
+            candidates.append(x)
+
     return candidates
 
 def enable_logging(log_level):
@@ -139,56 +126,68 @@ def enable_logging(log_level):
 
     # so we know how long it took
 
-if __name__ == '__main__':
-    enable_logging(logging.WARNING)
-    logging.warn("Started gathering statistics")
+def run_graph_metric(graph, target_name):
+    with open("../anonymized_results/" + target_name, 'wb') as stream:
+        print_structure_metrics(graph, stream)
 
-    target_name = "poa_directors_and_managers"
-    with open("../anonymized_results/" + target_name + "_summary.csv", 'wb') as f:
 
-        # setup
-        year = 2001
-        stream = f   # stream = sys.stdout
-        sample_size = 1000
+def run_distributions(graph, target_name, sample_size):
+    with open("../anonymized_results/" + target_name, 'wb') as stream:
+        print_node_degree_dist(graph, stream)
 
-        # set graphs
-        affiliation_graph = SnapManager()
-        affiliation_graph.load_graph_lite("X:/output_graphs/" + target_name + "_affiliation.graph")
+        sample = random.sample(graph.get_nodes(), sample_size)
+        print_node_statistics(graph, sample, stream)
 
-        connected_graph = SnapManager()
-        connected_graph.load_graph_lite("X:/output_graphs/" + target_name + "_connected_" + \
-            str(year) + ".graph")
+def wage_correls(connected_graph, affiliation_graph, year, sample_size, target_name):
 
-        # networks tructure as a whole
-        print_structure_metrics(connected_graph, stream)
-
-        # these take a sample explicitely
-        sample = random.sample(connected_graph.get_nodes(), sample_size)
-        print_node_statistics(connected_graph, sample, stream)
-
-        # specific distributions
-        print_node_degree_dist(connected_graph, stream)
-
+    with open("../anonymized_results/" + target_name, 'wb') as stream:
         # wage vs centrality...gets its own sample inside
-        logging.warn("Start calculating wage correlations with eigenvector...")
-        print_correl_wages(connected_graph.get_eigenvector_centrality,
-                           affiliation_graph,
-                           year,
-                           sample_size,
-                           stream)
 
+        # logging.warn("Start calculating wage correlations with degree...")
+        # print_correl_wages(connected_graph.get_node_degree,
+        #                    affiliation_graph,
+        #                    year,
+        #                    sample_size,
+        #                    stream)
+        #
+        # logging.warn("Start calculating wage correlations with eigenvector...")
+        # print_correl_wages(connected_graph.get_eigenvector_centrality,
+        #                    affiliation_graph,
+        #                    year,
+        #                    sample_size,
+        #                    stream)
+        # logging.warn("Start calculating wage correlations with closeness...")
+        # print_correl_wages(connected_graph.get_closeness_centrality,
+        #                    affiliation_graph,
+        #                    year,
+        #                    sample_size,
+        #                    stream)
         logging.warn("Start calculating wage correlations with betweenness...")
         print_correl_wages(connected_graph.get_betweenness_centrality,
                            affiliation_graph,
                            year,
                            sample_size,
                            stream)
-        logging.warn("Start calculating wage correlations with closeness...")
-        print_correl_wages(connected_graph.get_closeness_centrality,
-                           affiliation_graph,
-                           year,
-                           sample_size,
-                           stream)
+
+if __name__ == '__main__':
+    # set it up===
+    target_name = "poa_directors"
+    enable_logging(logging.WARNING)
+    logging.warn("Started " + target_name)
+    year = 2001
+    wages_by_sector_and_year = pickle.load(open("X:/output_stats/poa_wages_by_sector_and_year.p", 'rb'))
+
+    # set graphs======
+    affiliation_graph = SnapManager()
+    affiliation_graph.load_graph_lite("X:/output_graphs/" + target_name + "_affiliation.graph")
+    connected_graph = SnapManager()
+    connected_graph.load_graph_lite("X:/output_graphs/" + target_name + "_connected_" + \
+        str(year) + ".graph")
+
+    # run the stuff!======
+    # run_graph_metric(connected_graph, target_name + "_metrics.csv")
+    # run_distributions(connected_graph, target_name + "_distributions.csv", 1000)
+    wage_correls(connected_graph, affiliation_graph, year, 1000, target_name + "_correls.csv")
 
     logging.warn("Finished")
 

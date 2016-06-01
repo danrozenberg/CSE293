@@ -76,10 +76,10 @@ class CorporateBuilder(object):
         self.manager_positions_from_pis = defaultdict(int)
         self.other_jobs_from_pis = defaultdict(set)
 
-    def process_files(self, data_parser, interpreter_class, graph_manager, save_path=None):
+    def run(self, data_parser, interpreter_class):
 
         # get a graph from manager
-        manager = graph_manager()
+        manager = graph_manager.SnapManager()
         self.process_file("X:/csv_data/poa_only.csv", data_parser, interpreter_class, manager)
 
         with open("X:/output_stats/poa_directors.csv", "wb") as target:
@@ -118,7 +118,6 @@ class CorporateBuilder(object):
                     else:
                         self.other_jobs_from_pis[worker_id].add(interpreter.cbo_group)
 
-
     def passes_filter(self, interpreter):
         """
         Checks if the interpreted data is good enough to be considered
@@ -153,17 +152,17 @@ class CorporateBuilder(object):
         # finally...
         return True
 
-
 class WagesBuilder(object):
     def __init__(self):
         self.director_wages = defaultdict(list)
         self.manager_wages = defaultdict(list)
         self.wages = defaultdict(list)
 
-    def run(self, data_parser, interpreter_class, graph_manager):
+        self.wages_by_sector_and_year = defaultdict(list)
+
+    def run(self, data_parser, interpreter_class):
 
         # get a graph from manager
-        manager = graph_manager()
         self.process_file("X:/csv_data/poa_only.csv", data_parser, interpreter_class)
 
         avg_director_wages = {}
@@ -197,6 +196,9 @@ class WagesBuilder(object):
         pickle.dump(self.wages,
                 open("X:/output_stats/avg_wages_list.p", 'wb'))
 
+        pickle.dump(self.wages_by_sector_and_year,
+                    open("X:/output_stats/poa_wages_by_sector_and_year.p", 'wb'))
+
 
     def process_file(self, file_path, data_parser, interpreter_class):
         directors = [231,232,233,234,235,236,237,238,239]
@@ -221,6 +223,7 @@ class WagesBuilder(object):
                     if interpreter.cbo_group in directors or \
                         interpreter.cbo_group in managers:
                         self.wages[interpreter.year].append(interpreter.avg_wage)
+                        self.wages_by_sector_and_year[(interpreter.year, interpreter.cbo_group)].append(interpreter.avg_wage)
 
 
     def passes_filter(self, interpreter):
@@ -265,9 +268,8 @@ def enable_logging(log_level):
 
 if __name__ == '__main__':
     enable_logging(logging.WARNING)
-    builder = WagesBuilder()
+    builder = CorporateBuilder()
     builder.run(data_parser.Pis12DataParser(),
-                  data_parser.Pis12DataInterpreter,
-                  graph_manager.SnapManager)
+                  data_parser.Pis12DataInterpreter)
 
     logging.warn("Finished!")

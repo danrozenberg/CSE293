@@ -18,7 +18,6 @@ class TestSnapStatisticsGatherer(unittest.TestCase):
         manager.add_node(5)
         manager.add_node(5)
 
-
         # add wage
         manager.add_wage(1, 2002, 10.10,1)
         manager.add_wage(1, 2003, 12.20,2)
