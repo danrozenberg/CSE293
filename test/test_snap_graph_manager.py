@@ -174,10 +174,10 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node(2)
 
         # add wage
-        manager.add_wage(1, 2002, 10.10)
-        manager.add_wage(1, 2003, 12.20)
-        manager.add_wage(2, 1999, 1.1)
-        manager.add_wage(2, 1993, 3.3)
+        manager.add_wage(1, 2002, 10.10, 10)
+        manager.add_wage(1, 2003, 12.20, 10)
+        manager.add_wage(2, 1999, 1.1, 10)
+        manager.add_wage(2, 1993, 3.3, 10)
         self.assertEqual(10.10, manager.get_wage(1, 2002))
         self.assertEqual(12.20, manager.get_wage(1, 2003))
         self.assertEqual(1.1, manager.get_wage(2, 1999))
@@ -194,15 +194,15 @@ class TestSnapManager(unittest.TestCase):
         self.assertFalse(manager.has_wage(2,1999))
         self.assertFalse(manager.has_wage(2,1999))
 
-        manager.add_wage(1, 2002, 10.10)
-        manager.add_wage(1, 2003, 12.20)
+        manager.add_wage(1, 2002, 10.10, 10)
+        manager.add_wage(1, 2003, 12.20, 10)
         self.assertTrue(manager.has_wage(1,2002))
         self.assertTrue(manager.has_wage(1,2003))
         self.assertFalse(manager.has_wage(2,1999))
         self.assertFalse(manager.has_wage(2,1999))
 
-        manager.add_wage(2, 1999, 1.1)
-        manager.add_wage(2, 1993, 3.3)
+        manager.add_wage(2, 1999, 1.1, 10)
+        manager.add_wage(2, 1993, 3.3, 10)
         self.assertTrue(manager.has_wage(1,2002))
         self.assertTrue(manager.has_wage(1,2003))
         self.assertTrue(manager.has_wage(2,1999))
@@ -771,7 +771,7 @@ class TestSnapManager(unittest.TestCase):
 
     def test_get_clustering_coefficient(self):
         manager = self.manager
-        manager.generate_random_graph(20, 60)
+        manager.generate_random_graph(30, 800)
         self.assertGreater(manager.get_clustering_coefficient(1), 0)
 
     def test_get_eigenvector_centrallity(self):
@@ -845,12 +845,28 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node(4)
 
         self.assertEquals(4, len(manager.get_connected_components()))
+
         manager.add_edge(1,2)
         manager.add_edge(3,4)
         self.assertEquals(2, len(manager.get_connected_components()))
 
-        manager.add_edge(2,3)
-        self.assertEquals(1, len(manager.get_connected_components()))
+    def test_get_connected_components2(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(3)
+        manager.add_node(4)
+        manager.add_node(5)
+        manager.add_node(22)
+
+        manager.add_edge(1,5)
+        self.assertEqual([1,5], sorted(manager.get_biggest_component()))
+
+        manager.add_edge(22,3)
+        manager.add_edge(3,4)
+        self.assertEqual([3,4,22], sorted(manager.get_biggest_component()))
+
+        manager.add_edge(1,22)
+        self.assertEqual([1,3,4,5,22], sorted(manager.get_biggest_component()))
 
     def test_get_random_node(self):
         manager = self.manager

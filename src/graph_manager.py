@@ -21,6 +21,7 @@ class SnapManager(object):
         self.eigenvector_centralities = None
         self.betweenness_centralities = None
         self.tungraph = None
+        self.biggest_component = None
 
     def add_wage(self, node_id, year, value, cbo_group):
         node_attrs = self.get_node_attrs(node_id)
@@ -553,8 +554,8 @@ class SnapManager(object):
 
         Nodes = snap.TIntFltH()
         Edges = snap.TIntPrFltH()
-        snap.GetBetweennessCentr(self.tungraph, Nodes, Edges, 0.90)
-        self.betweenness_centralities  = Nodes
+        snap.GetBetweennessCentr(self.tungraph, Nodes, Edges, 1.0)
+        self.betweenness_centralities = Nodes
 
     def get_eigenvector_centrality(self, node_id=None):
         """  :return: hash from Id to centrality """
@@ -590,9 +591,26 @@ class SnapManager(object):
         components = snap.TCnComV()
         snap.GetWccs(self.network, components)
         sizes = []
+        biggest_component = None
+        biggest_size = 0
+
         for component in components:
             sizes.append(component.Len())
+            if component.Len() > biggest_size:
+                biggest_size = component.Len()
+                biggest_component = component
+
+        biggest_component_nodes = []
+        for n in range(0,biggest_size):
+            biggest_component_nodes.append(
+                self.id_from_NId[biggest_component[n]])
+
+        self.biggest_component = biggest_component_nodes
         return sizes
+
+    def get_biggest_component(self):
+        self.get_connected_components()
+        return self.biggest_component
 
     def print_info(self, file_path, description):
         snap.PrintInfo(self.network,
