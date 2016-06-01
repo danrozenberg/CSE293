@@ -1,0 +1,18 @@
+Affiliation Graph POA: Directed Multigraph
+  Nodes:                    12
+  Edges:                    11
+  Zero Deg Nodes:           1
+  Zero InDeg Nodes:         9
+  Zero OutDeg Nodes:        4
+  NonZero In-Out Deg Nodes: 0
+  Unique directed edges:    11
+  Unique undirected edges:  11
+  Self Edges:               0
+  BiDir Edges:              0
+  Closed triangles:         0
+  Open triangles:           18
+  Frac. of closed triads:   0.000000
+  Connected component size: 0.916667
+  Strong conn. comp. size:  0.083333
+  Approx. full diameter:    6
+  90% effective diameter:  4.225000
