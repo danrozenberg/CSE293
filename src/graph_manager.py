@@ -584,7 +584,6 @@ class SnapManager(object):
         NId = self.NId_from_id[node_id]
         return snap.GetClosenessCentr(self.tungraph, NId)
 
-
     def get_connected_components(self):
         """Returns all weakly connected components in Graph.
         :returns list of component sizes [s1, s2, ... , sn]"""
@@ -636,6 +635,20 @@ class SnapManager(object):
 
         self.tungraph = tungraph
         logging.info("Finish converting to TUNGraph....")
+
+    def get_connected_component_graph(self):
+        nodes = self.get_biggest_component()
+        new_manager = SnapManager()
+        for node_id in nodes:
+            new_manager.add_node(node_id)
+
+        for node_id_1 in nodes:
+            for node_id_2 in nodes:
+                if self.is_edge_between(node_id_1, node_id_2):
+                    new_manager.add_edge(node_id_1, node_id_2)
+
+        return new_manager
+
 
     def jig_dictionary(self, NId_from_id=None, id_from_NId=None ):
         # TODO: apologize for having to do this.

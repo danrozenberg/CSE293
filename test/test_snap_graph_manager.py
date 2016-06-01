@@ -856,6 +856,7 @@ class TestSnapManager(unittest.TestCase):
         manager.add_node(3)
         manager.add_node(4)
         manager.add_node(5)
+        manager.add_node(6)
         manager.add_node(22)
 
         manager.add_edge(1,5)
@@ -867,6 +868,32 @@ class TestSnapManager(unittest.TestCase):
 
         manager.add_edge(1,22)
         self.assertEqual([1,3,4,5,22], sorted(manager.get_biggest_component()))
+
+    def test_get_connected_component_graph(self):
+        manager = self.manager
+        manager.add_node(1)
+        manager.add_node(3)
+        manager.add_node(4)
+        manager.add_node(5)
+        manager.add_node(6)
+        manager.add_node(22)
+
+        manager.add_edge(1,5)
+        manager.add_edge(22,3)
+        manager.add_edge(3,4)
+        manager.add_edge(1,22)
+        self.assertEqual([1,3,4,5,22], sorted(manager.get_biggest_component()))
+
+        new_graph = manager.get_connected_component_graph()
+        self.assertEqual(5, new_graph.get_node_count())
+        self.assertEqual([1,3,4,5,22], sorted(new_graph.get_biggest_component()))
+
+        self.assertTrue(new_graph.is_edge_between(1,5))
+        self.assertTrue(new_graph.is_edge_between(22,3))
+        self.assertTrue(new_graph.is_edge_between(3,4))
+        self.assertEqual(new_graph.get_edge_count(), 4)
+        self.assertTrue(new_graph.is_edge_between(1,22))
+
 
     def test_get_random_node(self):
         manager = self.manager
